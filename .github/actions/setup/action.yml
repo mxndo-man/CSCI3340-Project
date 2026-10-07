@@ -7,3 +7,6 @@ runs:
       uses: astral-sh/setup-uv@v3
       with:
         version: "0.4.25"
+    - name: install python
+      shell: bash
+      run: uv python install
