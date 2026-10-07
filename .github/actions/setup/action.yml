@@ -4,9 +4,9 @@ runs:
   using: composite
   steps:
     - name: install uv 
-      uses: astral-sh/setup-uv@v3
+      uses: astral-sh/setup-uv@v6
       with:
-        version: "0.4.25"
+        version: "latest"
     - name: install python
       shell: bash
       run: uv python install
