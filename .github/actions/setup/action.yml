@@ -2,7 +2,7 @@ name: "install uv"
 description: "installs uv using the community action"
 runs:
   using: composite
-  stesp:
+  steps:
     - name: install uv 
       uses: astral-sh/setup-uv@v3
       with:
