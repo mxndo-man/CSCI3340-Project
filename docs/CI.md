@@ -1,12 +1,12 @@
 ---
-title: CI
+CI Docs
 ---
 
 # CI basics
 
 This is how the CI pipeline for this repo works. It runs every time we push, and it's made of two files: the workflow itself, and a small setup action that the workflow reuses.
 
-## The workflow
+## Workflow
 
 `.github/workflows/code-quality.yaml`
 
