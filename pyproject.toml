@@ -15,9 +15,6 @@ dependencies = [
     "redis>=8.1.0",
     "ruff>=0.16.10",
 ]
-# nothing uses this, I don't know why it's here. I won't delete it, but it seems unnecessary.
-# [project.scripts]
-# csci3340-project = "csci3340_project:main"
 
 [build-system]
 requires = ["uv_build>=0.12.1,<0.13.0"]
@@ -26,8 +23,16 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pyright>=1.1.414",
+    "taskipy>=1.14.1",
 ]
 
 
 [tool.uv]
 package = false
+
+# To run this do 'uv run task dev'
+[tool.taskipy.tasks]
+sync = "uv sync"
+migrate = "uv run python manage.py migrate"
+run = "uv run python manage.py runserver"
+dev = "uv run task sync && uv run task migrate && uv run task run"
