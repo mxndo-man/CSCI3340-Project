@@ -1,4 +1,12 @@
+# Database and environment files
 .venv
-
 .env
 db.sqlite3
+
+
+# Python bytecode (machine-specific, rebuilt on every run)
+__pycache__/
+*.py[cod]
+
+# Tool caches (ruff already self-ignores; listed for clarity)
+.ruff_cache/
