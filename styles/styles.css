@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@custom-variant hover (&:hover);
+
+@theme {
+  /* Add your custom colors here */
+  --color-background-color: #0f172b;
+  
+}

@@ -1,0 +1,68 @@
+<!-- base.html -->
+{% load static tailwind_cli %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Project Workspace{% endblock %}</title>
+
+    <!-- Alpine.js CDN scripts live here in the head -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    {% tailwind_css %}
+
+    <!-- HTMX for fast, seamless network requests -->
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg" crossorigin="anonymous"></script>
+
+</head>
+<body  class="bg-background-color text-slate-100 min-h-screen flex flex-col">
+    <div> 
+        <nav class = "bg-[#1e3a5f] text-slate-900 rounded-2xl shadow-lg px-6 py-4 mx-4 mt-4">
+        <div class = "flex-1 text-center">
+            <h1 class = "text-white text-xl font-bold">
+                <a href="/">Job Listings Inc</a>
+            </h1>
+        </div>
+
+        
+        <div class="flex items-center justify-end gap-3 text-sm font-semibold">
+            <a href="#"
+            class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
+                Log In
+            </a>
+
+            <a href="#"
+            class="px-4 py-2 bg-yellow-400 text-slate-900 rounded-lg hover:bg-yellow-300 transition-colors">
+                Sign Up
+            </a>
+        </div>
+
+
+        <ul class="flex justify-center gap-8 py-2">
+            <li>
+                <a href='#' class="text-slate-200 hover:text-brand-yellow transition-colors">
+                    <span>Home</span>
+                </a>
+            </li>
+            <li>
+                <a href='#' class="text-slate-200 hover:text-brand-yellow transition-colors">
+                    <span>About</span>
+                </a>
+            </li>
+            <li>
+                <a href='sus' class="text-slate-200 hover:text-brand-yellow transition-colors">
+                    <span>Registration</span>
+                </a>
+            </li>
+        </ul>
+        </nav>
+    </div> <!-- End of Nav -->
+
+    <!-- This is the hook where subpages are insrted after its extended! -->
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>
+

@@ -18,12 +18,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from apps.accounts.views import home_view
+from .views import real_home_view
 
 urlpatterns = [
     path("admin/", admin.site.urls),
 
     # Your root domain path maps directly to the test homepage (index.html)
-    path('', home_view, name='home'),
+    path('', real_home_view, name='home'),
+
+    path("home", home_view, name="sus"), # These are all test URLS
 
     # Includes all your modular accounts URLs under the /accounts/ prefix
     path('accounts/', include('apps.accounts.urls')),
