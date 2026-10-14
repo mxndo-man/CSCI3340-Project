@@ -48,6 +48,3 @@ jobs:
             git commit -am "Linter: Issues fixed"
             git push 
           fi
-
-
-      
