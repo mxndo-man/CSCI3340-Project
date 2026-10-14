@@ -1,6 +1,7 @@
 #This is the instance of celery.py
 
-import os 
+import os
+
 from celery import Celery
 from celery.schedules import crontab
 
