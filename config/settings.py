@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "apps.schedule",
     "apps.notifications",
     "apps.ingestion",
+    "django_tailwind_cli",
 ]
 
 MIDDLEWARE = [
@@ -139,3 +140,11 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "assets",
+] # Where the tailwind files exist, they dont need to be touched
+
+TAILWIND_CLI_SRC_CSS = "styles/styles.css" # Custom colors for easy rewrite of those colors
