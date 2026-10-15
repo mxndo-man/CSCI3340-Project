@@ -141,10 +141,12 @@ MAILERS = {
     },
 }
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = "accounts.CustomUser"
 
 STATICFILES_DIRS = [
     BASE_DIR / "assets",
-] # Where the tailwind files exist, they dont need to be touched
+]  # Where the tailwind files exist, they dont need to be touched
 
-TAILWIND_CLI_SRC_CSS = "styles/styles.css" # Custom colors for easy rewrite of those colors
+TAILWIND_CLI_SRC_CSS = (
+    "styles/styles.css"  # Custom colors for easy rewrite of those colors
+)
