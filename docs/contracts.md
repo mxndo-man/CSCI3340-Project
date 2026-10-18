@@ -1,12 +1,4 @@
-# Shortlist contracts (draft v0.1, Oct 13)
-
-*Draft for the team meeting. Final once all three approve the PR that adds it as `docs/contracts.md` (#7).*
-
-## Why we need ts at all
-
-I don't think any of us have built a database-backed app before :[, or if you have it prolly wasn't with a team. If we don't establish the model structures like how postings, boards, and applications are stored we will run into conflicts that will require the other people in this team to rewrite their code. Let's decide the structure once and write it down here so each of us builds our own apps freely against it :]
-
----
+# Shortlist contracts (draft v0.2, Oct 18)
 
 ## 1. Big picture & Django specifics
 
@@ -32,7 +24,7 @@ The components:
 - **Redis job queue:** a queue for slow jobs. Django moves once a job is added to the queue instead of making the user wait. Redis only *holds* jobs; it doesn't run them.
 - **Celery workers:** background programs that take jobs from the line and run them. **Beat** is Celery's clock: it adds scheduled jobs to the queue (sync every 6 hours).
 - **Extraction service:** A separate program that fetches postings from job boards and reads them with AI. It runs in its own docker container.
-- **Job boards:** Greenhouse and Lever publish free, official APIs listing each employer's open jobs. Here we ask will fetch a list of job postings and get structured data back for each one.
+- **Job boards:** Greenhouse and Lever publish free, official APIs listing each employer's open jobs. We ask for an employer's list of postings and get structured data back for each one.
 
 
 ---
@@ -62,7 +54,7 @@ The symbols at the ends say how many connections: `||` means "exactly one," `o{`
 
 **The key idea and what makes this app "social" is that postings are shared.**
 - A `Posting` is one real-world job posting, stored **once for everyone**. The discover page will list all the postings.
-- When a board saves a posting, it also creates a `BoardPosting` which essentially duplicates posting. That board's comments hang off the `BoardPosting`, so other boards never see them.
+- When a board saves a posting, it also creates a `BoardPosting` which essentially links a post to a board. That board's comments hang off the `BoardPosting`, so other boards never see them.
 - An `Application` belongs to one user and points at the shared `Posting`.
 
 ### Who owns what app (to make it more clear than the issue board)
@@ -75,8 +67,7 @@ The symbols at the ends say how many connections: `||` means "exactly one," `o{`
 | postings | mxndo-man | `Posting`, `BoardPosting`, `FieldReview`, `Comment` |
 | tracker | Azaelp2005 | `Application`, `Task` |
 | notifications | Azaelp2005 | `Notification`, `NotificationPreference`, `SavedSearch` |
-| schedule | Azaelp2005 | None; it reads from postings and tracker |
-| extraction_client | liamreeves34 | Nonesince it's a module and not an app  |
+| extraction_client | liamreeves34 | None since it's a module and not an app  |
 
 ### Build order
 
@@ -122,7 +113,7 @@ class Membership(models.Model):
         ]
 ```
 notes:
-- Always link to the user via `ForeignKey(settings.AUTH_USER_MODEL)`, never to `User` directly |
+- Always link to the user via `ForeignKey(settings.AUTH_USER_MODEL)`, never to `User` directly.
 - Every model also gets an automatic `id`. "created / updated" means auto-filled `created_at` / `updated_at` timestamps.
 - **We should use JSONField for lists:** PostgreSQL has a special list column (`ArrayField`), but it doesn't work on SQLite, which we use until Compose is ready. `JSONField` works on both.
 
@@ -143,7 +134,20 @@ Every Django project has a user model: the table of accounts. Django ships one (
 | --- | --- | --- |
 | What it is | `accounts.User` extends `AbstractUser`, adds our three profile fields, makes email unique | `accounts.CustomUser` extends `AbstractUser`, removes `username`, logs in by email |
 | Extra code needed | None | A custom manager (otherwise `createsuperuser` crashes) and a custom admin class (otherwise Django's system check fails with `admin.E033`). Both verified on Django 6.1.2. |
-| Can we change our mind later? | Yes: email login can be added later without touching the tables (see below) | Adding usernames back later means a migration |
+| Can we change our mind later? | Yes: email login can be added later with a small login add-on (an authentication backend) without changing any table | Adding usernames back later means a migration |
+
+`User` (Option A), extending Django's `AbstractUser`, which already provides `username`, `email`, `password`, `first_name`, `last_name`, and the active and staff flags:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| email | EmailField, **unique** | Overrides AbstractUser's email to make it unique (needed if we add email login later) |
+| display_name | CharField(100), blank | The name shown on boards and comments |
+| graduation_term | CharField(20), blank | For example "Fall 2027" |
+| timezone | CharField(50), default `"America/Chicago"` | Used to show deadlines in local time |
+
+- Setting: `AUTH_USER_MODEL = "accounts.User"`, set **before** anyone runs `migrate` on real work.
+- This replaces the separate `Profile` model from earlier plans: one table instead of two.
+- **After this lands, everyone deletes their local `db.sqlite3` and runs `migrate` again.** Otherwise Django reports `Migration admin.0001_initial is applied before its dependency accounts.0001_initial`, because their database was built against the old user table.
 
 ---
 
@@ -188,7 +192,6 @@ Constraint: unique (provider, token).
 ---
 
 ### 2.4 postings (mxndo-man)
-**Posting**: one real-world posting, shared by everyone (the catalog).
 `Posting`: one real-world posting, shared by everyone. Its fields are grouped below by purpose, but it's one model.
 
 *Where it came from:*
@@ -199,7 +202,7 @@ Constraint: unique (provider, token).
 | external_id | CharField(100), blank | The posting's ID on the job board |
 | source_url | URLField, blank | Link to the original posting (users apply there, never through us) |
 | source_text | TextField | The plain-text description the AI reads |
-| content_hash | CharField(71), indexed | Fingerprint of the text (section 5.6); detects duplicates and changes |
+| content_hash | CharField(71), indexed | Fingerprint of the text; detects duplicates and changes |
 | added_by | FK → User, null, `SET_NULL` | For hand-added postings; **never shown to other users** |
 
 *What we know about it (filled by the job board's API, the AI, or a person):*
@@ -219,8 +222,8 @@ Constraint: unique (provider, token).
 | pay_min, pay_max | DecimalField(10, 2), null | |
 | pay_period | Choices: `HOUR`, `YEAR`, `UNKNOWN`; null | |
 | skills | JSONField, default empty list | |
-| field_sources | JSONField, default empty dict | Where each field's value came from (section 4) |
-| field_details | JSONField, default empty dict | **decision for section 3.** For AI-filled fields: `{"deadline": {"confidence": 0.94, "evidence": "Applications close November 15, 2026."}}`, so the posting page can show *why* it says what it says |
+| field_sources | JSONField, default empty dict | Where each field's value came from (section 3) |
+| field_details | JSONField, default empty dict | **Decision pls: should we keep this?** `FieldReview` only stores the uncertain fields; this stores confidence and evidence for every AI-filled field:`{"deadline": {"confidence": 0.94, "evidence": "Applications close November 15, 2026."}}`, so the posting page can show *why* it says what it says |
 
 I allowed nulls in the choices field because null means "we haven't read this yet." `NOT_SPECIFIED` means "we read the posting, and it doesn't say." They aren't the same and Discover's filters need to tell them apart. an example of why this is important is bc if a student filtering out citizenship-restricted postings should still see `NOT_SPECIFIED` ones, but may want to hide unread ones.
 
@@ -228,7 +231,7 @@ I allowed nulls in the choices field because null means "we haven't read this ye
 
 | Field | Type | Meaning |
 | --- | --- | --- |
-| extraction_status | Choices: `PENDING`, `EXTRACTING`, `DONE`, `FAILED`, `MANUAL`; default `PENDING` | Where the posting is in the AI pipeline (section 5) |
+| extraction_status | Choices: `PENDING`, `EXTRACTING`, `DONE`, `FAILED`, `MANUAL`; default `PENDING` | Where the posting is in the AI pipeline (section 4) |
 | extraction_model_version | CharField(50), blank | Which AI model filled the fields |
 | verified | BooleanField, default False | True once every flagged field is resolved |
 | status | Choices: `OPEN`, `CLOSED`; default `OPEN` | `CLOSED` when the employer takes it down |
@@ -239,6 +242,11 @@ I allowed nulls in the choices field because null means "we haven't read this ye
 
 **`version` and edit conflicts:** postings are shared so two people might edit the same one at once. Without protection whoever saves second silently erases the first person's change. With `version` we can handle that conflict nicely, but implementation is up to u ofc.
 
+Constraint: unique (source, external_id), so a sync never adds the same job twice. Hand-added postings have no source, so `content_hash` de-duplicates them instead.
+
+Indexes on `deadline`, `citizenship`, `clearance`, and `status`. An **index** is a lookup the database keeps so filtering on that column stays fast as postings grow.
+
+
 `BoardPosting`: a board's saved link to a posting.
 | Field | Type | Meaning |
 | --- | --- | --- |
@@ -246,6 +254,7 @@ I allowed nulls in the choices field because null means "we haven't read this ye
 | posting | FK → Posting, `CASCADE` | |
 | saved_by | FK → User, null, `SET_NULL` | |
 | saved_at | DateTimeField, auto_now_add | |
+
 Constraint: unique (board, posting).
 
 `FieldReview`: one field the AI wasn't confident about, waiting for a person.
@@ -270,7 +279,7 @@ Constraint: unique (board, posting).
 
 ---
 
-### 2.4 tracker (Azaelp2005)
+### 2.5 tracker (Azaelp2005)
 `Application`: one user's application to one posting.
 
 | Field | Type | Meaning |
@@ -279,7 +288,7 @@ Constraint: unique (board, posting).
 | posting | FK → `"postings.Posting"`, `PROTECT` | A posting someone applied to can't be deleted out from under them |
 | status | Choices: `SAVED`, `APPLYING`, `APPLIED`, `INTERVIEW`, `OFFER`, `REJECTED`, `WITHDRAWN`; default `SAVED` | The pipeline |
 | applied_on | DateField, null | |
-| next_step_at | DateTimeField, null | For example an interview time; shows on the calendar |
+| next_step_at | DateTimeField, null | For example an interview time |
 | notes | TextField, blank | |
 | created_at, updated_at | DateTimeField | |
 
@@ -298,9 +307,49 @@ Constraint: unique (user, posting).
 
 ---
 
+### 2.6 notifications (Azaelp2005)
+
+`Notification`: one alert for one user, shown in the app and included in the daily email digest.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| user | FK → User, `CASCADE` | |
+| kind | Choices: `TASK_DUE`, `DEADLINE_SOON`, `NEW_MATCH`, `POSTING_CLOSED` | What triggered it |
+| message | CharField(300) | |
+| link_url | CharField(300), blank | Where clicking it goes |
+| dedupe_key | CharField(200) | For example `"TASK_DUE:task-12:2026-11-03"`; stops the same alert twice in one day |
+| read | BooleanField, default False | |
+| emailed | BooleanField, default False | |
+| created_at | DateTimeField, auto_now_add | |
+
+Constraint: unique (user, dedupe_key).
+
+`NotificationPreference`: each user's settings.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| user | OneToOneField → User, `CASCADE` | **One-to-one:** each user has at most one row |
+| email_enabled | BooleanField, default True | |
+| digest_hour | PositiveSmallIntegerField, default 8 | Hour (0–23) in the user's time zone |
+
+`SavedSearch`: a private, saved Discover filter.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| user | FK → User, `CASCADE` | Only its owner ever sees it |
+| name | CharField(100) | |
+| filters | JSONField, default empty dict | Same keys as Discover's filters, for example `{"citizenship": ["NOT_SPECIFIED"], "deadline_within_days": 30}` |
+| alerts_enabled | BooleanField, default True | Include new matches in the digest |
+| last_alerted_at | DateTimeField, null | Only postings first seen after this count as new |
+| created_at | DateTimeField, auto_now_add | |
+
+**Shared filter:** Discover and saved searches both use one function, `apps/postings/filters.py::filter_postings(queryset, filters)` (mxndo-man), so a saved search always matches what Discover would show.
+
+---
+
 ## 3. Where each value comes from
 
-A posting's information can come from three places & every field the AI will fille has a field in `Posting` that records its source in `field_sources`:
+A posting's information can come from four places, and `Posting.field_sources` records which one each field came from:
 
 ```json
 { "title": "api", "location": "api", "deadline": "model", "citizenship": "user" }
@@ -313,7 +362,7 @@ A posting's information can come from three places & every field the AI will fil
 | `model` | The AI model inferred it from the description |
 | `rules` | Hand-written pattern extraction rules inferred it (eg a reg expression that finds "U.S. citizenship required") |
 
-**Precidence: `user` > `api` > (`model` and `rules`).** A value from a higher source is never overwritten by a lower one.
+**Precedence: `user` > `api` > (`model` and `rules`).** A value from a higher source is never overwritten by a lower one.
 
 my hope is to use this structure to save on computation (not running the clanker unless needed). Structurally it would be nice to enforce these rules somewhere down the line:
 - If someone corrects a field, re-running the AI can't undo the correction.
@@ -341,7 +390,7 @@ it has two jobs:
 1. **Fetch:** ask Greenhouse's and Lever's public job-board APIs for an employer's internship postings.
 2. **Extract:** read a posting's description and pull out what the API doesn't provide: deadline, citizenship, clearance, degree levels, start term, skills, and hopefully pay and work modality.
 
-Django will never import the extractors code. It talks to it over HTTP through one module, `apps/extraction_client` becauese the AI libraries are large and slow to install. Keeping them out keeps the site light, and the extractor can crash or change without taking the site down.
+Django will never import the extractor's code. It talks to it over HTTP through `apps/extraction_client`, because the AI libraries are large and slow to install. Keeping them out keeps the site light, and the extractor can crash or change without taking the site down.
 
 **The flow:**
 
@@ -397,7 +446,7 @@ for p in fetch_source(provider="greenhouse", token="examplecorp"):
 | Endpoint | Purpose |
 | --- | --- |
 | `POST /v1/extract` | Read `text` or a `url`; optional `fields` |
-| `POST /v1/extract/file` | PDF upload (live mid-November but the stub will support it as sonn as it's done) |
+| `POST /v1/extract/file` | PDF upload (live mid-November but the stub will support it as soon as it's done) |
 | `POST /v1/sources/fetch` | One employer's internship postings |
 | `GET /healthz` | Is it up? → `{"status": "ok", "backend": "rules"}` |
 

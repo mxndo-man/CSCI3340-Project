@@ -51,7 +51,6 @@ flowchart LR
 | Celery + Redis | Background jobs and the queue | The best-documented Python option; Celery Beat runs the scheduled sync and digest |
 | FastAPI | The extraction service | Small, fast, and keeps the heavy AI libraries out of the website |
 | Tailwind CSS (`django-tailwind-cli`) | Styling | Style in the templates; no Node.js needed *(pending approval, PR #28)* |
-| FullCalendar | Weekly calendar | Saves us from building a calendar |
 | Docker Compose | Runs every service with one command | Same setup on every laptop *(in progress, #9)* |
 | uv | Python versions and packages | One command installs exact, locked versions |
 | ruff, pyright, GitHub Actions | Lint, format, type checks on every push | Catches mistakes before they reach `main` |
@@ -85,7 +84,7 @@ Open http://127.0.0.1:8000. Until the landing page merges, you'll see Django's "
 ```
 config/      settings, root URLs, Celery
 apps/        one folder per feature: accounts, boards, postings, tracker,
-             schedule, notifications, ingestion, extraction_client
+             notifications, ingestion, extraction_client
 templates/   base.html (shared layout) and one folder per app
 static/      project CSS, JS, images
 fixtures/    fake sample data for development
@@ -98,7 +97,7 @@ docs/        contracts.md, research/, wireframes/ (published, so nothing private
 | --- | --- | --- |
 | [@liamreeves34](https://github.com/liamreeves34) | data pipeline and AI lead | Job-board sync (`ingestion`), `extraction_client`, the extraction service, README and backlog |
 | [@mxndo-man](https://github.com/mxndo-man) | Tech lead | Repo, CI, Docker Compose, settings; boards; postings (Discover, review queue, comments); home dashboard; code review lead |
-| [@Azaelp2005](https://github.com/Azaelp2005) | Accounts and scheduling | Accounts; applications and tasks; schedule; notifications; wireframes |
+| [@Azaelp2005](https://github.com/Azaelp2005) | Accounts, tracker, & notifications | Accounts; applications and tasks; notifications; wireframes |
 
 Each owner builds inside their own apps. Shared files (`base.html`, `config/settings.py`, `pyproject.toml`, `uv.lock`, CI) change only through a PR all three approve.
 
@@ -122,7 +121,7 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 | 2 | Oct 22–28 | **D1 (Oct 23)**; Docker Compose; sign-up and login; user interviews |
 | 3 | Oct 29–Nov 4 | Boards, postings, job-board sync in development; wireframes drafted |
 | 4 | Nov 5–11 | Home dashboard, Discover, add by hand; wireframes final |
-| 5 | Nov 12–18 | **D2 (Nov 14)**; applications and tasks; calendar |
+| 5 | Nov 12–18 | **D2 (Nov 14)**; applications and tasks |
 | 6 | Nov 19–25 | AI reading on synced postings, review queue, reminders |
 | 7 | Nov 26–Dec 2 | Saved-search alerts, polish, tests (Thanksgiving week) |
 | 8 | Dec 3–7 | Feature freeze Dec 3; **final demo Mon Dec 7** |
@@ -146,6 +145,5 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 | --- | --- |
 | Multi-user and social | Boards, the shared catalog, board comments, edit-conflict protection |
 | Create / read / update / delete | Boards, postings, applications, tasks, saved searches, comments, notifications |
-| Schedule manager | Weekly calendar of deadlines, tasks, and interviews |
 | Notifications and reminders | Daily digest, in the app and by email |
 | SDLC and Agile | Issues, weekly sprints, Wednesday updates |
