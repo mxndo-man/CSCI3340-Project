@@ -4,7 +4,7 @@
 
 *CSCI 3340 Software Engineering 1, UTRGV, Fall 2026.*
 
-> **Status (Deliverable 1, Oct 23):** the Django project runs locally, and the plan, issues, and board are in place. Features are being built over the next sprints. See the [project board](BOARD_LINK).
+> **Status (Deliverable 1, Oct 23):** the Django project runs locally, and the plan, issues, and board are in place. Features are being built over the next sprints.
 
 ---
 
@@ -104,8 +104,6 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 
 ## Agile planning
 
-**Board:** [GitHub project board](BOARD_LINK), with columns Backlog → This sprint → In progress → In review → Done.
-
 **Cadence**
 - **One-week sprints, Thursday to Wednesday,** so the Wednesday class status update is the board itself: done, in progress, next.
 - A **rotating scrum master** keeps the board current and prepares the Wednesday update.
@@ -150,4 +148,4 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 | Create / read / update / delete | Boards, postings, applications, tasks, saved searches, comments, notifications |
 | Schedule manager | Weekly calendar of deadlines, tasks, and interviews |
 | Notifications and reminders | Daily digest, in the app and by email |
-| SDLC and Agile | Issues, project board, weekly sprints, Wednesday updates |
+| SDLC and Agile | Issues, weekly sprints, Wednesday updates |
