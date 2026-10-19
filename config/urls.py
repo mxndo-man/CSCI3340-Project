@@ -20,15 +20,13 @@ from django.urls import path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-
-    path('accounts/', include('apps.accounts.urls', namespace='accounts')),
-    path('boards/', inlcude('apps.accounts.urls', namespace='boards')),
-    path('postings', include('apps.accounts.postings', namespace='positing')),
-    path('tracker', include('apps.accounts.tracker', namespace='tracker')),
-    path('notifications', include('apps.accounts.notifications', namespace='notifications')),
-    path('ingestions', include('apps.accounts.ingestions', namespace='ingestions')),
-
+    path("accounts/", include("apps.accounts.urls", namespace="accounts")),
+    path("boards/", inlcude("apps.accounts.urls", namespace="boards")),
+    path("postings", include("apps.accounts.postings", namespace="positing")),
+    path("tracker", include("apps.accounts.tracker", namespace="tracker")),
+    path(
+        "notifications",
+        include("apps.accounts.notifications", namespace="notifications"),
+    ),
+    path("ingestions", include("apps.accounts.ingestions", namespace="ingestions")),
 ]
-
-
-
