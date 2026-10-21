@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
-    REDIS_URL=(str, "redis://localhost:6379/0")
+    REDIS_URL=(str, "redis://localhost:6379/0"),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
