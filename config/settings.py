@@ -120,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Chicago"
 
 USE_I18N = True
 
@@ -141,3 +141,9 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+
+# Celery / Redis
+REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
+CELERY_BROKER_URL = REDIS_URL
+CELERLY_RESULT_BACKEND = REDIS_URL
+CELERLY_TIMEZONE = TIME_ZONE
