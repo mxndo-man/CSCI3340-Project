@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
+    REDIS_URL=(str, "redis://localhost:6379/0")
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -142,7 +143,7 @@ MAILERS = {
 }
 
 # Celery / Redis
-REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
+REDIS_URL = env("REDIS_URL")
 CELERY_BROKER_URL = REDIS_URL
 CELERLY_RESULT_BACKEND = REDIS_URL
 CELERLY_TIMEZONE = TIME_ZONE
