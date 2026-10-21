@@ -17,6 +17,10 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'add-every-6-hours': {
         'task' : 'tasks.add',
-        'schedule' : crontab(0,"*6"),
+        'schedule' : crontab(minute=0,hour="*/6"),
+    },
+    "daily-diget" :{
+        'task': 'app.notificatinos.tasks.send_daily_digest',
+        'schedule' : crontab(minute=0,hour=8),
     },
 }
