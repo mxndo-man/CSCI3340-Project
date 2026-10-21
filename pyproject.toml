@@ -32,6 +32,8 @@ dev = [
 package = false
 
 # To run this do 'uv run task dev'
+#windows smart control blocks this because of task.exe so on Windows run:
+# uv run python -c "from taskipy.cli import main; main()" dev 
 [tool.taskipy.tasks]
 sync = "uv sync"
 makemigrations="uv run python manage.py makemigrations"

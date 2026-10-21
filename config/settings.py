@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "apps.boards",
     "apps.postings",
     "apps.tracker",
-    "apps.schedule",
     "apps.notifications",
     "apps.ingestion",
     "django_tailwind_cli",
