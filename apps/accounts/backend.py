@@ -5,8 +5,10 @@ from django.db.models import Q
 User = get_user_model()
 
 
+
 class EmailOrUsernameModelBackend(ModelBackend):
     """
+    Custom authentication backend that allows users to log in using
     Custom authentication backend that allows users to log in using
     either their username or their email address for log in section (not for sign up).
     Would optimally be good if it can be called in specific log in instances, in order to keep
@@ -17,8 +19,12 @@ class EmailOrUsernameModelBackend(ModelBackend):
         if username is None:
             username = kwargs.get(User.USERNAME_FIELD)
 
+
         try:
             # Query against both username OR email using a Q object lookup
+            user = User.objects.get(
+                Q(username__iexact=username) | Q(email__iexact=username)
+            )
             user = User.objects.get(
                 Q(username__iexact=username) | Q(email__iexact=username)
             )
@@ -27,6 +33,7 @@ class EmailOrUsernameModelBackend(ModelBackend):
             # to protect bad inputs
             User().set_password(password)
             return None
+
 
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
