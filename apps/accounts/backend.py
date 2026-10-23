@@ -5,7 +5,6 @@ from django.db.models import Q
 User = get_user_model()
 
 
-
 class EmailOrUsernameModelBackend(ModelBackend):
     """
     Custom authentication backend that allows users to log in using
@@ -18,7 +17,6 @@ class EmailOrUsernameModelBackend(ModelBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(User.USERNAME_FIELD)
-
 
         try:
             # Query against both username OR email using a Q object lookup
@@ -33,7 +31,6 @@ class EmailOrUsernameModelBackend(ModelBackend):
             # to protect bad inputs
             User().set_password(password)
             return None
-
 
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
