@@ -1,32 +1,25 @@
 # Create your views here.
 # apps/accounts/views.py
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-from .forms import CustomUserCreationForm
+from django.contrib.auth import logout
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_POST
+
 
 def home_view(request):
     """Renders the public blank homepage."""
-    return render(request, 'accounts/index.html')
+    return render(request, "../templates/base.html")
 
-def register_view(request):
-    """Handles displaying and processing the sign-up form."""
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # Instantly sign them into their session
-            return redirect('test_page')  # Redirect them behind the wall
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'accounts/register.html', {'form': form})
 
-@login_required(login_url='/accounts/register/')
-def test_page_view(request):
-    """A blank test page locked behind an active user session authentication wall."""
-    return render(request, 'accounts/test_page.html')
-
+@require_POST
 def logout_view(request):
-    """Logs out the user and sends them back home."""
     logout(request)
-    return redirect('home')
+    return redirect("home")
+
+
+def login_page(request):
+    if (
+        request.user.is_authenticated
+    ):  # If user is already logged in, send them to home page
+        return redirect("home")
+    # Renders the login page that would be in apps/accounts/templates/...
+    return render(request, "apps/accounts/templates/login_page.html")

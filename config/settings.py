@@ -20,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
+    REDIS_URL=(str, "redis://localhost:6379/0"),
 )
 environ.Env.read_env(BASE_DIR / ".env")
 
@@ -50,7 +51,6 @@ INSTALLED_APPS = [
     "apps.tracker",
     "apps.notifications",
     "apps.ingestion",
-    "django_tailwind_cli",
 ]
 
 MIDDLEWARE = [
@@ -79,6 +79,8 @@ TEMPLATES = [
         },
     },
 ]
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 WSGI_APPLICATION = "config.wsgi.application"
 
@@ -118,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Chicago"
 
 USE_I18N = True
 
@@ -140,10 +142,15 @@ MAILERS = {
     },
 }
 
-AUTH_USER_MODEL = 'accounts.CustomUser'
+# Celery / Redis
+REDIS_URL = env("REDIS_URL")
+CELERY_BROKER_URL = REDIS_URL
+CELERLY_RESULT_BACKEND = REDIS_URL
+CELERLY_TIMEZONE = TIME_ZONE
 
 STATICFILES_DIRS = [
     BASE_DIR / "assets",
 ] # Where the tailwind files exist, they dont need to be touched
 
 TAILWIND_CLI_SRC_CSS = "styles/styles.css" # Custom colors for easy rewrite of those colors
+
