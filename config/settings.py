@@ -147,3 +147,11 @@ REDIS_URL = env("REDIS_URL")
 CELERY_BROKER_URL = REDIS_URL
 CELERLY_RESULT_BACKEND = REDIS_URL
 CELERLY_TIMEZONE = TIME_ZONE
+
+STATICFILES_DIRS = [
+    BASE_DIR / "assets",
+]  # Where the tailwind files exist, they dont need to be touched
+
+TAILWIND_CLI_SRC_CSS = (
+    "styles/styles.css"  # Custom colors for easy rewrite of those colors
+)
