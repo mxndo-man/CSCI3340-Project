@@ -68,7 +68,7 @@ uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000. Until the landing page merges, you'll see Django's "install worked" page. That's expected.
+Open http://127.0.0.1:8000/admin/ to check it's running. The home page (`/`) shows "Page not found" until the landing page is added (#10). This behavior expected.
 
 | Task | Command |
 | --- | --- |
@@ -105,8 +105,6 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 
 **Cadence**
 - **One-week sprints, Thursday to Wednesday,** so the Wednesday class status update is the board itself: done, in progress, next.
-- A **rotating scrum master** keeps the board current and prepares the Wednesday update.
-- **Async standups** in the group chat on Monday and Thursday: did, doing, blocked.
 
 **Work items**
 - One GitHub issue per app or feature, plus integration issues where apps connect. Each has an owner, labels, and a milestone (D1 Oct 23, D2 Nov 14, Final Dec 7).
