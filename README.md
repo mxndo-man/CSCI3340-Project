@@ -4,7 +4,7 @@
 
 *CSCI 3340 Software Engineering 1, UTRGV, Fall 2026.*
 
-> **Status (Deliverable 1, Oct 23):** the Django project runs locally, and the plan, issues, and board are in place. Features are being built over the next sprints.
+> **Status (Deliverable 1, Oct 23):** the Django project runs locally, and the plan, issues, and user stories are in place. Features are being built over the next sprints.
 
 ---
 
@@ -50,7 +50,7 @@ flowchart LR
 | PostgreSQL | Database | Handles many writers at once (the site, workers, and sync); SQLite allows one writer at a time |
 | Celery + Redis | Background jobs and the queue | The best-documented Python option; Celery Beat runs the scheduled sync and digest |
 | FastAPI | The extraction service | Small, fast, and keeps the heavy AI libraries out of the website |
-| Tailwind CSS (`django-tailwind-cli`) | Styling | Style in the templates; no Node.js needed *(pending approval, PR #28)* |
+| Tailwind CSS (`django-tailwind-cli`) | Styling | Style in the templates; no Node.js needed *(pending, #24)* |
 | Docker Compose | Runs every service with one command | Same setup on every laptop *(in progress, #9)* |
 | uv | Python versions and packages | One command installs exact, locked versions |
 | ruff, pyright, GitHub Actions | Lint, format, type checks on every push | Catches mistakes before they reach `main` |
@@ -68,7 +68,7 @@ uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000/admin/ to check it's running. The home page (`/`) shows "Page not found" until the landing page is added (#10). This behavior expected.
+Open http://127.0.0.1:8000/admin/ to check it's running. The home page (`/`) shows "Page not found" until the landing page is added (#10). This behavior is expected.
 
 | Task | Command |
 | --- | --- |
@@ -108,7 +108,7 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 
 **Work items**
 - One GitHub issue per app or feature, plus integration issues where apps connect. Each has an owner, labels, and a milestone (D1 Oct 23, D2 Nov 14, Final Dec 7).
-- **User stories** take the form *"As a ___, I want ___ so that ___,"* with acceptance criteria. The product owner orders the backlog. The first draft is on the board, and our user interviews (Oct 28) will revise it.
+- **User stories** take the form *"As a ___, I want ___ so that ___,"* with acceptance criteria. The product owner orders the backlog. First draft: [`docs/user_stories.md`](docs/user_stories.md)
 
 **Sprint plan**
 
