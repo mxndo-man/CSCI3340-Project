@@ -8,7 +8,6 @@ User = get_user_model()
 class EmailOrUsernameModelBackend(ModelBackend):
     """
     Custom authentication backend that allows users to log in using
-    Custom authentication backend that allows users to log in using
     either their username or their email address for log in section (not for sign up).
     Would optimally be good if it can be called in specific log in instances, in order to keep
     django authentication backend
