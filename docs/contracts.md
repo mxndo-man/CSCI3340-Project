@@ -459,7 +459,6 @@ for p in fetch_source(provider="greenhouse", token="examplecorp"):
   "contract_version": "1.0",
   "backend": "student",
   "model_version": "student-v1",
-  "latency_ms": 2140,
   "fields": {
     "deadline": { "value": "2026-11-15", "confidence": 0.94,
                   "evidence": "Applications close November 15, 2026.",

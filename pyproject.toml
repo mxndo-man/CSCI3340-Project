@@ -12,6 +12,7 @@ dependencies = [
     "django>=6.1.2",
     "django-environ>=0.14.0",
     "django-tailwind-cli>=4.8.1",
+    "httpx>=0.28.1",
     "psycopg[binary]>=3.3.6",
     "redis>=8.1.0",
     "ruff>=0.16.10",
