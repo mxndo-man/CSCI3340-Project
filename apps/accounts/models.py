@@ -20,22 +20,22 @@ class CustomUser(AbstractUser):
         ("Fall 2028", "Fall 2028"),
     )
 
-    Timezones = (tz for tz in sorted(zoneinfo.available_timezones()))
+    Timezones = ( (tz,tz) for tz in sorted(zoneinfo.available_timezones()))
 
     display_name = models.CharField(max_length=100, blank=True)
     graduation_term = models.CharField(max_length=20, choices=Grad_Terms, blank=True)
-    time_zone = models.CharField(
-        max_length=100,
-        choices=Timezones,
-        default="UTC",
-        help_text="Select your local timezone.",
-    )
+    # time_zone = models.CharField(
+    #     max_length=100,
+    #     choices=Timezones,
+    #     default="UTC",
+    #     help_text="Select your local timezone.",
+    # )
+    time_zone = models.CharField(max_length=100, default="UT", help_text="Select your local timezone.")
     # Timezones might require middleware setup for dynamic calls, but for now its being left like this
 
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = "email"
+    REQUIRED_FIELDS = ["email"]
 
     def __str__(self):
         return self.email
 
-        return self.email
