@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_tailwind_cli",
     "apps.accounts",
     "apps.boards",
     "apps.postings",
@@ -114,6 +115,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "accounts.CustomUser"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
@@ -147,3 +150,11 @@ REDIS_URL = env("REDIS_URL")
 CELERY_BROKER_URL = REDIS_URL
 CELERLY_RESULT_BACKEND = REDIS_URL
 CELERLY_TIMEZONE = TIME_ZONE
+
+STATICFILES_DIRS = [
+    BASE_DIR / "assets",
+]  # Where the tailwind files exist, they dont need to be touched
+
+TAILWIND_CLI_SRC_CSS = (
+    "styles/styles.css"  # Custom colors for easy rewrite of those colors
+)
