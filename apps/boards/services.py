@@ -40,3 +40,10 @@ def join_by_code(user: AbstractBaseUser, join_code: str = "") -> Board:
         board=board, user=user, defaults={"role": Membership.Role.MEMBER}
     )
     return board
+
+
+def leave_board(user: AbstractBaseUser, board: Board) -> None:
+    membership = Membership.objects.get(board=board, user=user)
+    if membership.role == Membership.Role.OWNER:
+        raise ValueError("Owner cannot leave the board.")
+    membership.delete()
