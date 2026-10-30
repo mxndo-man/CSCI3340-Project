@@ -1,8 +1,8 @@
-from .models import Board, Membership
-from django.db import transaction
-
 # from django.contrib.auth.models import User
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.db import transaction
+
+from .models import Board, Membership
 
 
 @transaction.atomic

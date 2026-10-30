@@ -1,8 +1,8 @@
-from typing import ClassVar
-from django.conf import settings
-from django.db import models
-from django.db import IntegrityError, transaction
 import secrets
+from typing import ClassVar
+
+from django.conf import settings
+from django.db import IntegrityError, models, transaction
 
 
 class Board(models.Model):
