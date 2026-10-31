@@ -27,21 +27,35 @@
 
         
         <div class="flex items-center justify-end gap-3 text-sm font-semibold">
-            <a href="#"
+            {% if user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}"
+            class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
+                Profile
+            </a>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit"
+                class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
+                    Log Out
+                </button>
+            </form>
+            {% else %}
+            <a href="{% url 'login' %}"
             class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
                 Log In
             </a>
 
-            <a href="#"
+            <a href="{% url 'accounts:signup' %}"
             class="px-4 py-2 bg-yellow-400 text-slate-900 rounded-lg hover:bg-yellow-300 transition-colors">
                 Sign Up
             </a>
+            {% endif %}
         </div>
 
 
         <ul class="flex justify-center gap-8 py-2">
             <li>
-                <a href='#' class="text-slate-200 hover:text-brand-yellow transition-colors">
+                <a href='/' class="text-slate-200 hover:text-brand-yellow transition-colors">
                     <span>Home</span>
                 </a>
             </li>
@@ -51,8 +65,8 @@
                 </a>
             </li>
             <li>
-                <a href='sus' class="text-slate-200 hover:text-brand-yellow transition-colors">
-                    <span>Registration</span>
+                <a href="#" class="text-slate-200 hover:text-brand-yellow transition-colors">
+                    <span>Boards</span>
                 </a>
             </li>
         </ul>
@@ -65,4 +79,3 @@
 
 </body>
 </html>
-

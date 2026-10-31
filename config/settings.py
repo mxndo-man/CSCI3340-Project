@@ -139,6 +139,8 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
+AUTHENTICATION_BACKENDS = ["apps.accounts.backend.EmailOrUsernameModelBackend"]
+
 MAILERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
@@ -151,10 +153,9 @@ CELERY_BROKER_URL = REDIS_URL
 CELERLY_RESULT_BACKEND = REDIS_URL
 CELERLY_TIMEZONE = TIME_ZONE
 
-STATICFILES_DIRS = [
-    BASE_DIR / "assets",
-]  # Where the tailwind files exist, they dont need to be touched
 
 TAILWIND_CLI_SRC_CSS = (
     "styles/styles.css"  # Custom colors for easy rewrite of those colors
 )
+
+LOGOUT_REDIRECT_URL = "home"

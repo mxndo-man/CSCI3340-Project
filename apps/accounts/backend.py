@@ -18,13 +18,11 @@ class EmailOrUsernameModelBackend(ModelBackend):
             username = kwargs.get(User.USERNAME_FIELD)
 
         try:
-            # Query against both username OR email using a Q object lookup
-            user = User.objects.get(
-                Q(username__iexact=username) | Q(email__iexact=username)
-            )
-            user = User.objects.get(
-                Q(username__iexact=username) | Q(email__iexact=username)
-            )
+            lookup = "email__iexact" if "@" in username else "username__iexact"
+            user = User._default_manager.filter(**{lookup: username}).first()
+            if user is None:
+                User().set_password(password)
+                return None
         except User.DoesNotExist:
             # Run the default password hasher checking mechanism anyway
             # to protect bad inputs

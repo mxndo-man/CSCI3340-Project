@@ -1,25 +1,21 @@
 # Create your views here.
 # apps/accounts/views.py
-from django.contrib.auth import logout
-from django.shortcuts import redirect, render
-from django.views.decorators.http import require_POST
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, UpdateView
+
+from .forms import CustomUserCreationForm, ProfileForm
 
 
-def home_view(request):
-    """Renders the public blank homepage."""
-    return render(request, "../templates/base.html")
+class SignUpView(CreateView):
+    form_class = CustomUserCreationForm
+    template_name = "accounts/signup.html"
+    success_url = reverse_lazy("login")  #after signing up, go log in
 
+class ProfileView(LoginRequiredMixin, UpdateView):
+    form_class = ProfileForm
+    template_name = "accounts/profile.html"
+    success_url = reverse_lazy("accounts:profile")
 
-@require_POST
-def logout_view(request):
-    logout(request)
-    return redirect("home")
-
-
-def login_page(request):
-    if (
-        request.user.is_authenticated
-    ):  # If user is already logged in, send them to home page
-        return redirect("home")
-    # Renders the login page that would be in apps/accounts/templates/...
-    return render(request, "apps/accounts/templates/login_page.html")
+    def get_object(self):
+        return self.request.user
