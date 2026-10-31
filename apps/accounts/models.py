@@ -23,10 +23,9 @@ class CustomUser(AbstractUser):
         ("Fall 2028", "Fall 2028"),
     )
 
-
     display_name = models.CharField(max_length=100, blank=True)
     graduation_term = models.CharField(max_length=20, choices=Grad_Terms, blank=True)
- 
+
     time_zone = models.CharField(
         max_length=100,
         default="America/Chicago",
@@ -36,7 +35,7 @@ class CustomUser(AbstractUser):
     # Timezones might require middleware setup for dynamic calls, but for now its being left like this
 
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email"] # noqa: RUF012
+    REQUIRED_FIELDS = ["email"]  # noqa: RUF012
     # me:1 , ruff:0
 
     def __str__(self):
