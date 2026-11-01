@@ -16,11 +16,9 @@ class CustomUserCreationForm(UserCreationForm):
         )  # Reqiure usernmae and email when creating new user.
 
     def clean_username(self):
-        username = self.cleaned_data.get("username")
-
+        username = super().clean_username()
         if username and "@" in username:
             raise ValidationError("Usernames cannot contain the '@' symbol.")
-
         return username
 
     def clean_email(self):
