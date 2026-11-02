@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 
 from apps.accounts.models import CustomUser
+
 from .models import Board, Membership
 from .permissions import is_owner
 
