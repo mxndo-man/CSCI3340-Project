@@ -1,5 +1,6 @@
 # from django.contrib.auth.models import User
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 
 from .models import Board, Membership
@@ -42,8 +43,47 @@ def join_by_code(user: AbstractBaseUser, join_code: str = "") -> Board:
     return board
 
 
+def remove_member(
+    actor: AbstractBaseUser, target_user: AbstractBaseUser, board: Board
+) -> None:
+    """To remove ta member from the board.
+
+    Attributes:
+        actor: The owner committing the action.
+        target_user: The user leaving.leaving.leaving.leaving.
+        board: The board associated to the action.
+    Raise:
+        A 404/403 page if the actor does not have permission.
+        A ValueError if the owner tries to remove themselves.
+
+    """
+    if not Membership.objects.filter(
+        user=actor, role=Membership.Role.OWNER, board=board
+    ).exists():
+        raise PermissionDenied()
+
+    target = Membership.objects.get(board=board, user=target_user)
+
+    if target.role == Membership.Role.OWNER:
+        raise ValueError("Owner cannot be removed.")
+
+    target.delete()
+
+
 def leave_board(user: AbstractBaseUser, board: Board) -> None:
-    membership = Membership.objects.get(board=board, user=user)
-    if membership.role == Membership.Role.OWNER:
-        raise ValueError("Owner cannot leave the board.")
-    membership.delete()
+    """If a member wants to leaves the board they are in.
+
+    Attributes:
+        user: The user leaving the board.
+        board: The board that the user is leaving.
+    Raise:
+        A value error if the owner tries to leave.
+
+
+    """
+    target = Membership.objects.get(board=board, user=user)
+
+    if target.role == Membership.Role.OWNER:
+        raise ValueError("Owner Cannot leave the board")
+
+    target.delete()
