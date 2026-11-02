@@ -10,3 +10,6 @@ __pycache__/
 
 # Tool caches (ruff already self-ignores; listed for clarity)
 .ruff_cache/
+
+
+.vscode/*
