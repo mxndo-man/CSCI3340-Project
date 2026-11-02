@@ -53,7 +53,7 @@ def remove_member(actor: CustomUser, target_user: CustomUser, board: Board) -> N
         A ValueError if the owner tries to remove themselves.
 
     """
-    if is_owner(user=actor, board=board):
+    if not is_owner(user=actor, board=board):
         raise PermissionDenied()
 
     target = Membership.objects.get(board=board, user=target_user)
