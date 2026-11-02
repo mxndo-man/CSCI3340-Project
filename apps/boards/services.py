@@ -1,20 +1,18 @@
-# from django.contrib.auth.models import User
-from django.contrib.auth.base_user import AbstractBaseUser
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 
+from apps.accounts.models import CustomUser
 from .models import Board, Membership
+from .permissions import is_owner
 
 
 @transaction.atomic
-def create_user_board(
-    user: AbstractBaseUser, name: str, description: str = ""
-) -> Board:
+def create_user_board(user: CustomUser, name: str, description: str = "") -> Board:
     """Creates a user board for when the board is created.
 
     Attributes:
-        user: should be user but for what we have right now its AbstractBaseUser
-        name: name of board
+        user: The user creating the board.
+        name: name of the board.
         description: a description of the board.
     Returns:
         object type board
@@ -26,7 +24,7 @@ def create_user_board(
     return board
 
 
-def join_by_code(user: AbstractBaseUser, join_code: str = "") -> Board:
+def join_by_code(user: CustomUser, join_code: str = "") -> Board:
     """Join the member by the code give by the Owner.
 
     Attributes:
@@ -43,23 +41,19 @@ def join_by_code(user: AbstractBaseUser, join_code: str = "") -> Board:
     return board
 
 
-def remove_member(
-    actor: AbstractBaseUser, target_user: AbstractBaseUser, board: Board
-) -> None:
+def remove_member(actor: CustomUser, target_user: CustomUser, board: Board) -> None:
     """To remove ta member from the board.
 
     Attributes:
         actor: The owner committing the action.
-        target_user: The user leaving.leaving.leaving.leaving.
+        target_user: The user leaving.
         board: The board associated to the action.
     Raise:
         A 404/403 page if the actor does not have permission.
         A ValueError if the owner tries to remove themselves.
 
     """
-    if not Membership.objects.filter(
-        user=actor, role=Membership.Role.OWNER, board=board
-    ).exists():
+    if is_owner(user=actor, board=board):
         raise PermissionDenied()
 
     target = Membership.objects.get(board=board, user=target_user)
@@ -70,7 +64,7 @@ def remove_member(
     target.delete()
 
 
-def leave_board(user: AbstractBaseUser, board: Board) -> None:
+def leave_board(user: CustomUser, board: Board) -> None:
     """If a member wants to leaves the board they are in.
 
     Attributes:
