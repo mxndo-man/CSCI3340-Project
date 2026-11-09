@@ -18,14 +18,15 @@ Including another URLconf
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
 
 from apps.ui_preview.views import styleguide
+from config.views import HomeView, landing
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("", TemplateView.as_view(template_name="base.html"), name="home"),
+    path("", landing, name="landing"),
+    path("home/", HomeView.as_view(), name="home"),
     path("accounts/", include("apps.accounts.urls")),
     path("boards/", include("apps.boards.urls")),
     path("postings/", include("apps.postings.urls")),

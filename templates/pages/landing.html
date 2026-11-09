@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block content %}
+{% page_url "postings:discover" as discover_url %}
+<section class="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 md:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
+  <div>
+    {% include "components/chip.html" with tone="accent" label="Built for students hunting internships" only %}
+    <h1 class="mt-5 text-balance font-serif text-[40px] font-semibold leading-[48px] tracking-[-0.02em] text-bark-900 sm:text-display">Find internships you can actually apply to.</h1>
+    <p class="mt-5 max-w-xl text-lg leading-7 text-bark-700">Shortlist reads every posting for the details that rule you in or out (deadline, citizenship, clearance and pay) and puts them up front.</p>
+    <div class="mt-8 flex flex-wrap items-center gap-3">
+      <a href="{% url 'accounts:signup' %}" class="{% button_class 'primary' %}">Create a free account</a>
+      {% if discover_url %}<a href="{{ discover_url }}" class="{% button_class 'secondary' %}">Browse internships</a>{% endif %}
+    </div>
+    {% if discover_url %}<p class="mt-4 text-sm text-bark-500">No account needed to browse.</p>{% endif %}
+  </div>
+
+  {# An illustration made of real cards, so it can't drift from the design. #}
+  <div class="rounded-[28px] border border-sand-200 bg-sand-100 p-4 sm:p-6">
+    <div aria-hidden="true" class="mb-4 flex items-center gap-2 rounded-full border border-sand-200 bg-white px-4 py-2.5 text-sm text-bark-500">
+      {% icon "search" "size-4" %}
+      Software engineering · paid · no clearance
+    </div>
+    <div class="space-y-3">
+      {% for posting in sample_postings %}{% include "postings/partials/card.html" with posting=posting static=True only %}{% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="border-t border-sand-200 bg-white/60">
+  <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
+    <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">How it works</p>
+    <h2 class="mt-2 max-w-2xl font-serif text-h1 font-semibold text-bark-900">From “maybe” to “applied” in three steps</h2>
+    <ol class="mt-10 grid gap-6 md:grid-cols-3">
+      <li class="rounded-2xl border border-sand-200 bg-white p-6">
+        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "compass" "size-5" %}</span>
+        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">1.</span> Discover</h3>
+        <p class="mt-2 text-[15px] leading-6 text-bark-700">Search internships with the deciding facts up front: deadline, pay, citizenship and clearance.</p>
+      </li>
+      <li class="rounded-2xl border border-sand-200 bg-white p-6">
+        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "bookmark" "size-5" %}</span>
+        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">2.</span> Save to a board</h3>
+        <p class="mt-2 text-[15px] leading-6 text-bark-700">Keep a shortlist for yourself, or share a board with friends and talk postings through.</p>
+      </li>
+      <li class="rounded-2xl border border-sand-200 bg-white p-6">
+        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "list-checks" "size-5" %}</span>
+        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">3.</span> Track your applications</h3>
+        <p class="mt-2 text-[15px] leading-6 text-bark-700">Move each application from saved to offer, with reminders before every deadline.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+{% endblock %}

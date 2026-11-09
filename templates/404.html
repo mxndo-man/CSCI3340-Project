@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Not found · Shortlist{% endblock %}
+
+{% block content %}
+{# Django shows this page for any 404 when DEBUG is off. #}
+{% page_url "postings:discover" as discover_url %}
+<div class="mx-auto w-full max-w-3xl px-4 py-20 text-center sm:px-6 sm:py-24">
+  <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">Not found</p>
+  <h1 class="mt-2 font-serif text-h1 font-semibold text-bark-900">We couldn't find that page</h1>
+  <p class="mx-auto mt-3 max-w-md text-[15px] text-bark-700">The link may be old, or the board may have been deleted.</p>
+  <div class="mt-8 flex justify-center">
+    {% if discover_url %}
+      <a href="{{ discover_url }}" class="{% button_class 'primary' %}">Go to Discover</a>
+    {% else %}
+      <a href="{% url 'landing' %}" class="{% button_class 'primary' %}">Go to the home page</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

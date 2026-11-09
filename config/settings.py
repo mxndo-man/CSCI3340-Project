@@ -160,4 +160,6 @@ TAILWIND_CLI_SRC_CSS = (
     "styles/styles.css"  # Custom colors for easy rewrite of those colors
 )
 
-LOGOUT_REDIRECT_URL = "home"
+# After logging in, go to the home dashboard; after logging out, back to the landing page.
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "landing"

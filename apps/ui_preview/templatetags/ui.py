@@ -4,6 +4,8 @@ Every helper reads only the field names and choice values in docs/contracts.md, 
 the same on the preview's fake objects and on the real models.
 """
 
+from decimal import Decimal
+
 from django import template
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
@@ -110,6 +112,121 @@ def avatar_tone(person):
     if not key:
         return "sand"
     return AVATAR_TONES[(int(key) - 1) % len(AVATAR_TONES)]
+
+
+@register.simple_tag
+def first_name(person):
+    """For greetings: first_name, else the first word of the display name or username."""
+    return getattr(person, "first_name", "") or display_name(person).split(" ")[0]
+
+
+# ---- Posting facts ----------------------------------------------------------------------
+
+# Contract value -> (chip tone, chip label, the value written out on the posting page)
+CITIZENSHIP = {
+    "US_CITIZEN": ("alert", "US citizens only", "US citizens only"),
+    "US_PERSON": ("warn", "US citizens or PR", "US citizens or permanent residents"),
+    "WORK_AUTHORIZATION": (
+        "warn",
+        "Work authorization",
+        "Must be authorized to work in the US",
+    ),
+    "NOT_SPECIFIED": ("good", "Any citizenship", "No requirement"),
+}
+CLEARANCE = {
+    "NONE_MENTIONED": ("good", "No clearance", "Not required"),
+    "ABLE_TO_OBTAIN": ("alert", "Clearance required", "Must be able to get one"),
+    "ACTIVE_REQUIRED": ("alert", "Active clearance", "Must already have one"),
+}
+WORK_MODE = {
+    "ONSITE": "On-site",
+    "HYBRID": "Hybrid",
+    "REMOTE": "Remote",
+    "UNSPECIFIED": "Not stated",
+}
+DEGREE = {
+    "HS": "High school",
+    "ASSOCIATE": "Associate",
+    "BACHELOR": "Bachelor's",
+    "MASTER": "Master's",
+    "PHD": "PhD",
+}
+PROVIDER = {"GREENHOUSE": "Greenhouse", "LEVER": "Lever", "ASHBY": "Ashby"}
+
+
+def _amount(value):
+    """Decimal("25.00") -> "25", 80000 -> "80,000", Decimal("25.5") -> "25.50"."""
+    number = Decimal(value)
+    if number == number.to_integral_value():
+        return f"{int(number):,}"
+    return f"{number:,.2f}"
+
+
+def _pay_range(low, high):
+    if low is None or low == high:
+        return f"${_amount(high)}"
+    return f"${_amount(low)}–{_amount(high)}"
+
+
+def pay_text(pay_min, pay_max, pay_period):
+    """The pay written out: "$32 an hour", "$25–29 an hour", "$80,000 a year", "Unpaid"."""
+    high = pay_max if pay_max is not None else pay_min
+    if high is None:
+        return "Not stated"
+    if not high:
+        return "Unpaid"
+    per = {"HOUR": " an hour", "YEAR": " a year"}.get(pay_period or "", "")
+    return f"{_pay_range(pay_min, high)}{per}"
+
+
+def degree_text(levels):
+    """["BACHELOR", "MASTER"] -> "Bachelor's or Master's". An empty list means any degree."""
+    names = [label for value, label in DEGREE.items() if value in (levels or [])]
+    if not names:
+        return "Any degree"
+    if len(names) == 1:
+        return names[0]
+    return ", ".join(names[:-1]) + " or " + names[-1]
+
+
+@register.simple_tag
+def work_mode_label(value):
+    return WORK_MODE.get(value or "", "")
+
+
+@register.simple_tag
+def provider_label(posting):
+    """Which job board a posting came from, or "Added by a student"."""
+    provider = getattr(getattr(posting, "source", None), "provider", None)
+    return PROVIDER.get(provider or "", "Added by a student")
+
+
+@register.simple_tag
+def posting_chips(posting):
+    """The deciding facts as chips: pay, clearance, citizenship and degree.
+
+    Each is {"tone": ..., "label": ...}. Fields that haven't been read yet (null) are
+    left out instead of guessed.
+    """
+    chips = []
+    high = posting.pay_max if posting.pay_max is not None else posting.pay_min
+    if high is not None:
+        if high:
+            per = {"HOUR": "/hr", "YEAR": "/yr"}.get(posting.pay_period or "", "")
+            label = f"Paid · {_pay_range(posting.pay_min, high)}{per}"
+            chips.append({"tone": "good", "label": label})
+        else:
+            chips.append({"tone": "alert", "label": "Unpaid"})
+    for value, table in (
+        (posting.clearance, CLEARANCE),
+        (posting.citizenship, CITIZENSHIP),
+    ):
+        if value in table:
+            tone, label, _ = table[value]
+            chips.append({"tone": tone, "label": label})
+    if getattr(posting, "extraction_status", "DONE") in ("DONE", "MANUAL"):
+        chips.append({"tone": "neutral", "label": degree_text(posting.degree_levels)})
+    return chips
 
 
 # ---- Dates ------------------------------------------------------------------------------
