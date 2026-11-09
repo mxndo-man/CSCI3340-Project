@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     "apps.tracker",
     "apps.notifications",
     "apps.ingestion",
+    # Template helpers ({% load ui %}), the style guide and the /preview/ pages. No models.
+    "apps.ui_preview",
 ]
 
 MIDDLEWARE = [

@@ -15,9 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import TemplateView
+
+from apps.ui_preview.views import styleguide
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -30,3 +33,7 @@ urlpatterns = [
     path("notifications/", include("apps.notifications.urls")),
     path("ingestion/", include("apps.ingestion.urls")),
 ]
+
+# Every UI component on one page, for copying markup. Development only.
+if settings.DEBUG:
+    urlpatterns += [path("styleguide/", styleguide, name="styleguide")]
