@@ -35,6 +35,10 @@ urlpatterns = [
     path("ingestion/", include("apps.ingestion.urls")),
 ]
 
+# Every page on sample data, until the real views exist (UI_PREVIEW=1 in .env).
+if settings.UI_PREVIEW:
+    urlpatterns += [path("preview/", include("apps.ui_preview.urls"))]
+
 # Every UI component on one page, for copying markup. Development only.
 if settings.DEBUG:
     urlpatterns += [path("styleguide/", styleguide, name="styleguide")]

@@ -4,12 +4,15 @@ Every helper reads only the field names and choice values in docs/contracts.md, 
 the same on the preview's fake objects and on the real models.
 """
 
+import json
+from datetime import date
 from decimal import Decimal
 
 from django import template
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.dateformat import format as date_format
 
 register = template.Library()
 
@@ -231,6 +234,251 @@ def posting_chips(posting):
     if getattr(posting, "extraction_status", "DONE") in ("DONE", "MANUAL"):
         chips.append({"tone": "neutral", "label": degree_text(posting.degree_levels)})
     return chips
+
+
+@register.simple_tag
+def boards_with(posting, boards):
+    """The boards (from the page's my_boards) that already hold this posting.
+
+    Each board needs a `posting_ids` set; see docs/frontend-handoff.md.
+    """
+    return [b for b in boards or () if posting.id in getattr(b, "posting_ids", ())]
+
+
+# ---- The "Key facts" tiles on a posting page --------------------------------------------
+
+FACTS = (
+    ("deadline", "Deadline"),
+    ("pay", "Pay"),
+    ("citizenship", "Citizenship"),
+    ("clearance", "Security clearance"),
+    ("degree_levels", "Degree"),
+    ("work_mode", "Work mode"),
+    ("start_term", "Start term"),
+    ("location", "Location"),
+)
+PAY_PERIOD = {"HOUR": "an hour", "YEAR": "a year", "UNKNOWN": "not stated"}
+
+
+def _raw_value(posting, key):
+    if key == "pay":
+        return {
+            "min": posting.pay_min,
+            "max": posting.pay_max,
+            "period": posting.pay_period,
+        }
+    return getattr(posting, key, None)
+
+
+def _written(key, value, posting):
+    """A field's value as the tile shows it."""
+    if key == "deadline":
+        if isinstance(value, str):  # a FieldReview's proposed_value is JSON
+            value = date.fromisoformat(value)
+        if value:
+            return date_format(value, "F j, Y")
+        return "Rolling" if posting.deadline_type == "ROLLING" else "Not stated"
+    if key == "pay":
+        value = value or {}
+        return pay_text(value.get("min"), value.get("max"), value.get("period"))
+    if key in ("citizenship", "clearance"):
+        table = CITIZENSHIP if key == "citizenship" else CLEARANCE
+        return table[value][2] if value in table else "Not read yet"
+    if key == "degree_levels":
+        return degree_text(value)
+    if key == "work_mode":
+        return WORK_MODE.get(value or "", "Not read yet")
+    return value or "Not stated"
+
+
+def _fix_form(key, value):
+    """What the tile's "Fix it" form needs: which input, its choices, its start value."""
+    if key == "deadline":
+        initial = value.isoformat() if isinstance(value, date) else (value or "")
+        return {"input": "date", "initial": initial, "choices": ()}
+    if key == "pay":
+        return {"input": "pay", "initial": value or {}, "choices": PAY_PERIOD.items()}
+    if key in ("citizenship", "clearance"):
+        table = CITIZENSHIP if key == "citizenship" else CLEARANCE
+        choices = [(code, labels[2]) for code, labels in table.items()]
+        return {"input": "select", "initial": value or "", "choices": choices}
+    if key == "work_mode":
+        return {"input": "select", "initial": value or "", "choices": WORK_MODE.items()}
+    if key == "degree_levels":
+        return {
+            "input": "checkboxes",
+            "initial": value or [],
+            "choices": DEGREE.items(),
+        }
+    return {"input": "text", "initial": value or "", "choices": ()}
+
+
+@register.simple_tag
+def fact_source(posting, field_name, review=None):
+    """Where a fact came from: "From Greenhouse", "Read by AI · 94% sure", "Checked by a
+    student". Reads Posting.field_sources and the confidence in Posting.field_details.
+    A pending FieldReview reports its own confidence."""
+    if review is not None:
+        return f"Read by AI · {round(review.confidence * 100)}% sure"
+    source = (posting.field_sources or {}).get(field_name)
+    detail = (posting.field_details or {}).get(field_name) or {}
+    if source == "user":
+        return "Checked by a student"
+    if source == "api":
+        return f"From {provider_label(posting)}"
+    if source in ("model", "rules"):
+        reader = "AI" if source == "model" else "our rules"
+        confidence = detail.get("confidence")
+        if confidence is None:
+            return f"Read by {reader}"
+        return f"Read by {reader} · {round(confidence * 100)}% sure"
+    return "Not read yet"
+
+
+@register.simple_tag
+def facts_for(posting, reviews=()):
+    """The eight "Key facts" tiles for a posting page, in order.
+
+    reviews: the posting's pending FieldReviews. A field with one shows the AI's
+    proposed value, its confidence and its evidence, and gets Looks right / Fix it.
+    Other fields read the posting, with the evidence from Posting.field_details.
+    Each tile is a dict: key, label, value, source, quote, needs_check, review, plus
+    input, choices and initial for the fix form.
+    """
+    pending = {r.field_name: r for r in reviews or () if r.status == "PENDING"}
+    details = posting.field_details or {}
+    facts = []
+    for key, label in FACTS:
+        review = pending.get(key)
+        value = review.proposed_value if review else _raw_value(posting, key)
+        evidence = (
+            review.evidence if review else (details.get(key) or {}).get("evidence")
+        )
+        facts.append(
+            {
+                "key": key,
+                "label": label,
+                "value": _written(key, value, posting),
+                "source": fact_source(posting, key, review),
+                "quote": evidence or "",
+                "needs_check": review is not None,
+                "review": review,
+                **_fix_form(key, value),
+            }
+        )
+    return facts
+
+
+# ---- Discover's filters -----------------------------------------------------------------
+
+# key, label, and options: (value sent, menu label, chip label, phrase in a search's name).
+# Lists are sent comma-separated; see apps/ui_preview/filters.py.
+DISCOVER_MENUS = (
+    (
+        "citizenship",
+        "Citizenship",
+        (
+            (
+                "NOT_SPECIFIED,WORK_AUTHORIZATION",
+                "No citizenship requirement",
+                "No requirement",
+                "no citizenship requirement",
+            ),
+            (
+                "NOT_SPECIFIED,WORK_AUTHORIZATION,US_PERSON",
+                "Open to permanent residents",
+                "PR OK",
+                "open to permanent residents",
+            ),
+        ),
+    ),
+    (
+        "degree_levels",
+        "Degree",
+        (
+            ("BACHELOR", "I'm working toward a bachelor's", "Bachelor's", "bachelor's"),
+            ("MASTER", "I'm working toward a master's", "Master's", "master's"),
+        ),
+    ),
+    (
+        "work_mode",
+        "Work mode",
+        (
+            ("REMOTE", "Remote", "Remote", "remote"),
+            ("HYBRID", "Hybrid", "Hybrid", "hybrid"),
+            ("ONSITE", "On-site", "On-site", "on-site"),
+        ),
+    ),
+)
+
+
+def _chosen(filters, key):
+    value = filters.get(key) or ""
+    return ",".join(value) if isinstance(value, (list, tuple)) else value
+
+
+def _all_menus(start_terms):
+    terms = tuple((term, term, term, term.lower()) for term in start_terms or ())
+    return DISCOVER_MENUS + (("start_term", "Start term", terms),)
+
+
+@register.simple_tag
+def discover_menus(filters, start_terms=()):
+    """Discover's filter menus, each with its options and the one that's chosen.
+
+    start_terms: the start terms that exist in the data, for the last menu.
+    """
+    menus = []
+    for key, label, options in _all_menus(start_terms):
+        chosen = _chosen(filters, key)
+        items = [
+            {"value": value, "label": text, "short": short, "selected": value == chosen}
+            for value, text, short, _ in options
+        ]
+        selected = next((item for item in items if item["selected"]), None)
+        menus.append(
+            {"key": key, "label": label, "options": items, "selected": selected}
+        )
+    return menus
+
+
+@register.simple_tag
+def active_filter_count(filters):
+    """How many filters are on (the search box doesn't count)."""
+    keys = (
+        "paid",
+        "deadline_within_days",
+        "start_term",
+        *(m[0] for m in DISCOVER_MENUS),
+    )
+    return sum(1 for key in keys if filters.get(key)) + bool(filters.get("clearance"))
+
+
+@register.simple_tag
+def describe_filters(filters, start_terms=()):
+    """A readable name for a search: "Paid, no clearance, closes within 30 days"."""
+    parts = []
+    if filters.get("q"):
+        parts.append(f"“{filters['q']}”")
+    if filters.get("paid"):
+        parts.append("paid")
+    if filters.get("clearance") == ["NONE_MENTIONED"]:
+        parts.append("no clearance")
+    if filters.get("deadline_within_days"):
+        parts.append(f"closes within {filters['deadline_within_days']} days")
+    for key, _, options in DISCOVER_MENUS:
+        chosen = _chosen(filters, key)
+        parts.extend(phrase for value, _, _, phrase in options if value == chosen)
+    if filters.get("start_term"):
+        parts.append(filters["start_term"].lower())
+    text = ", ".join(parts)
+    return text[:1].upper() + text[1:] if text else "All internships"
+
+
+@register.filter
+def filters_json(filters):
+    """The filters that are set, as JSON: the value a SavedSearch stores."""
+    return json.dumps({key: value for key, value in filters.items() if value})
 
 
 # ---- Dates ------------------------------------------------------------------------------

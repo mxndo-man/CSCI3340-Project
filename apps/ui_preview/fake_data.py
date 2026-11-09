@@ -416,6 +416,7 @@ class World:
         self.me.email = "liam@example.edu"
         self.postings = self._build_postings()
         self.reviews = self._build_reviews()
+        self.applications: list = []
 
     def days(self, n: int) -> date:
         return self.today + timedelta(days=n)
@@ -535,6 +536,18 @@ class World:
         return [
             r for r in self.reviews if r.posting is posting and r.status == "PENDING"
         ]
+
+    def my_boards(self) -> list:
+        """The current user's boards, each with posting_ids (filled in with boards)."""
+        return []
+
+    def application_for(self, posting: FakePosting):
+        """The current user's application to this posting, if they track it."""
+        return next((a for a in self.applications if a.posting is posting), None)
+
+    def has_saved_search(self, filters: dict) -> bool:
+        """Has the current user already saved a search with these filters?"""
+        return False
 
 
 def world() -> World:

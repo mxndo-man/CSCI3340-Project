@@ -19,6 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
+    UI_PREVIEW=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
     REDIS_URL=(str, "redis://localhost:6379/0"),
 )
@@ -32,6 +33,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DJANGO_DEBUG")
+
+# Serve /preview/: every page on sample data, until the real models and views exist.
+UI_PREVIEW = env("UI_PREVIEW")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
