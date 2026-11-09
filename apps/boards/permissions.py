@@ -2,7 +2,9 @@
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+
 from apps.accounts.models import CustomUser
+
 from .models import Board, Membership
 
 
