@@ -158,4 +158,6 @@ TAILWIND_CLI_SRC_CSS = (
     "styles/styles.css"  # Custom colors for easy rewrite of those colors
 )
 
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"

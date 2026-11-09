@@ -1,0 +1,8 @@
+Notifications summary
+
+- The `Notifications` model stores the recipient, title, message, read status (by default not read), and creation time.
+- Notifications are ordered newest first. The indexes are intended to help lookups by date, recipient, and read status.
+- A signal creates a welcome notification when a new user account is created.
+- The notifications page requires login and lists only the signed-in user's notifications.
+- The page shows whether each notification is read, but does not mark notifications as read yet.
+- A database migration is still needed before the model can be used with the database.
