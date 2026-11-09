@@ -1,8 +1,8 @@
 {% load ui %}{% comment %}
 A notice inside a card.
   {% include "components/banner.html" with tone="warn" icon="triangle-alert" title="1 fact needs a second look" body="..." %}
-tone: warn (ochre, the default) or good (moss). class: extra classes.
-{% endcomment %}<div role="status" class="flex gap-3 rounded-xl p-4 {% if tone == 'good' %}bg-moss-50 text-moss-700{% else %}bg-ochre-50 text-ochre-800{% endif %} {{ class }}">
+tone: warn (ochre, the default), good (moss) or alert (brick, for form errors). class: extra classes.
+{% endcomment %}<div role="{% if tone == 'alert' %}alert{% else %}status{% endif %}" class="flex gap-3 rounded-xl p-4 {% if tone == 'good' %}bg-moss-50 text-moss-700{% elif tone == 'alert' %}bg-brick-50 text-brick-700{% else %}bg-ochre-50 text-ochre-800{% endif %} {{ class }}">
   {% if icon %}{% icon icon "mt-0.5 size-5 shrink-0" %}{% endif %}
   <div>
     <p class="text-sm font-semibold">{{ title }}</p>

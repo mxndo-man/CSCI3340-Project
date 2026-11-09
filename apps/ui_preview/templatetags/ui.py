@@ -63,7 +63,7 @@ WIDGET_SHAPE = {
 
 
 @register.simple_tag
-def ui_widget(field, has_hint=False, extra=""):
+def ui_widget(field, has_hint=False, extra="", placeholder="", autocomplete=""):
     """Render one form field's input with the design classes, linked to its hint and errors.
 
     The ids match components/field.html: <id>_helptext and <id>_error.
@@ -74,6 +74,10 @@ def ui_widget(field, has_hint=False, extra=""):
         border = "border-brick-700" if field.errors else "border-sand-400"
         css = f"{INPUT} {border} {WIDGET_SHAPE.get(field.widget_type, 'h-11')}"
     attrs = {"class": f"{css} {extra}".strip()}
+    if placeholder:
+        attrs["placeholder"] = placeholder
+    if autocomplete:
+        attrs["autocomplete"] = autocomplete
     described_by = []
     if has_hint:
         described_by.append(f"{field.auto_id}_helptext")
