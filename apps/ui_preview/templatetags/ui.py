@@ -583,3 +583,13 @@ def main_nav(context):
         {"label": label, "url": page_url(context, name), "active": section == app}
         for label, name, app in items
     ]
+
+
+# ---- Boards -----------------------------------------------------------------------------
+
+
+@register.simple_tag
+def member_overflow(board, shown=4):
+    """How many members the avatar stack leaves out: the "+10" circle."""
+    listed = min(len(getattr(board, "members", ()) or ()), shown)
+    return max((getattr(board, "member_count", 0) or 0) - listed, 0)

@@ -1,0 +1,32 @@
+{% load ui %}{% comment %}
+One board on the boards page; the whole card is a link.
+  {% include "boards/partials/board_card.html" with board=board %}
+Reads board: name, member_count, members, board_postings (newest first; each has
+.posting), updated_at, get_absolute_url.
+{% endcomment %}<a href="{{ board.get_absolute_url }}" class="group flex h-full min-h-52 flex-col rounded-2xl border border-sand-200 bg-white p-5 transition hover:border-sand-300 hover:shadow-soft">
+  <div class="flex items-start justify-between gap-3">
+    <h2 class="text-title font-semibold text-bark-900 group-hover:text-clay-700">{{ board.name }}</h2>
+    {% if board.member_count == 1 %}
+      {% include "components/chip.html" with label="Just you" icon="lock" only %}
+    {% else %}
+      {% with label=board.member_count|stringformat:"d"|add:" members" %}{% include "components/chip.html" with label=label only %}{% endwith %}
+    {% endif %}
+  </div>
+  <p class="mt-1 text-sm text-bark-500">{{ board.board_postings|length }} posting{{ board.board_postings|length|pluralize }}{% if board.updated_at %} · Updated {{ board.updated_at|timesince }} ago{% endif %}</p>
+  {% if board.board_postings %}
+    <ul class="mt-4 space-y-1.5">
+      {% for item in board.board_postings|slice:":3" %}
+        <li class="flex items-center gap-2 text-sm text-bark-700">
+          <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-sand-300"></span>
+          <span class="truncate">{{ item.posting.title }} · {{ item.posting.organization }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="mt-4 text-sm text-bark-500">No postings yet.</p>
+  {% endif %}
+  <div class="mt-auto flex items-center justify-between pt-5">
+    {% include "boards/partials/member_stack.html" with board=board only %}
+    <span class="text-bark-500 transition group-hover:translate-x-0.5 group-hover:text-clay-700">{% icon "arrow-right" "size-4" %}</span>
+  </div>
+</a>

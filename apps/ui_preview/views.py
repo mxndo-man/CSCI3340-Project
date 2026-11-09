@@ -118,27 +118,34 @@ def action(request):
     return redirect(target if safe else reverse("ui_preview:index"))
 
 
+# The pages listed on /preview/: label, URL name, URL args, template.
+INDEX_PAGES = [
+    ("Discover", "ui_preview:discover", [], "postings/discover.html"),
+    (
+        "A posting with a fact to check",
+        "ui_preview:posting_detail",
+        [1],
+        "postings/detail.html",
+    ),
+    (
+        "A posting with two facts to check",
+        "ui_preview:posting_detail",
+        [8],
+        "postings/detail.html",
+    ),
+    ("A closed posting", "ui_preview:posting_detail", [12], "postings/detail.html"),
+    ("Add a posting", "ui_preview:posting_add", [], "postings/add.html"),
+    ("Boards", "ui_preview:boards", [], "boards/list.html"),
+    ("A board with comments", "ui_preview:board_detail", [1], "boards/detail.html"),
+]
+
+
 def index(request):
     """A list of every preview page."""
     world = fake_data.world()
     pages = [
-        ("Discover", reverse("ui_preview:discover"), "postings/discover.html"),
-        (
-            "A posting with a fact to check",
-            reverse("ui_preview:posting_detail", args=[1]),
-            "postings/detail.html",
-        ),
-        (
-            "A posting with two facts to check",
-            reverse("ui_preview:posting_detail", args=[8]),
-            "postings/detail.html",
-        ),
-        (
-            "A closed posting",
-            reverse("ui_preview:posting_detail", args=[12]),
-            "postings/detail.html",
-        ),
-        ("Add a posting", reverse("ui_preview:posting_add"), "postings/add.html"),
+        (label, reverse(name, args=args), template)
+        for label, name, args, template in INDEX_PAGES
     ]
     return render(
         request, "ui_preview/index.html", _context(request, world, pages=pages)
@@ -188,3 +195,31 @@ def posting_detail(request, pk):
 def posting_add(request):
     world = fake_data.world()
     return render(request, "postings/add.html", _context(request, world, "postings"))
+
+
+def boards(request):
+    world = fake_data.world()
+    context = _context(request, world, "boards", boards=world.my_boards())
+    return render(request, "boards/list.html", context)
+
+
+def board_detail(request, pk):
+    world = fake_data.world()
+    board = world.board(pk)
+    if board is None:
+        raise Http404("No such board in the preview data")
+    board_postings = board.board_postings
+    chosen = request.GET.get("item", "")
+    selected = next((bp for bp in board_postings if str(bp.id) == chosen), None)
+    if selected is None and board_postings:
+        selected = board_postings[0]
+    context = _context(
+        request,
+        world,
+        "boards",
+        board=board,
+        board_postings=board_postings,
+        selected=selected,
+        comments=world.comments_on(selected) if selected else [],
+    )
+    return render(request, "boards/detail.html", context)

@@ -5,7 +5,7 @@ these works on the real models. Dates are counted from today, so the countdowns 
 same whenever you open the preview. Every company, person and posting here is made up.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -95,6 +95,56 @@ class FakeFieldReview:
 
     def get_absolute_url(self) -> str:
         return f"{self.posting.get_absolute_url()}#fact-{self.field_name}"
+
+
+@dataclass
+class FakeBoard:
+    """boards.Board. The fields after created_at aren't model fields: the board
+    pages need them, so the real view adds them (see docs/frontend-handoff.md)."""
+
+    id: int
+    name: str
+    join_code: str
+    created_by: FakeUser
+    created_at: datetime
+    description: str = ""
+    members: list[FakeUser] = field(default_factory=list)
+    member_count: int = 0
+    board_postings: list[FakeBoardPosting] = field(default_factory=list)
+    posting_ids: set[int] = field(default_factory=set)
+    updated_at: datetime | None = None
+
+    def get_absolute_url(self) -> str:
+        return reverse("ui_preview:board_detail", args=[self.id])
+
+
+@dataclass
+class FakeBoardPosting:
+    """postings.BoardPosting, plus comment_count (added by the view)."""
+
+    id: int
+    board: FakeBoard
+    posting: FakePosting
+    saved_by: FakeUser | None
+    saved_at: datetime
+    comment_count: int = 0
+
+    def get_absolute_url(self) -> str:
+        return f"{self.board.get_absolute_url()}?item={self.id}"
+
+
+@dataclass
+class FakeComment:
+    """postings.Comment"""
+
+    id: int
+    board_posting: FakeBoardPosting
+    author: FakeUser | None
+    body: str
+    created_at: datetime
+
+    def get_absolute_url(self) -> str:
+        return f"{self.board_posting.get_absolute_url()}#comment-{self.id}"
 
 
 # ---- The data ---------------------------------------------------------------------------
@@ -339,6 +389,92 @@ POSTINGS: list[dict[str, Any]] = [
     },
 ]
 
+# name, join code, members (the first one made it), member count, updated (hours ago),
+# saved postings as (posting id, saved by). Every board has a join code: the contracts
+# have no private boards.
+BOARDS = [
+    (
+        "Summer 2027 hunt",
+        "K7Q-2M9",
+        ["LR", "MK", "AP"],
+        3,
+        2,
+        [(1, "LR"), (2, "MK"), (4, "AP"), (8, "MK"), (7, "LR")],
+    ),
+    (
+        "Lab internships",
+        "L4B-7TR",
+        ["LR", "JS"],
+        2,
+        26,
+        [(3, "JS"), (6, "LR"), (4, "JS")],
+    ),
+    (
+        "CS club picks",
+        "C5C-1UB",
+        ["AP", "TN", "DO", "LR"],
+        14,
+        72,
+        [
+            (7, "AP"),
+            (11, "TN"),
+            (2, "DO"),
+            (5, "AP"),
+            (9, "DO"),
+            (1, "TN"),
+            (6, "LR"),
+            (8, "TN"),
+        ],
+    ),
+    (
+        "Just me",
+        "J5M-3QX",
+        ["LR"],
+        1,
+        170,
+        [(9, "LR"), (11, "LR"), (10, "LR"), (5, "LR")],
+    ),
+]
+
+# board, posting, author, minutes ago, text
+COMMENTS = [
+    (
+        1,
+        1,
+        "MK",
+        120,
+        (
+            "The posting says US citizens only, but their careers page only asks for "
+            "work authorization. Worth checking before anyone skips it."
+        ),
+    ),
+    (
+        1,
+        1,
+        "AP",
+        60,
+        "I applied last year. The take-home took about a day, so start early.",
+    ),
+    (1, 1, "LR", 20, "Going to apply this weekend. Anyone want to swap cover letters?"),
+    (
+        1,
+        2,
+        "MK",
+        120,
+        "They told me the start date is flexible if you ask. Worth applying early.",
+    ),
+    (1, 2, "LR", 60, "Nice, adding it to my tracker."),
+    (
+        1,
+        4,
+        "AP",
+        1440,
+        "Master's preferred, but they interviewed a junior from our department last year.",
+    ),
+    (3, 7, "AP", 1440, "Remote and paid, and they fly you out for the testing week."),
+    (2, 3, "JS", 2880, "Clearance takes months, so they want applications in early."),
+]
+
 CITIZENSHIP_EVIDENCE = {
     "NOT_SPECIFIED": None,
     "US_PERSON": "Applicants must be US citizens or permanent residents.",
@@ -416,6 +552,7 @@ class World:
         self.me.email = "liam@example.edu"
         self.postings = self._build_postings()
         self.reviews = self._build_reviews()
+        self.boards, self.comments = self._build_boards()
         self.applications: list = []
 
     def days(self, n: int) -> date:
@@ -537,9 +674,62 @@ class World:
             r for r in self.reviews if r.posting is posting and r.status == "PENDING"
         ]
 
-    def my_boards(self) -> list:
-        """The current user's boards, each with posting_ids (filled in with boards)."""
-        return []
+    def ago(self, **kwargs: float) -> datetime:
+        return self.now - timedelta(**kwargs)
+
+    def _build_boards(self) -> tuple[list[FakeBoard], list[FakeComment]]:
+        boards: list[FakeBoard] = []
+        comments: list[FakeComment] = []
+        bp_id = 0
+        for number, (name, code, member_ids, count, updated, items) in enumerate(
+            BOARDS, start=1
+        ):
+            members = [self.people[m] for m in member_ids]
+            board = FakeBoard(
+                id=number,
+                name=name,
+                join_code=code,
+                created_by=members[0],
+                created_at=self.ago(days=40),
+                members=members,
+                member_count=count,
+                updated_at=self.ago(hours=updated),
+            )
+            for age, (posting_id, saver) in enumerate(items):
+                bp_id += 1
+                board.board_postings.append(
+                    FakeBoardPosting(
+                        id=bp_id,
+                        board=board,
+                        posting=self.postings[posting_id - 1],
+                        saved_by=self.people[saver],
+                        saved_at=self.ago(hours=updated + age * 5),
+                    )
+                )
+            board.posting_ids = {bp.posting.id for bp in board.board_postings}
+            boards.append(board)
+        for number, (board_id, posting_id, author, minutes, body) in enumerate(
+            COMMENTS, start=1
+        ):
+            bp = next(
+                bp
+                for bp in boards[board_id - 1].board_postings
+                if bp.posting.id == posting_id
+            )
+            bp.comment_count += 1
+            when = self.ago(minutes=minutes)
+            comments.append(FakeComment(number, bp, self.people[author], body, when))
+        return boards, comments
+
+    def my_boards(self) -> list[FakeBoard]:
+        """The current user's boards, each with posting_ids for the save menu."""
+        return [b for b in self.boards if self.me in b.members]
+
+    def board(self, pk: int) -> FakeBoard | None:
+        return next((b for b in self.boards if b.id == pk), None)
+
+    def comments_on(self, board_posting: FakeBoardPosting) -> list[FakeComment]:
+        return [c for c in self.comments if c.board_posting is board_posting]
 
     def application_for(self, posting: FakePosting):
         """The current user's application to this posting, if they track it."""

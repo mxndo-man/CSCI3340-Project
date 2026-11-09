@@ -15,4 +15,6 @@ urlpatterns = [
     path("postings/", views.discover, name="discover"),
     path("postings/add/", views.posting_add, name="posting_add"),
     path("postings/<int:pk>/", views.posting_detail, name="posting_detail"),
+    path("boards/", views.boards, name="boards"),
+    path("boards/<int:pk>/", views.board_detail, name="board_detail"),
 ]
