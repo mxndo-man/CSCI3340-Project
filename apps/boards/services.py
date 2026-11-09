@@ -25,7 +25,7 @@ def create_user_board(user: CustomUser, name: str, description: str = "") -> Boa
     return board
 
 
-def join_by_code(user: CustomUser, join_code: str = "") -> Board:
+def join_by_code(user: CustomUser, join_code: str) -> Board:
     """Join the member by the code give by the Owner.
 
     Attributes:
