@@ -22,6 +22,7 @@ from django.views.decorators.http import require_POST
 
 from . import fake_data
 from .filters import SORTS, filter_postings, parse_filters
+from .templatetags import ui
 
 
 class StyleguideForm(forms.Form):
@@ -70,8 +71,8 @@ def styleguide(request):
 
 # ---- Preview pages ----------------------------------------------------------------------
 
-# Every form the templates post. Real views pass `form_urls` with their own URLs; the
-# preview sends them all to `action`. docs/frontend-handoff.md lists each form's fields.
+# Every form the templates post. The preview sends them all to `action`; on real pages
+# {% form_url %} finds the real URL instead. docs/frontend-handoff.md lists each form.
 FORM_ACTIONS = (
     "save_to_board",
     "remove_from_board",
@@ -81,6 +82,8 @@ FORM_ACTIONS = (
     "save_search",
     "create_board",
     "join_board",
+    "leave_board",
+    "remove_member",
     "comment",
     "move_application",
     "add_task",
@@ -136,7 +139,20 @@ INDEX_PAGES = [
     ("A closed posting", "ui_preview:posting_detail", [12], "postings/detail.html"),
     ("Add a posting", "ui_preview:posting_add", [], "postings/add.html"),
     ("Boards", "ui_preview:boards", [], "boards/list.html"),
-    ("A board with comments", "ui_preview:board_detail", [1], "boards/detail.html"),
+    (
+        "A board you own, with comments",
+        "ui_preview:board_detail",
+        [1],
+        "boards/detail.html",
+    ),
+    (
+        "A board you're a member of",
+        "ui_preview:board_detail",
+        [3],
+        "boards/detail.html",
+    ),
+    ("New board (its own page)", "ui_preview:board_create", [], "boards/create.html"),
+    ("Join a board (its own page)", "ui_preview:board_join", [], "boards/join.html"),
 ]
 
 
@@ -208,7 +224,7 @@ def board_detail(request, pk):
     board = world.board(pk)
     if board is None:
         raise Http404("No such board in the preview data")
-    board_postings = board.board_postings
+    board_postings = ui.board_postings(board)
     chosen = request.GET.get("item", "")
     selected = next((bp for bp in board_postings if str(bp.id) == chosen), None)
     if selected is None and board_postings:
@@ -223,3 +239,33 @@ def board_detail(request, pk):
         comments=world.comments_on(selected) if selected else [],
     )
     return render(request, "boards/detail.html", context)
+
+
+# The same fields as apps/boards/forms.py, so the pages show the real labels and errors.
+class BoardForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    description = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 2}), required=False
+    )
+
+
+class JoinBoardForm(forms.Form):
+    join_code = forms.CharField(max_length=12, label="Join code")
+
+
+def _preview_form_page(request, form_class, template):
+    """GET shows the form; POST shows its errors, or says nothing was saved."""
+    world = fake_data.world()
+    form = form_class(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        messages.info(request, "Preview only, nothing was saved")
+        return redirect("ui_preview:boards")
+    return render(request, template, _context(request, world, "boards", form=form))
+
+
+def board_create(request):
+    return _preview_form_page(request, BoardForm, "boards/create.html")
+
+
+def board_join(request):
+    return _preview_form_page(request, JoinBoardForm, "boards/join.html")

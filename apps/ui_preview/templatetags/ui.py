@@ -240,9 +240,13 @@ def posting_chips(posting):
 def boards_with(posting, boards):
     """The boards (from the page's my_boards) that already hold this posting.
 
-    Each board needs a `posting_ids` set; see docs/frontend-handoff.md.
+    Reads each board's BoardPostings, so prefetch them: see docs/frontend-handoff.md.
     """
-    return [b for b in boards or () if posting.id in getattr(b, "posting_ids", ())]
+    return [
+        b
+        for b in boards or ()
+        if any(item.posting_id == posting.id for item in board_postings(b))
+    ]
 
 
 # ---- The "Key facts" tiles on a posting page --------------------------------------------
@@ -560,6 +564,29 @@ def page_url(context, name, *args):
     return _reverse_first(names, args)
 
 
+# Forms that already have a real URL to post to. An action that isn't here gets its URL
+# from the view's form_urls (see docs/frontend-handoff.md); add it here once it exists.
+FORM_URL_NAMES = {
+    "create_board": "boards:create",
+    "join_board": "boards:join",
+    "leave_board": "boards:leave",
+    "remove_member": "boards:remove",
+}
+
+
+@register.simple_tag(takes_context=True)
+def form_url(context, action, *args):
+    """Where a form posts: {% form_url "leave_board" board.pk as url %}.
+
+    The view's form_urls wins, so the preview can send every form to its no-op handler.
+    Otherwise it's the real URL in FORM_URL_NAMES, or "" if that doesn't exist yet.
+    """
+    given = (context.get("form_urls") or {}).get(action)
+    if given:
+        return given
+    return _reverse_first([FORM_URL_NAMES.get(action)], args)
+
+
 MAIN_NAV = (
     ("Discover", "postings:discover", "postings"),
     ("Boards", "boards:list", "boards"),
@@ -588,8 +615,52 @@ def main_nav(context):
 # ---- Boards -----------------------------------------------------------------------------
 
 
+# These read the contracts' relations (Membership and BoardPosting have no related_name, so
+# Django names them membership_set and boardposting_set). The view only has to prefetch
+# them; it doesn't have to add anything to the board.
+
+
+def _related(obj, name):
+    """obj.<name>.all() as a list, or [] if that relation doesn't exist yet."""
+    manager = getattr(obj, name, None)
+    return list(manager.all()) if manager is not None else []
+
+
+@register.simple_tag
+def memberships(board):
+    """The board's Memberships, owners first, then in the order people joined."""
+    rows = _related(board, "membership_set")
+    return sorted(rows, key=lambda m: (m.role != "OWNER", m.joined_at))
+
+
+@register.simple_tag
+def board_members(board):
+    """The board's members (users), owners first."""
+    return [m.user for m in memberships(board)]
+
+
+@register.simple_tag
+def member_count(board):
+    return len(_related(board, "membership_set"))
+
+
+@register.simple_tag
+def board_role(board, user):
+    """The user's role on the board: "OWNER", "MEMBER", or "" if they aren't on it."""
+    user_id = getattr(user, "pk", None) or getattr(user, "id", None)
+    return next(
+        (m.role for m in _related(board, "membership_set") if m.user_id == user_id), ""
+    )
+
+
+@register.simple_tag
+def board_postings(board):
+    """The board's BoardPostings, newest first."""
+    rows = _related(board, "boardposting_set")
+    return sorted(rows, key=lambda bp: bp.saved_at, reverse=True)
+
+
 @register.simple_tag
 def member_overflow(board, shown=4):
     """How many members the avatar stack leaves out: the "+10" circle."""
-    listed = min(len(getattr(board, "members", ()) or ()), shown)
-    return max((getattr(board, "member_count", 0) or 0) - listed, 0)
+    return max(member_count(board) - shown, 0)

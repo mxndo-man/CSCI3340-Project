@@ -84,7 +84,7 @@ One posting (postings:detail). The view passes:
             {% elif application %}
               <a href="{{ application.get_absolute_url }}" class="{% button_class 'ghost' 'md' 'w-full' %}">Open in tracker</a>
             {% else %}
-              <form method="post" action="{{ form_urls.track }}">
+              <form method="post" action="{% form_url "track" %}">
                 {% csrf_token %}
                 <input type="hidden" name="posting" value="{{ posting.id }}">
                 <input type="hidden" name="next" value="{{ request.get_full_path }}">

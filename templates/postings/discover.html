@@ -89,7 +89,7 @@ Discover (postings:discover). The view passes:
   </form>
 
   {% if user.is_authenticated and not search_saved %}
-    <form id="save-search" method="post" action="{{ form_urls.save_search }}">
+    <form id="save-search" method="post" action="{% form_url "save_search" %}">
       {% csrf_token %}
       <input type="hidden" name="name" value="{{ search_name }}">
       <input type="hidden" name="filters" value="{{ filters|filters_json }}">

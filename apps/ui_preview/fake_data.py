@@ -97,10 +97,26 @@ class FakeFieldReview:
         return f"{self.posting.get_absolute_url()}#fact-{self.field_name}"
 
 
-@dataclass
+class FakeManager:
+    """Stands in for a reverse relation like board.membership_set: .all() and .count()."""
+
+    def __init__(self) -> None:
+        self._rows: list = []
+
+    def add(self, row) -> None:
+        self._rows.append(row)
+
+    def all(self) -> list:
+        return list(self._rows)
+
+    def count(self) -> int:
+        return len(self._rows)
+
+
+# eq=False compares these by identity, the way model instances compare by pk.
+@dataclass(eq=False)
 class FakeBoard:
-    """boards.Board. The fields after created_at aren't model fields: the board
-    pages need them, so the real view adds them (see docs/frontend-handoff.md)."""
+    """boards.Board, with its reverse relations membership_set and boardposting_set."""
 
     id: int
     name: str
@@ -108,17 +124,30 @@ class FakeBoard:
     created_by: FakeUser
     created_at: datetime
     description: str = ""
-    members: list[FakeUser] = field(default_factory=list)
-    member_count: int = 0
-    board_postings: list[FakeBoardPosting] = field(default_factory=list)
-    posting_ids: set[int] = field(default_factory=set)
     updated_at: datetime | None = None
+    membership_set: FakeManager = field(default_factory=FakeManager)
+    boardposting_set: FakeManager = field(default_factory=FakeManager)
 
     def get_absolute_url(self) -> str:
         return reverse("ui_preview:board_detail", args=[self.id])
 
 
-@dataclass
+@dataclass(eq=False)
+class FakeMembership:
+    """boards.Membership"""
+
+    id: int
+    board: FakeBoard
+    user: FakeUser
+    role: str  # OWNER or MEMBER
+    joined_at: datetime
+
+    @property
+    def user_id(self) -> int:
+        return self.user.id
+
+
+@dataclass(eq=False)
 class FakeBoardPosting:
     """postings.BoardPosting, plus comment_count (added by the view)."""
 
@@ -128,6 +157,10 @@ class FakeBoardPosting:
     saved_by: FakeUser | None
     saved_at: datetime
     comment_count: int = 0
+
+    @property
+    def posting_id(self) -> int:
+        return self.posting.id
 
     def get_absolute_url(self) -> str:
         return f"{self.board.get_absolute_url()}?item={self.id}"
@@ -159,6 +192,20 @@ PEOPLE = {
     "DO": (6, "devo", "Dev O.", "Spring 2028"),
     "RB": (7, "rosab", "Rosa B.", "Fall 2027"),
 }
+
+# More people, so a big board really has 14 members (only the first four show as avatars).
+EXTRA_PEOPLE = [
+    "Sam T.",
+    "Priya V.",
+    "Noah W.",
+    "Lena H.",
+    "Omar F.",
+    "Grace L.",
+    "Mateo R.",
+    "Ivy C.",
+    "Ben A.",
+    "Zoe M.",
+]
 
 # The prototype's postings. posted: days ago. deadline: days from today. pay: dollars an
 # hour (0 = unpaid). provider None means a student added it by hand.
@@ -389,13 +436,14 @@ POSTINGS: list[dict[str, Any]] = [
     },
 ]
 
-# name, join code, members (the first one made it), member count, updated (hours ago),
-# saved postings as (posting id, saved by). Every board has a join code: the contracts
-# have no private boards.
+# name, join code, members (the first one made it and owns it), member count (topped up
+# from EXTRA_PEOPLE), updated (hours ago), saved postings as (posting id, saved by).
+# Every board has a join code: the contracts have no private boards. Codes look like the
+# real ones (secrets.token_urlsafe(9): 12 characters, mixed case).
 BOARDS = [
     (
         "Summer 2027 hunt",
-        "K7Q-2M9",
+        "k7Qm29XpvLdA",
         ["LR", "MK", "AP"],
         3,
         2,
@@ -403,7 +451,7 @@ BOARDS = [
     ),
     (
         "Lab internships",
-        "L4B-7TR",
+        "L4bT7r-qW2ns",
         ["LR", "JS"],
         2,
         26,
@@ -411,7 +459,7 @@ BOARDS = [
     ),
     (
         "CS club picks",
-        "C5C-1UB",
+        "C5cU1b_xR8hz",
         ["AP", "TN", "DO", "LR"],
         14,
         72,
@@ -428,7 +476,7 @@ BOARDS = [
     ),
     (
         "Just me",
-        "J5M-3QX",
+        "J5mQ3xYe0tKp",
         ["LR"],
         1,
         170,
@@ -548,6 +596,12 @@ class World:
             initials: FakeUser(id=pk, username=u, display_name=n, graduation_term=t)
             for initials, (pk, u, n, t) in PEOPLE.items()
         }
+        self.extra_people = [
+            FakeUser(
+                id=len(PEOPLE) + n, username=name.split()[0].lower(), display_name=name
+            )
+            for n, name in enumerate(EXTRA_PEOPLE, start=1)
+        ]
         self.me = self.people["LR"]
         self.me.email = "liam@example.edu"
         self.postings = self._build_postings()
@@ -680,24 +734,36 @@ class World:
     def _build_boards(self) -> tuple[list[FakeBoard], list[FakeComment]]:
         boards: list[FakeBoard] = []
         comments: list[FakeComment] = []
-        bp_id = 0
+        bp_id = membership_id = 0
+        extras = iter(self.extra_people)
         for number, (name, code, member_ids, count, updated, items) in enumerate(
             BOARDS, start=1
         ):
+            # The first person listed created the board and owns it.
             members = [self.people[m] for m in member_ids]
+            members += [next(extras) for _ in range(count - len(members))]
             board = FakeBoard(
                 id=number,
                 name=name,
                 join_code=code,
                 created_by=members[0],
                 created_at=self.ago(days=40),
-                members=members,
-                member_count=count,
                 updated_at=self.ago(hours=updated),
             )
+            for position, person in enumerate(members):
+                membership_id += 1
+                board.membership_set.add(
+                    FakeMembership(
+                        id=membership_id,
+                        board=board,
+                        user=person,
+                        role="OWNER" if position == 0 else "MEMBER",
+                        joined_at=self.ago(days=40 - position),
+                    )
+                )
             for age, (posting_id, saver) in enumerate(items):
                 bp_id += 1
-                board.board_postings.append(
+                board.boardposting_set.add(
                     FakeBoardPosting(
                         id=bp_id,
                         board=board,
@@ -706,14 +772,13 @@ class World:
                         saved_at=self.ago(hours=updated + age * 5),
                     )
                 )
-            board.posting_ids = {bp.posting.id for bp in board.board_postings}
             boards.append(board)
         for number, (board_id, posting_id, author, minutes, body) in enumerate(
             COMMENTS, start=1
         ):
             bp = next(
                 bp
-                for bp in boards[board_id - 1].board_postings
+                for bp in boards[board_id - 1].boardposting_set.all()
                 if bp.posting.id == posting_id
             )
             bp.comment_count += 1
@@ -722,8 +787,12 @@ class World:
         return boards, comments
 
     def my_boards(self) -> list[FakeBoard]:
-        """The current user's boards, each with posting_ids for the save menu."""
-        return [b for b in self.boards if self.me in b.members]
+        """The current user's boards."""
+        return [
+            b
+            for b in self.boards
+            if any(m.user is self.me for m in b.membership_set.all())
+        ]
 
     def board(self, pk: int) -> FakeBoard | None:
         return next((b for b in self.boards if b.id == pk), None)

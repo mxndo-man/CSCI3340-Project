@@ -16,5 +16,7 @@ urlpatterns = [
     path("postings/add/", views.posting_add, name="posting_add"),
     path("postings/<int:pk>/", views.posting_detail, name="posting_detail"),
     path("boards/", views.boards, name="boards"),
+    path("boards/new/", views.board_create, name="board_create"),
+    path("boards/join/", views.board_join, name="board_join"),
     path("boards/<int:pk>/", views.board_detail, name="board_detail"),
 ]

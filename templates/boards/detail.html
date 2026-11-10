@@ -6,25 +6,32 @@
 {% block content %}
 {% comment %}
 One board (boards:detail). The view passes:
-  board           the Board, with members and member_count
+  board           the Board; prefetch membership_set__user
   board_postings  its BoardPostings, each with posting, saved_by and comment_count
   selected        the BoardPosting being discussed (?item=<id>), or the first one
   comments        the selected one's Comments, oldest first, each with author
-  form_urls.comment   posts board_posting, body, next
+Members, roles and the Leave and Remove buttons come from board.membership_set through
+the ui helpers. Forms post through {% form_url %}:
+  leave_board     boards:leave <board id>, posts next
+  remove_member   boards:remove <board id> <user id>, posts next
+  comment         posts board_posting, body, next (no real URL yet: pass form_urls.comment)
 {% endcomment %}
 {% page_url "boards:list" as boards_url %}
 {% page_url "postings:discover" as discover_url %}
-<div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+{% memberships board as rows %}
+{% member_count board as count %}
+{% board_role board user as my_role %}
+<div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10" x-data>
   {% include "components/back_link.html" with href=boards_url label="All boards" only %}
 
   <header class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
       <h1 class="font-serif text-h1 font-semibold text-bark-900">{{ board.name }}</h1>
       {% if board.description %}<p class="mt-2 max-w-2xl text-[15px] text-bark-700">{{ board.description }}</p>{% endif %}
-      <div class="mt-3 flex items-center gap-3">
+      <button type="button" @click="$refs.members.showModal()" aria-haspopup="dialog" class="mt-3 -ml-1 flex items-center gap-3 rounded-full py-1 pl-1 pr-3 transition-colors hover:bg-sand-100">
         {% include "boards/partials/member_stack.html" with board=board only %}
-        <span class="text-sm text-bark-700">{% if board.member_count == 1 %}Only you so far{% else %}{{ board.member_count }} members{% endif %}</span>
-      </div>
+        <span class="text-sm font-medium text-bark-700">{% if count == 1 %}Only you so far{% else %}{{ count }} members{% endif %}</span>
+      </button>
     </div>
     <div class="flex items-center gap-2 self-start rounded-full border border-sand-200 bg-white py-1 pl-4 pr-1 sm:self-auto">
       <span class="text-xs font-semibold uppercase tracking-wider text-bark-500">Join code</span>
@@ -86,7 +93,8 @@ One board (boards:detail). The view passes:
               <li class="py-6 text-center text-sm text-bark-500">No comments yet. Start the conversation.</li>
             {% endfor %}
           </ul>
-          <form method="post" action="{{ form_urls.comment }}" class="border-t border-sand-100 pt-4" x-data="{ body: '' }">
+          {% form_url "comment" as comment_url %}
+          <form method="post" action="{{ comment_url }}" class="border-t border-sand-100 pt-4" x-data="{ body: '' }">
             {% csrf_token %}
             <input type="hidden" name="board_posting" value="{{ selected.id }}">
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -101,5 +109,44 @@ One board (boards:detail). The view passes:
       </section>
     </div>
   {% endif %}
+
+  {# Owners can remove members; members can leave. Owners can't leave or be removed. #}
+  <dialog x-ref="members" aria-labelledby="members-title" class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-sand-200 bg-white p-6 shadow-pop backdrop:bg-bark-900/30 backdrop:backdrop-blur-[2px]">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="members-title" class="font-serif text-h2 font-semibold text-bark-900">Members</h2>
+      <button type="button" aria-label="Close" @click="$refs.members.close()" class="-mr-2 -mt-1 inline-flex size-9 items-center justify-center rounded-full text-bark-500 hover:bg-sand-100 hover:text-bark-900">{% icon "x" "size-5" %}</button>
+    </div>
+    <ul class="mt-4 max-h-80 divide-y divide-sand-100 overflow-y-auto">
+      {% for membership in rows %}
+        <li class="flex items-center gap-3 py-3">
+          {% include "components/avatar.html" with person=membership.user size="sm" only %}
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-semibold text-bark-900">{% display_name membership.user %}{% if membership.user_id == user.id %} (you){% endif %}</span>
+            <span class="block text-xs text-bark-500">Joined {{ membership.joined_at|date:"M j, Y" }}</span>
+          </span>
+          {% if membership.role == "OWNER" %}
+            {% include "components/chip.html" with label="Owner" tone="accent" only %}
+          {% elif my_role == "OWNER" %}
+            {% form_url "remove_member" board.pk membership.user_id as remove_url %}
+            {% display_name membership.user as name %}
+            <form method="post" action="{{ remove_url }}" x-data @submit="if (!confirm('Remove {{ name|escapejs }} from {{ board.name|escapejs }}?')) $event.preventDefault()">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <button type="submit" class="{% button_class 'danger' 'sm' %}">Remove<span class="sr-only"> {{ name }}</span></button>
+            </form>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    {% if my_role == "MEMBER" %}
+      {% form_url "leave_board" board.pk as leave_url %}
+      <form method="post" action="{{ leave_url }}" class="mt-4 flex items-center justify-between gap-3 border-t border-sand-100 pt-4" x-data @submit="if (!confirm('Leave {{ board.name|escapejs }}? You can rejoin with its code.')) $event.preventDefault()">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <p class="text-xs text-bark-500">You can rejoin later with the join code.</p>
+        <button type="submit" class="{% button_class 'danger' 'sm' %}">{% icon "log-out" "size-4" %}Leave board</button>
+      </form>
+    {% endif %}
+  </dialog>
 </div>
 {% endblock %}

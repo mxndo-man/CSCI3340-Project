@@ -17,7 +17,7 @@ both posting to form_urls.review_field:
     <p class="text-[15px] font-semibold text-bark-900" x-show="!editing">{{ fact.value }}</p>
 
     {% if fact.needs_check and user.is_authenticated %}
-      <form method="post" action="{{ form_urls.review_field }}" class="space-y-2" x-show="editing" x-cloak>
+      <form method="post" action="{% form_url "review_field" %}" class="space-y-2" x-show="editing" x-cloak>
         {% csrf_token %}
         <input type="hidden" name="review" value="{{ fact.review.id }}">
         <input type="hidden" name="status" value="EDITED">
@@ -66,7 +66,7 @@ both posting to form_urls.review_field:
     {% if fact.needs_check %}
       <div class="mt-3 flex flex-wrap gap-2" x-show="!editing">
         {% if user.is_authenticated %}
-          <form method="post" action="{{ form_urls.review_field }}">
+          <form method="post" action="{% form_url "review_field" %}">
             {% csrf_token %}
             <input type="hidden" name="review" value="{{ fact.review.id }}">
             <input type="hidden" name="status" value="ACCEPTED">
