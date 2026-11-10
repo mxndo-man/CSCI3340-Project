@@ -29,7 +29,6 @@ def extract(
     fields: list[str] | None = None,
     http: httpx.Client | None = None,
 ) -> ExtractionResult:
-
     # Extract fields from posting text (or a supported job board URL).
     if (text is None) == (url is None):
         raise ValueError("Pass exactly one of text= or url=.")
