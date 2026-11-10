@@ -842,3 +842,15 @@ def digest_hours():
 @register.simple_tag
 def unread_count(notifications):
     return sum(1 for n in notifications or () if not n.read)
+
+
+# ---- Home -------------------------------------------------------------------------------
+
+
+@register.simple_tag
+def greeting():
+    """ "Good morning", "Good afternoon" or "Good evening", by the local time now."""
+    hour = timezone.localtime().hour
+    if hour < 12:
+        return "Good morning"
+    return "Good afternoon" if hour < 18 else "Good evening"

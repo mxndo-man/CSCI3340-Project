@@ -102,7 +102,18 @@ None of these have URL names yet: until they do, pass `form_urls={"save_to_board
 
 ### Home (Armando and Azael)
 
-*Added later in this branch: `templates/pages/home.html` on preview data. Until then `/home/` is a placeholder (`pages/home_placeholder.html`).*
+`/home/` (`home`) renders `pages/home_placeholder.html` today, from `HomeView` in `config/views.py`. The finished design is `pages/home.html` (preview: `/preview/home/`, and `/preview/home/new/` for a brand-new user). To go live, give `HomeView` a `get_context_data` that adds the context below and set `template_name = "pages/home.html"`. It needs Posting, Application, Task, SavedSearch, BoardPosting and Comment, so it comes last.
+
+| Context | What |
+| --- | --- |
+| `closing` | Open postings with a deadline in the next 14 days, soonest first (user story 13 says 14; the prototype said 7). Suggested: the ones the user tracks or has on a board. |
+| `saved_search` | The user's newest SavedSearch with alerts on, or None |
+| `new_matches` | Up to 3 postings matching it, newest first (`filter_postings`) |
+| `applications` | The user's Applications, for the counts by status (story 13's "applications by status") |
+| `tasks` | The user's Tasks (`select_related("application__posting")`); the page shows this week's |
+| `activity` | The latest Comments on the user's boards by other people, newest first: `select_related("author", "board_posting__board", "board_posting__posting")[:3]` |
+
+Every card has an empty state, so it works for a brand-new user (story 13). Ticking a task here posts the same `toggle_task` form as the tracker. The new matches use `postings/partials/row.html`.
 
 ### Accounts (Azael)
 
@@ -211,6 +222,13 @@ Components to `{% include %}` are in `templates/components/`; `/styleguide/` (wi
 | Join codes | `K7Q-2M9` style | 12 characters, mixed case, case-sensitive (`secrets.token_urlsafe(9)` in the boards app) |
 | Leave and remove members | Not in the prototype | A Members dialog on the board page (the boards app supports both) |
 | Fact tiles | A quote and confidence on every fact | Only where `field_details` or a FieldReview has them (section 3, Extraction review) |
+| Closed applications | One "Closed" group | `REJECTED` and `WITHDRAWN`, listed under "Closed" |
+| Add an application | A free-text role and company | Sends people to Add a posting first: `Application.posting` is required |
+| Task due | A date | `due_at`, a date and time (a `datetime-local` input) |
+| Calendar | A tab in Tracker | Azael's `/schedule/` page. The prototype's event colors: deadline clay, task ochre, interview moss. |
+| Notification settings | Four switches | `email_enabled` and `digest_hour` only |
+| Saved searches | Under Settings | `notifications:saved_searches`, still in the Settings side menu |
+| Home "Closing" | The next 7 days | The next 14 days (user story 13), plus an applications-by-status card |
 | Routes | `/discover`, `/posting/<id>`, `/add`, `/settings` | `postings:discover`, `postings:detail`, `postings:add`, `accounts:profile` |
 
 ## 6. Open decisions

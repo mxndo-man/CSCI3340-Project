@@ -14,7 +14,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateformat import format as date_format
 
-from .filters import filters_to_query
+from .filters import EMPTY, filter_postings, filters_to_query
 
 # ---- The objects ------------------------------------------------------------------------
 
@@ -1033,6 +1033,35 @@ class World:
             "notifications": self.notifications[:5],
             "unread_count": sum(1 for n in self.notifications if not n.read),
         }
+
+    def closing(self, days: int = 14) -> list[FakePosting]:
+        """Open postings closing in the next `days` days, soonest first."""
+        soon = [
+            p
+            for p in self.postings
+            if p.status == "OPEN"
+            and p.deadline
+            and 0 <= (p.deadline - self.today).days <= days
+        ]
+        return sorted(soon, key=lambda p: p.deadline or self.today)
+
+    def new_matches(self, search: FakeSavedSearch, limit: int = 3) -> list[FakePosting]:
+        """Postings matching a saved search, newest first, leaving out ones closing soon."""
+        found = filter_postings(
+            self.postings, {**EMPTY, **search.filters}, self.today, "newest"
+        )
+        closing = set(map(id, self.closing()))
+        return [p for p in found if id(p) not in closing][:limit]
+
+    def activity(self, limit: int = 3) -> list[FakeComment]:
+        """The latest comments by other people on the current user's boards."""
+        mine = self.my_boards()
+        others = [
+            c
+            for c in self.comments
+            if c.author is not self.me and c.board_posting.board in mine
+        ]
+        return sorted(others, key=lambda c: c.created_at, reverse=True)[:limit]
 
     def application_for(self, posting: FakePosting):
         """The current user's application to this posting, if they track it."""

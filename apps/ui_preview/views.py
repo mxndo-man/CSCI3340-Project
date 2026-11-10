@@ -76,6 +76,8 @@ def action(request):
 
 # The pages listed on /preview/: label, URL name, URL args, template.
 INDEX_PAGES = [
+    ("Home", "ui_preview:home", [], "pages/home.html"),
+    ("Home for a brand-new user", "ui_preview:home_new", [], "pages/home.html"),
     ("Discover", "ui_preview:discover", [], "postings/discover.html"),
     (
         "A posting with a fact to check",
@@ -278,3 +280,27 @@ def preferences(request):
     world = fake_data.world()
     context = _context(request, world, preferences=world.preferences)
     return render(request, "notifications/preferences.html", context)
+
+
+def home(request, newcomer=False):
+    """The home dashboard. /preview/home/new/ shows it for a brand-new user with nothing yet."""
+    world = fake_data.world()
+    search = (
+        None
+        if newcomer
+        else next((s for s in world.saved_searches if s.alerts_enabled), None)
+    )
+    context = _context(
+        request,
+        world,
+        closing=[] if newcomer else world.closing(),
+        saved_search=search,
+        new_matches=world.new_matches(search) if search else [],
+        applications=[] if newcomer else world.applications,
+        tasks=[] if newcomer else world.tasks,
+        activity=[] if newcomer else world.activity(),
+    )
+    if newcomer:
+        context["my_boards"] = []
+        context["notification_menu"] = {"notifications": [], "unread_count": 0}
+    return render(request, "pages/home.html", context)
