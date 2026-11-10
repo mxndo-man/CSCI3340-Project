@@ -25,7 +25,7 @@ The dialogs post to boards:create (name, description, next) and boards:join
     </div>
   </div>
 
-  <ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
     {% for board in boards %}
       <li>{% include "boards/partials/board_card.html" with board=board only %}</li>
     {% endfor %}

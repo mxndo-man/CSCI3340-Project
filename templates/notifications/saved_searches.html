@@ -17,7 +17,7 @@ Searches are saved from Discover ("Save this search").
 {% form_url "delete_saved_search" as delete_url %}
 <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
   <h1 class="font-serif text-h1 font-semibold text-bark-900">Settings</h1>
-  <div class="mt-8 grid gap-8 md:grid-cols-[200px_minmax(0,1fr)]">
+  <div class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-[200px_minmax(0,1fr)]">
     {% include "components/settings_nav.html" with active="searches" %}
     <div class="min-w-0 max-w-2xl">
       {% if saved_searches %}

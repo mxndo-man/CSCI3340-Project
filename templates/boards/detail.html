@@ -43,7 +43,7 @@ the ui helpers. Forms post through {% form_url %}:
   {% if not board_postings %}
     {% include "components/empty_state.html" with title="No postings yet" body="Save a posting from Discover and it will show up here for everyone on the board." action_label="Find postings in Discover" action_href=discover_url class="mt-8" only %}
   {% else %}
-    <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+    <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
       <section aria-labelledby="saved-postings">
         <div class="flex items-center justify-between">
           <h2 id="saved-postings" class="text-sm font-semibold text-bark-700">{{ board_postings|length }} saved posting{{ board_postings|length|pluralize }}</h2>

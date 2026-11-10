@@ -23,7 +23,7 @@ is), next to {% form_url "add_task" %}. Each checkbox posts task, done, next to
   {% include "tracker/partials/tabs.html" with active="tasks" %}
 
   <div class="mt-6 max-w-3xl rounded-2xl border border-sand-200 bg-white p-3 sm:p-4">
-    <form method="post" action="{{ add_task_url }}" class="grid gap-2 p-1 sm:grid-cols-[minmax(0,1fr)_auto_auto]" x-data="{ title: '' }">
+    <form method="post" action="{{ add_task_url }}" class="grid grid-cols-1 gap-2 p-1 sm:grid-cols-[minmax(0,1fr)_auto_auto]" x-data="{ title: '' }">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
       <label for="new-task" class="sr-only">New task</label>

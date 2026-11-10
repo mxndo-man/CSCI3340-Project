@@ -17,7 +17,7 @@ One posting (postings:detail). The view passes:
 <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
   {% include "components/back_link.html" with href=discover_url label="Back to Discover" only %}
 
-  <div class="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+  <div class="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
     <div class="min-w-0">
       <header>
         <h1 class="font-serif text-h1 font-semibold text-bark-900">{{ posting.title }}</h1>
@@ -46,7 +46,7 @@ One posting (postings:detail). The view passes:
             {% include "components/banner.html" with tone="good" icon="circle-check" title="All facts checked" body="Students checked every fact our AI reader wasn't sure about." class="mt-4" only %}
           {% endif %}
         {% endwith %}
-        <dl class="mt-5 grid gap-3 sm:grid-cols-2">
+        <dl class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {% for fact in facts %}{% include "postings/partials/fact_tile.html" %}{% endfor %}
         </dl>
         <p class="mt-4 text-xs leading-5 text-bark-500">Where facts come from: a student's check beats the job board, and the job board beats our AI reader.</p>

@@ -98,7 +98,7 @@ Discover (postings:discover). The view passes:
   {% endif %}
 
   {% if page_obj.paginator.count %}
-    <div class="mt-4 grid gap-4 md:grid-cols-2">
+    <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
       {% for posting in page_obj %}{% include "postings/partials/card.html" %}{% endfor %}
     </div>
     {% if page_obj.has_other_pages %}
