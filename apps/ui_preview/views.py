@@ -42,6 +42,7 @@ FORM_ACTIONS = (
     "delete_saved_search",
     "update_preferences",
     "mark_all_read",
+    "open_notification",
 )
 
 
@@ -55,6 +56,8 @@ def _context(request, world, nav_active="", **extra):
         "user": AnonymousUser() if visitor else world.me,
         "form_urls": dict.fromkeys(FORM_ACTIONS, action_url),
         "my_boards": [] if visitor else world.my_boards(),
+        # The bell. A real context processor in apps/notifications adds this to every page.
+        "notification_menu": None if visitor else world.notification_menu(),
     }
     context.update(extra)
     return context
@@ -110,6 +113,19 @@ INDEX_PAGES = [
         "tracker/applications.html",
     ),
     ("Tracker: tasks", "ui_preview:tasks", [], "tracker/tasks.html"),
+    ("Notifications", "ui_preview:notifications", [], "notifications/list.html"),
+    (
+        "Saved searches",
+        "ui_preview:saved_searches",
+        [],
+        "notifications/saved_searches.html",
+    ),
+    (
+        "Notification settings",
+        "ui_preview:preferences",
+        [],
+        "notifications/preferences.html",
+    ),
 ]
 
 
@@ -244,3 +260,21 @@ def tasks(request):
     world = fake_data.world()
     context = _context(request, world, "tracker", tasks=world.tasks)
     return render(request, "tracker/tasks.html", context)
+
+
+def notifications(request):
+    world = fake_data.world()
+    context = _context(request, world, notifications=world.notifications)
+    return render(request, "notifications/list.html", context)
+
+
+def saved_searches(request):
+    world = fake_data.world()
+    context = _context(request, world, saved_searches=world.saved_searches)
+    return render(request, "notifications/saved_searches.html", context)
+
+
+def preferences(request):
+    world = fake_data.world()
+    context = _context(request, world, preferences=world.preferences)
+    return render(request, "notifications/preferences.html", context)

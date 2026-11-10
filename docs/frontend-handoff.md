@@ -134,7 +134,44 @@ The helpers do the grouping, so the view passes plain querysets: `tracker_column
 
 ### Notifications (Azael)
 
-*Added later in this branch: the notification bell (the `nav_notifications` slot in `base.html`), saved searches and notification settings.*
+| Template | URL name | Context it reads |
+| --- | --- | --- |
+| `notifications/menu.html` (the bell) | every page, through `base.html` | `notification_menu`: `{"notifications": the latest 5, newest first, "unread_count": all unread}` |
+| `notifications/list.html` | `notifications:list` | `notifications` (the user's, newest first) |
+| `notifications/saved_searches.html` | `notifications:saved_searches` | `saved_searches` (the user's, newest first) |
+| `notifications/preferences.html` | `notifications:preferences` (proposed: not in contracts section 7 yet) | `preferences` (the user's NotificationPreference; `get_or_create` it) |
+| `notifications/partials/item.html` | (partial) | `notification` (`kind`, `message`, `link_url`, `read`, `created_at`) |
+
+**The bell.** `base.html` shows it when the page's context has `notification_menu`. To put it on every page, add a context processor: a function Django calls on every render that adds variables to the context.
+
+```python
+# apps/notifications/context_processors.py
+def notification_menu(request):
+    if not request.user.is_authenticated:
+        return {}
+    mine = Notification.objects.filter(user=request.user)
+    return {
+        "notification_menu": {
+            "notifications": mine.order_by("-created_at")[:5],
+            "unread_count": mine.filter(read=False).count(),
+        }
+    }
+```
+
+Then add `"apps.notifications.context_processors.notification_menu"` to `TEMPLATES["OPTIONS"]["context_processors"]` in `config/settings.py` (a shared file, so it needs all three approvals).
+
+| Form | Action | Fields |
+| --- | --- | --- |
+| Open a notification (menu and list) | `open_notification` | `notification`, `next` (its `link_url`): mark it read, then redirect to `next` |
+| Mark all as read (menu and list) | `mark_all_read` | `next` |
+| Alerts switch (saved searches) | `toggle_alerts` | `search`, `alerts_enabled` (`true` or `false`: the new value), `next` |
+| Delete (saved searches) | `delete_saved_search` | `search`, `next` |
+| Daily digest switch, and "Send it at" (settings) | `update_preferences` | `email_enabled` (`true` or `false`) or `digest_hour` (`0` to `23`), plus `next`. Each control sends only its own field. |
+
+- **Saving a search** happens on Discover (Armando's page): its form posts `name` and `filters` (the filters as JSON, the same dict `SavedSearch.filters` stores) to `save_search`. That view can live in either app; agree between you.
+- Each saved search links to Discover with its filters through `{{ search.filters|discover_query }}`. The line under it comes from `alerts_enabled` and `last_alerted_at`; the prototype's "4 new matches this week" would need a count per search, which the view could add later.
+- **Settings has two of the prototype's four switches.** The contracts have only `email_enabled` and `digest_hour`, so deadline reminders, board comments and instant matches aren't shown. Add fields to NotificationPreference if you want them back.
+- `components/settings_nav.html` links Profile, Notifications and Saved searches; each link appears once its page exists.
 
 ### Extraction review (Liam): how FieldReview and field_details feed the fact tiles
 

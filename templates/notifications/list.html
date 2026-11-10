@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Notifications · Shortlist{% endblock %}
+
+{% block content %}
+{% comment %}
+Every notification (notifications:list). The view passes:
+  notifications  the user's Notifications, newest first
+"Mark all as read" posts next to {% form_url "mark_all_read" %}; opening one is in
+notifications/partials/item.html.
+{% endcomment %}
+{% unread_count notifications as unread %}
+{% form_url "mark_all_read" as mark_url %}
+{% page_url "notifications:preferences" as preferences_url %}
+<div class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="min-w-0">
+      <h1 class="font-serif text-h1 font-semibold text-bark-900">Notifications</h1>
+      <p class="mt-2 text-[15px] text-bark-700">{% if unread %}{{ unread }} unread{% else %}You're all caught up.{% endif %}</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      {% if preferences_url %}<a href="{{ preferences_url }}" class="{% button_class 'ghost' %}">Settings</a>{% endif %}
+      <form method="post" action="{{ mark_url }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit"{% if not unread %} disabled{% endif %} class="{% button_class 'secondary' %}">{% icon "check" "size-4" %}Mark all as read</button>
+      </form>
+    </div>
+  </div>
+
+  {% if notifications %}
+    <ul class="mt-8 space-y-1 rounded-2xl border border-sand-200 bg-white p-1.5">
+      {% for notification in notifications %}<li>{% include "notifications/partials/item.html" with notification=notification %}</li>{% endfor %}
+    </ul>
+  {% else %}
+    {% include "components/empty_state.html" with title="No notifications yet" body="You'll hear here about deadlines coming up, tasks due and new matches for your saved searches." class="mt-8" only %}
+  {% endif %}
+</div>
+{% endblock %}

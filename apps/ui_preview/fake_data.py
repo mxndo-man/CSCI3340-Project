@@ -12,6 +12,9 @@ from typing import Any
 
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateformat import format as date_format
+
+from .filters import filters_to_query
 
 # ---- The objects ------------------------------------------------------------------------
 
@@ -213,6 +216,43 @@ class FakeTask:
 
     def get_absolute_url(self) -> str:
         return f"{reverse('ui_preview:tasks')}#task-{self.id}"
+
+
+@dataclass(eq=False)
+class FakeNotification:
+    """notifications.Notification"""
+
+    id: int
+    user: FakeUser
+    kind: str  # TASK_DUE, DEADLINE_SOON, NEW_MATCH or POSTING_CLOSED
+    message: str
+    link_url: str
+    dedupe_key: str
+    created_at: datetime
+    read: bool = False
+    emailed: bool = False
+
+
+@dataclass(eq=False)
+class FakeSavedSearch:
+    """notifications.SavedSearch"""
+
+    id: int
+    user: FakeUser
+    name: str
+    filters: dict[str, Any]
+    created_at: datetime
+    alerts_enabled: bool = True
+    last_alerted_at: datetime | None = None
+
+
+@dataclass(eq=False)
+class FakeNotificationPreference:
+    """notifications.NotificationPreference"""
+
+    user: FakeUser
+    email_enabled: bool = True
+    digest_hour: int = 8
 
 
 # ---- The data ---------------------------------------------------------------------------
@@ -670,6 +710,9 @@ class World:
         self.boards, self.comments = self._build_boards()
         self.applications = self._build_applications()
         self.tasks = self._build_tasks()
+        self.saved_searches = self._build_saved_searches()
+        self.notifications = self._build_notifications()
+        self.preferences = FakeNotificationPreference(user=self.me)
 
     def days(self, n: int) -> date:
         return self.today + timedelta(days=n)
@@ -903,13 +946,102 @@ class World:
             tasks.append(task)
         return tasks
 
+    def _build_saved_searches(self) -> list[FakeSavedSearch]:
+        return [
+            FakeSavedSearch(
+                id=1,
+                user=self.me,
+                name="Paid, no clearance, closes within 30 days",
+                filters={
+                    "paid": True,
+                    "clearance": ["NONE_MENTIONED"],
+                    "deadline_within_days": 30,
+                },
+                created_at=self.ago(days=12),
+                last_alerted_at=self.ago(hours=20),
+            ),
+            FakeSavedSearch(
+                id=2,
+                user=self.me,
+                name="Remote, summer 2027",
+                filters={"work_mode": ["REMOTE"], "start_term": "Summer 2027"},
+                created_at=self.ago(days=5),
+                alerts_enabled=False,
+            ),
+        ]
+
+    def _build_notifications(self) -> list[FakeNotification]:
+        """The prototype's four notifications, newest first; the first two unread."""
+        brightwater, riverbend = self.postings[3], self.postings[11]
+        cover_letter = self.tasks[0]
+        due_day = date_format(timezone.localtime(cover_letter.due_at), "l")
+        search = self.saved_searches[0]
+        days_left = ((brightwater.deadline or self.today) - self.today).days
+        rows = [
+            (
+                "DEADLINE_SOON",
+                f"{brightwater.title} at {brightwater.organization} closes in {days_left} days.",
+                brightwater.get_absolute_url(),
+                f"DEADLINE_SOON:posting-{brightwater.id}",
+                self.ago(hours=1),
+                False,
+            ),
+            (
+                "TASK_DUE",
+                f"Due {due_day}: {cover_letter.title} for Northwind Labs.",
+                cover_letter.get_absolute_url(),
+                f"TASK_DUE:task-{cover_letter.id}",
+                self.ago(hours=3),
+                False,
+            ),
+            (
+                "NEW_MATCH",
+                f"4 new matches for “{search.name}.”",
+                reverse("ui_preview:discover") + "?" + filters_to_query(search.filters),
+                f"NEW_MATCH:search-{search.id}",
+                self.ago(days=1),
+                True,
+            ),
+            (
+                "POSTING_CLOSED",
+                f"{riverbend.title} at {riverbend.organization} has closed.",
+                riverbend.get_absolute_url(),
+                f"POSTING_CLOSED:posting-{riverbend.id}",
+                self.ago(days=2),
+                True,
+            ),
+        ]
+        return [
+            FakeNotification(
+                id=number,
+                user=self.me,
+                kind=kind,
+                message=message,
+                link_url=link,
+                dedupe_key=f"{key}:{when.date().isoformat()}",
+                created_at=when,
+                read=read,
+            )
+            for number, (kind, message, link, key, when, read) in enumerate(
+                rows, start=1
+            )
+        ]
+
+    def notification_menu(self) -> dict[str, Any]:
+        """What base.html's bell reads: the latest notifications and the unread count."""
+        return {
+            "notifications": self.notifications[:5],
+            "unread_count": sum(1 for n in self.notifications if not n.read),
+        }
+
     def application_for(self, posting: FakePosting):
         """The current user's application to this posting, if they track it."""
         return next((a for a in self.applications if a.posting is posting), None)
 
     def has_saved_search(self, filters: dict) -> bool:
         """Has the current user already saved a search with these filters?"""
-        return False
+        wanted = {key: value for key, value in filters.items() if value}
+        return any(s.filters == wanted for s in self.saved_searches)
 
 
 def world() -> World:

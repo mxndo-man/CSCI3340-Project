@@ -21,4 +21,7 @@ urlpatterns = [
     path("boards/<int:pk>/", views.board_detail, name="board_detail"),
     path("tracker/applications/", views.applications, name="applications"),
     path("tracker/tasks/", views.tasks, name="tasks"),
+    path("notifications/", views.notifications, name="notifications"),
+    path("notifications/searches/", views.saved_searches, name="saved_searches"),
+    path("notifications/preferences/", views.preferences, name="preferences"),
 ]

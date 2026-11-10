@@ -5,14 +5,16 @@ the same on the preview's fake objects and on the real models.
 """
 
 import json
-from datetime import date
+from datetime import date, time
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django import template
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.dateformat import format as date_format
+from django.utils.timesince import timesince
 
 register = template.Library()
 
@@ -782,3 +784,61 @@ def due_this_week(tasks):
         if not t.done and 0 <= (_local(t.due_at).date() - today).days <= 7
     ]
     return sorted(soon, key=lambda t: t.due_at)
+
+
+# ---- Notifications and saved searches ---------------------------------------------------
+
+NOTIFICATION_ICON = {
+    "TASK_DUE": "list-checks",
+    "DEADLINE_SOON": "clock",
+    "NEW_MATCH": "compass",
+    "POSTING_CLOSED": "lock",
+}
+
+
+@register.simple_tag
+def notification_icon(kind):
+    """The icon name for a Notification.kind."""
+    return NOTIFICATION_ICON.get(kind, "bell")
+
+
+# Discover's list filters travel comma-separated: ?work_mode=REMOTE,HYBRID. These must match
+# how Discover reads them (apps/ui_preview/filters.py now, apps/postings/filters.py later).
+LIST_FILTERS = ("citizenship", "clearance", "degree_levels", "work_mode")
+
+
+@register.filter
+def discover_query(filters):
+    """A SavedSearch.filters dict as Discover's query string: {{ search.filters|discover_query }}."""
+    pairs = [("applied", "1")]
+    for key, value in (filters or {}).items():
+        if not value:
+            continue
+        if key == "paid":
+            pairs.append((key, "1"))
+        elif key in LIST_FILTERS:
+            pairs.append((key, ",".join(value)))
+        else:
+            pairs.append((key, str(value)))
+    return urlencode(pairs)
+
+
+@register.simple_tag
+def saved_search_line(search):
+    """The line under a saved search's name: whether alerts are on, and when they last ran."""
+    if not search.alerts_enabled:
+        return "Alerts are off"
+    if search.last_alerted_at:
+        return f"Alerts are on · last checked {timesince(search.last_alerted_at)} ago"
+    return "Alerts are on · new matches show up in your daily digest"
+
+
+@register.simple_tag
+def digest_hours():
+    """(hour, label) for every NotificationPreference.digest_hour: (8, "8:00 AM")."""
+    return [(hour, date_format(time(hour), "g:i A")) for hour in range(24)]
+
+
+@register.simple_tag
+def unread_count(notifications):
+    return sum(1 for n in notifications or () if not n.read)
