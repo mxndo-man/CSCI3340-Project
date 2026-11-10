@@ -103,6 +103,13 @@ INDEX_PAGES = [
     ),
     ("New board (its own page)", "ui_preview:board_create", [], "boards/create.html"),
     ("Join a board (its own page)", "ui_preview:board_join", [], "boards/join.html"),
+    (
+        "Tracker: applications by status",
+        "ui_preview:applications",
+        [],
+        "tracker/applications.html",
+    ),
+    ("Tracker: tasks", "ui_preview:tasks", [], "tracker/tasks.html"),
 ]
 
 
@@ -219,3 +226,21 @@ def board_create(request):
 
 def board_join(request):
     return _preview_form_page(request, JoinBoardForm, "boards/join.html")
+
+
+def applications(request):
+    world = fake_data.world()
+    context = _context(
+        request,
+        world,
+        "tracker",
+        applications=world.applications,
+        tasks=world.tasks,
+    )
+    return render(request, "tracker/applications.html", context)
+
+
+def tasks(request):
+    world = fake_data.world()
+    context = _context(request, world, "tracker", tasks=world.tasks)
+    return render(request, "tracker/tasks.html", context)

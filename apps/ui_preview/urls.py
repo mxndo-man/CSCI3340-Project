@@ -19,4 +19,6 @@ urlpatterns = [
     path("boards/new/", views.board_create, name="board_create"),
     path("boards/join/", views.board_join, name="board_join"),
     path("boards/<int:pk>/", views.board_detail, name="board_detail"),
+    path("tracker/applications/", views.applications, name="applications"),
+    path("tracker/tasks/", views.tasks, name="tasks"),
 ]

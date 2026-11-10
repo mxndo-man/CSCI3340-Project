@@ -666,3 +666,119 @@ def board_postings(board):
 def member_overflow(board, shown=4):
     """How many members the avatar stack leaves out: the "+10" circle."""
     return max(member_count(board) - shown, 0)
+
+
+# ---- Tracker ----------------------------------------------------------------------------
+
+# Application.status, in pipeline order. The first five are the board's columns; the last
+# two are the "Closed" list under it.
+APPLICATION_STATUSES = (
+    ("SAVED", "Saved"),
+    ("APPLYING", "Applying"),
+    ("APPLIED", "Applied"),
+    ("INTERVIEW", "Interview"),
+    ("OFFER", "Offer"),
+    ("REJECTED", "Rejected"),
+    ("WITHDRAWN", "Withdrawn"),
+)
+CLOSED_STATUSES = ("REJECTED", "WITHDRAWN")
+
+
+@register.simple_tag
+def application_statuses():
+    """Every status as (value, label), for the "Move to" menu."""
+    return APPLICATION_STATUSES
+
+
+@register.simple_tag
+def tracker_columns(applications):
+    """The board's five columns, each {"status", "label", "applications"}."""
+    return [
+        {
+            "status": status,
+            "label": label,
+            "applications": [a for a in applications or () if a.status == status],
+        }
+        for status, label in APPLICATION_STATUSES
+        if status not in CLOSED_STATUSES
+    ]
+
+
+@register.simple_tag
+def closed_applications(applications):
+    """Rejected and withdrawn applications, most recently changed first."""
+    closed = [a for a in applications or () if a.status in CLOSED_STATUSES]
+    return sorted(closed, key=lambda a: a.updated_at, reverse=True)
+
+
+@register.simple_tag
+def active_count(applications):
+    """Applications still in progress: everything but rejected and withdrawn."""
+    return sum(1 for a in applications or () if a.status not in CLOSED_STATUSES)
+
+
+def _local(moment):
+    return timezone.localtime(moment) if timezone.is_aware(moment) else moment
+
+
+@register.simple_tag
+def next_task(application):
+    """The application's soonest open Task (through task_set), or None."""
+    open_tasks = [t for t in _related(application, "task_set") if not t.done]
+    return min(open_tasks, key=lambda t: t.due_at, default=None)
+
+
+@register.simple_tag
+def application_line(application):
+    """The one line under an application card's company: what's next for it."""
+    status = application.status
+    if status == "INTERVIEW" and application.next_step_at:
+        when = date_format(_local(application.next_step_at), "D, M j · g:i A")
+        return f"Interview {when}"
+    if status == "OFFER":
+        return "Offer received. Congrats!"
+    if status in CLOSED_STATUSES:
+        verb = "Not selected" if status == "REJECTED" else "You withdrew"
+        return f"{verb} · {date_format(_local(application.updated_at), 'M j')}"
+    if status == "APPLIED" and application.applied_on:
+        return f"Applied {date_format(application.applied_on, 'M j')}"
+    task = next_task(application)
+    if task is not None:
+        return f"{task.title} · due {date_format(_local(task.due_at), 'D, M j')}"
+    posting = application.posting
+    if posting.deadline:
+        return f"Closes {date_format(posting.deadline, 'M j')} · {countdown(posting)['text']}"
+    return "No deadline listed"
+
+
+@register.simple_tag
+def task_due(task):
+    """{"text": "Due Thu, Nov 5", "urgent": True}. Urgent: open and due within 2 days."""
+    due = _local(task.due_at)
+    days = (due.date() - timezone.localdate()).days
+    return {
+        "text": f"Due {date_format(due, 'D, M j')}",
+        "urgent": not task.done and days <= 2,
+    }
+
+
+@register.simple_tag
+def split_tasks(tasks):
+    """{"open": [...] soonest first, "done": [...]}."""
+    tasks = list(tasks or ())
+    return {
+        "open": sorted((t for t in tasks if not t.done), key=lambda t: t.due_at),
+        "done": [t for t in tasks if t.done],
+    }
+
+
+@register.simple_tag
+def due_this_week(tasks):
+    """Open tasks due from today through the next 7 days, soonest first."""
+    today = timezone.localdate()
+    soon = [
+        t
+        for t in tasks or ()
+        if not t.done and 0 <= (_local(t.due_at).date() - today).days <= 7
+    ]
+    return sorted(soon, key=lambda t: t.due_at)

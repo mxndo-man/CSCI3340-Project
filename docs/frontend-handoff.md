@@ -112,9 +112,29 @@ None of these have URL names yet: until they do, pass `form_urls={"save_to_board
 - The contracts call the field `timezone`; the model has `time_zone`. Pick one and update the other.
 - The unused `accounts/index.html`, `register.html` and `test_page.html` are still there; delete them when you're ready.
 
-### Tracker and notifications (Azael)
+### Tracker (Azael)
 
-*Added later in this branch: applications by status, tasks, the notification bell (the `nav_notifications` slot in `base.html`), saved searches and notification settings.*
+| Template | URL name | Context it reads |
+| --- | --- | --- |
+| `tracker/applications.html` | `tracker:applications` | `applications` (the user's: `select_related("posting")`, `prefetch_related("task_set")`), `tasks` (the user's, for "Due this week": `select_related("application__posting")`) |
+| `tracker/tasks.html` | `tracker:tasks` | `tasks` (the user's: `select_related("application__posting")`) |
+| `tracker/partials/application_card.html`, `task_row.html`, `tabs.html` | (partials) | `application`; `task`; `active` (`"applications"` or `"tasks"`) |
+
+The helpers do the grouping, so the view passes plain querysets: `tracker_columns` (the five columns), `closed_applications` (`REJECTED` and `WITHDRAWN`, under "Closed"), `active_count`, `application_line` (the card's one line: the interview time from `next_step_at`, "Applied" from `applied_on`, the next open task through `task_set`, or the posting's deadline), `due_this_week`, `split_tasks` and `task_due` (red when an open task is due within 2 days).
+
+| Form | Action | Fields |
+| --- | --- | --- |
+| Move a card (its menu submits on change), and Reopen under Closed | `move_application` | `application`, `status` (any `Application.status` value; Reopen sends `SAVED`), `next` |
+| Add a task | `add_task` | `title`, `due_at` (a `datetime-local` value such as `2026-11-12T17:00`, which a `DateTimeField` reads as is), `next` |
+| Tick a task | `toggle_task` | `task`, `done` (`1` or `0`: the new value), `next` |
+
+- Give `Application` and `Task` a `get_absolute_url()`: the posting page's "Open in tracker" uses the application's. Until `tracker:application_detail` and `tracker:task_detail` pages exist, pointing them at the board with an anchor works: `reverse("tracker:applications") + f"#application-{self.pk}"` (the cards have those ids), and `#task-<id>` on the tasks page.
+- "Add an application" opens a dialog that sends people to Add a posting, because `Application.posting` is required. The prototype's free-text role and company form has no field to save into.
+- The calendar isn't a tab here; it's your `/schedule/` page. The prototype's event colors: deadline clay, task ochre, interview moss.
+
+### Notifications (Azael)
+
+*Added later in this branch: the notification bell (the `nav_notifications` slot in `base.html`), saved searches and notification settings.*
 
 ### Extraction review (Liam): how FieldReview and field_details feed the fact tiles
 

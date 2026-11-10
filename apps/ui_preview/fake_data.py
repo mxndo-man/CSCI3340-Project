@@ -6,7 +6,7 @@ same whenever you open the preview. Every company, person and posting here is ma
 """
 
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -178,6 +178,41 @@ class FakeComment:
 
     def get_absolute_url(self) -> str:
         return f"{self.board_posting.get_absolute_url()}#comment-{self.id}"
+
+
+@dataclass(eq=False)
+class FakeApplication:
+    """tracker.Application, with its reverse relation task_set."""
+
+    id: int
+    user: FakeUser
+    posting: FakePosting
+    status: str  # SAVED, APPLYING, APPLIED, INTERVIEW, OFFER, REJECTED or WITHDRAWN
+    created_at: datetime
+    updated_at: datetime
+    applied_on: date | None = None
+    next_step_at: datetime | None = None
+    notes: str = ""
+    task_set: FakeManager = field(default_factory=FakeManager)
+
+    def get_absolute_url(self) -> str:
+        return f"{reverse('ui_preview:applications')}#application-{self.id}"
+
+
+@dataclass(eq=False)
+class FakeTask:
+    """tracker.Task"""
+
+    id: int
+    user: FakeUser
+    title: str
+    due_at: datetime
+    application: FakeApplication | None = None
+    done: bool = False
+    created_at: datetime | None = None
+
+    def get_absolute_url(self) -> str:
+        return f"{reverse('ui_preview:tasks')}#task-{self.id}"
 
 
 # ---- The data ---------------------------------------------------------------------------
@@ -523,6 +558,32 @@ COMMENTS = [
     (2, 3, "JS", 2880, "Clearance takes months, so they want applications in early."),
 ]
 
+# The current user's applications: posting id, status, applied (days from today),
+# next step (days from today, hour), last changed (days ago).
+APPLICATIONS = [
+    (1, "SAVED", None, None, 2),
+    (7, "SAVED", None, None, 3),
+    (8, "SAVED", None, None, 1),
+    (2, "APPLYING", None, None, 1),
+    (4, "APPLYING", None, None, 2),
+    (6, "APPLIED", -6, None, 6),
+    (5, "APPLIED", -4, None, 4),
+    (11, "APPLIED", -9, None, 9),
+    (9, "INTERVIEW", -12, (9, 14), 1),
+    (12, "REJECTED", -14, None, 3),
+    (10, "WITHDRAWN", None, None, 14),
+]
+
+# The current user's tasks: title, due (days from today), application's posting id, done.
+TASKS = [
+    ("Finish cover letter", 2, 2, False),
+    ("Submit application", 3, 4, False),
+    ("Practice interview questions", 5, 9, False),
+    ("Ask Prof. Ortiz for a reference", 9, 1, False),
+    ("Add robotics project to résumé", 17, 7, False),
+    ("Request transcript", -1, 2, True),
+]
+
 CITIZENSHIP_EVIDENCE = {
     "NOT_SPECIFIED": None,
     "US_PERSON": "Applicants must be US citizens or permanent residents.",
@@ -607,7 +668,8 @@ class World:
         self.postings = self._build_postings()
         self.reviews = self._build_reviews()
         self.boards, self.comments = self._build_boards()
-        self.applications: list = []
+        self.applications = self._build_applications()
+        self.tasks = self._build_tasks()
 
     def days(self, n: int) -> date:
         return self.today + timedelta(days=n)
@@ -799,6 +861,47 @@ class World:
 
     def comments_on(self, board_posting: FakeBoardPosting) -> list[FakeComment]:
         return [c for c in self.comments if c.board_posting is board_posting]
+
+    def at(self, days: int, hour: int) -> datetime:
+        """A time-zone-aware moment, `days` from today at `hour` o'clock local time."""
+        return timezone.make_aware(datetime.combine(self.days(days), time(hour)))
+
+    def _build_applications(self) -> list[FakeApplication]:
+        applications = []
+        for number, (posting_id, status, applied, next_step, changed) in enumerate(
+            APPLICATIONS, start=1
+        ):
+            applications.append(
+                FakeApplication(
+                    id=number,
+                    user=self.me,
+                    posting=self.postings[posting_id - 1],
+                    status=status,
+                    created_at=self.ago(days=20),
+                    updated_at=self.ago(days=changed),
+                    applied_on=self.days(applied) if applied is not None else None,
+                    next_step_at=self.at(*next_step) if next_step else None,
+                )
+            )
+        return applications
+
+    def _build_tasks(self) -> list[FakeTask]:
+        tasks = []
+        for number, (title, due, posting_id, done) in enumerate(TASKS, start=1):
+            application = self.application_for(self.postings[posting_id - 1])
+            task = FakeTask(
+                id=number,
+                user=self.me,
+                title=title,
+                due_at=self.at(due, 17),
+                application=application,
+                done=done,
+                created_at=self.ago(days=10),
+            )
+            if application is not None:
+                application.task_set.add(task)
+            tasks.append(task)
+        return tasks
 
     def application_for(self, posting: FakePosting):
         """The current user's application to this posting, if they track it."""
