@@ -45,6 +45,11 @@ def status_of(response):
     return response.status_code
 
 
+def body_of(response):
+    """The response's HTML as text, for the same reason as status_of."""
+    return response.content.decode()
+
+
 def make_user(**fields):
     defaults = {
         "username": "ana",
@@ -92,10 +97,23 @@ class ProjectPagesTests(TestCase):
         # Log out is a POST form, never a link.
         self.assertContains(response, 'action="/accounts/logout/"')
 
-    def test_real_pages_never_link_into_the_preview(self):
+    def test_with_the_preview_off_real_pages_never_link_into_it(self):
         self.client.force_login(make_user())
         response = self.client.get("/accounts/profile/")
         self.assertNotContains(response, "/preview/")
+        self.assertNotContains(response, "Preview:")
+
+    @override_settings(ROOT_URLCONF=DEV)
+    def test_with_the_preview_on_every_nav_link_works(self):
+        # Discover, Boards and Tracker have no real views yet. With UI_PREVIEW on they must
+        # still be links (to their previews), not plain text.
+        self.client.force_login(make_user())
+        response = self.client.get("/accounts/profile/")
+        page = body_of(response)
+        for label in ("Discover", "Boards", "Tracker"):
+            with self.subTest(label=label):
+                self.assertRegex(page, rf'<a href="/[^"]+"[^>]*>\s*{label}\s')
+        # The real page itself isn't a preview, so no preview banner.
         self.assertNotContains(response, "Preview:")
 
     def test_styleguide_is_off_without_debug(self):
@@ -116,10 +134,21 @@ class LinkHelperTests(TestCase):
         )
 
     @override_settings(ROOT_URLCONF=DEV)
-    def test_page_url_on_a_real_page_never_uses_the_stand_in(self):
-        for name in ui.PREVIEW_PAGES:
-            with self.subTest(name=name):
-                self.assertFalse(ui.page_url({}, name).startswith("/preview/"))
+    def test_page_url_on_a_real_page_falls_back_to_the_preview(self):
+        with mock.patch.dict(ui.PREVIEW_PAGES, {"not_built:page": "ui_preview:boards"}):
+            self.assertEqual(ui.page_url({}, "not_built:page"), "/preview/boards/")
+
+    @override_settings(ROOT_URLCONF=DEV)
+    def test_page_url_prefers_the_real_page_to_its_preview(self):
+        with mock.patch.dict(
+            ui.PREVIEW_PAGES, {"accounts:profile": "ui_preview:boards"}
+        ):
+            self.assertEqual(ui.page_url({}, "accounts:profile"), "/accounts/profile/")
+
+    @override_settings(ROOT_URLCONF=LIVE)
+    def test_page_url_with_the_preview_off_is_empty_for_unbuilt_pages(self):
+        with mock.patch.dict(ui.PREVIEW_PAGES, {"not_built:page": "ui_preview:boards"}):
+            self.assertEqual(ui.page_url({}, "not_built:page"), "")
 
     def test_page_url_finds_real_pages(self):
         self.assertEqual(ui.page_url({}, "accounts:profile"), "/accounts/profile/")

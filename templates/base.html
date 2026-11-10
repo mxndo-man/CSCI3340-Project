@@ -113,12 +113,12 @@
   </header>
 
   {% if ui_preview %}
-    {# Preview pages show fake data as a fake user; say so, so nobody mistakes it for their account. #}
+    {# Preview pages show sample data on your account; say so, so nobody thinks it's real. #}
     {% url "ui_preview:index" as preview_index_url %}
     <div role="status" class="border-b border-ochre-600/25 bg-ochre-50 text-ochre-800">
       <p class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 text-sm sm:px-6">
         {% icon "triangle-alert" "size-4 shrink-0" %}
-        <span><span class="font-semibold">Preview:</span> sample data, {% if user.is_authenticated %}seen as the fake user {% display_name user %}{% else %}seen logged out{% endif %} (nothing you do here is saved)</span>
+        <span><span class="font-semibold">Preview:</span> {% if user.is_authenticated %}sample boards, postings and tasks on your account{% else %}sample data, seen logged out{% endif %} (nothing you do here is saved)</span>
         {% if preview_index_url %}<a href="{{ preview_index_url }}" class="font-semibold underline underline-offset-2 hover:no-underline">All preview pages</a>{% endif %}
       </p>
     </div>

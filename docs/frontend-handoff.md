@@ -4,7 +4,7 @@
 
 ## 1. How it works
 
-Every page's HTML is already written, in `templates/`. Those are the **real** templates, not mockups. Until your views exist, `apps/ui_preview` feeds them fake objects shaped exactly like the models in `docs/contracts.md`, at `/preview/` (only when `UI_PREVIEW=1`). Your job is the other half: a view that renders the same template with real querysets.
+Every page's HTML is already written, in `templates/`. Those are the **real** templates, not mockups. Until your views exist, `apps/ui_preview` feeds them fake objects shaped exactly like the models in `docs/contracts.md`, at `/preview/` (only when `UI_PREVIEW=1`). The preview uses whoever is logged in as "you" (the sample boards, applications and tasks belong to your real account), and pages that need an account send logged-out visitors to log in, like the real views will. Your job is the other half: a view that renders the same template with real querysets.
 
 ```mermaid
 flowchart LR
@@ -14,7 +14,7 @@ flowchart LR
     T -- "{% load ui %}" --> UI["apps/ui/templatetags/ui.py<br/>helpers: chips, countdowns, links"]
 ```
 
-When your view is registered under its contract URL name, the nav and every link switch to it on their own; nobody edits `base.html`. Then the preview route for that page can be deleted.
+Until then, with `UI_PREVIEW=1` the nav and every link to that page open its preview (marked by a banner saying it's sample data); with it off, they show as plain text. When your view is registered under its contract URL name, the nav and every link switch to it on their own; nobody edits `base.html`. Then the preview route for that page can be deleted.
 
 Three apps are involved, and only one is temporary:
 
@@ -182,7 +182,7 @@ Then add `"apps.notifications.context_processors.notification_menu"` to `TEMPLAT
 - **Saving a search** happens on Discover (Armando's page): its form posts `name` and `filters` (the filters as JSON, the same dict `SavedSearch.filters` stores) to `save_search`. That view can live in either app; agree between you.
 - Each saved search links to Discover with its filters through `{{ search.filters|discover_query }}`. The line under it comes from `alerts_enabled` and `last_alerted_at`; the prototype's "4 new matches this week" would need a count per search, which the view could add later.
 - **Settings has two of the prototype's four switches.** The contracts have only `email_enabled` and `digest_hour`, so deadline reminders, board comments and instant matches aren't shown. Add fields to NotificationPreference if you want them back.
-- `components/settings_nav.html` links Profile, Notifications and Saved searches; each link appears once its page exists.
+- `components/settings_nav.html` links Profile, Notifications and Saved searches; each goes to its preview until the real page exists (with `UI_PREVIEW` on).
 
 ### Extraction review (Liam): how FieldReview and field_details feed the fact tiles
 
@@ -203,7 +203,7 @@ The posting page shows eight "Key facts" tiles from `{% facts_for posting review
 | `posting_chips`, `facts_for`, `fact_source`, `countdown`, `work_mode_label`, `provider_label` | Posting facts, written against the contracts' choice values |
 | `discover_menus`, `active_filter_count`, `describe_filters`, `filters_json` | Discover's filters |
 | `memberships`, `board_members`, `member_count`, `board_role`, `board_postings`, `member_overflow`, `boards_with` | Boards, read from `membership_set` and `boardposting_set` |
-| `page_url "<url name>"` | A link to a page, or `""` if it doesn't exist yet (the nav shows plain text then) |
+| `page_url "<url name>"` | A link to a page: the real one if it exists, else its preview when `UI_PREVIEW` is on, else `""` (the nav shows plain text then) |
 | `form_url "<action>" [args]` | Where a form posts (rule 4) |
 | `main_nav` | The top bar's links |
 

@@ -2,7 +2,8 @@
 
 Field names and choice values follow the contracts exactly, so a template that works on
 these works on the real models. Dates are counted from today, so the countdowns look the
-same whenever you open the preview. Every company, person and posting here is made up.
+same whenever you open the preview. "You" is whoever is logged in: the real account owns
+the fake boards, applications and tasks. Every other company, person and posting is made up.
 """
 
 from dataclasses import dataclass, field
@@ -258,8 +259,14 @@ class FakeNotificationPreference:
 
 # ---- The data ---------------------------------------------------------------------------
 
+# Fake people's ids start here, so none can equal a real user's id: templates mark "you"
+# by comparing ids, and the preview puts the logged-in account into this world. (A
+# multiple of 4 keeps each person's avatar color, which is picked from the id.)
+FAKE_ID_START = 1_000_000
+
 PEOPLE = {
-    # initials: (id, username, display_name, graduation_term)
+    # initials: (number, username, display_name, graduation_term). "LR" is "you": the
+    # logged-in account takes this place, and Liam R. only stands in when nobody is.
     "LR": (1, "liamr", "Liam R.", "Fall 2027"),
     "MK": (2, "mayak", "Maya K.", "Spring 2028"),
     "AP": (3, "arjunp", "Arjun P.", "Fall 2027"),
@@ -691,21 +698,30 @@ def _sources_and_details(
 class World:
     """Every fake object, linked together the way the real models would be."""
 
-    def __init__(self) -> None:
+    def __init__(self, me: Any = None) -> None:
+        """me: the logged-in user, who becomes "you": the owner of the boards, applications,
+        tasks, saved searches and notifications. Without one, the fake Liam R. stands in."""
         self.today = timezone.localdate()
         self.now = timezone.now()
         self.people = {
-            initials: FakeUser(id=pk, username=u, display_name=n, graduation_term=t)
-            for initials, (pk, u, n, t) in PEOPLE.items()
+            initials: FakeUser(
+                id=FAKE_ID_START + number, username=u, display_name=n, graduation_term=t
+            )
+            for initials, (number, u, n, t) in PEOPLE.items()
         }
         self.extra_people = [
             FakeUser(
-                id=len(PEOPLE) + n, username=name.split()[0].lower(), display_name=name
+                id=FAKE_ID_START + len(PEOPLE) + number,
+                username=name.split()[0].lower(),
+                display_name=name,
             )
-            for n, name in enumerate(EXTRA_PEOPLE, start=1)
+            for number, name in enumerate(EXTRA_PEOPLE, start=1)
         ]
-        self.me = self.people["LR"]
-        self.me.email = "liam@example.edu"
+        if me is None:
+            self.me = self.people["LR"]
+            self.me.email = "liam@example.edu"
+        else:
+            self.me = self.people["LR"] = me
         self.postings = self._build_postings()
         self.reviews = self._build_reviews()
         self.boards, self.comments = self._build_boards()
@@ -897,12 +913,16 @@ class World:
             comments.append(FakeComment(number, bp, self.people[author], body, when))
         return boards, comments
 
+    def is_me(self, person: Any) -> bool:
+        """Is this person "you"? By id, like the templates, so it works for a real user."""
+        return person is not None and person.id == self.me.id
+
     def my_boards(self) -> list[FakeBoard]:
         """The current user's boards."""
         return [
             b
             for b in self.boards
-            if any(m.user is self.me for m in b.membership_set.all())
+            if any(self.is_me(m.user) for m in b.membership_set.all())
         ]
 
     def board(self, pk: int) -> FakeBoard | None:
@@ -1065,7 +1085,7 @@ class World:
         others = [
             c
             for c in self.comments
-            if c.author is not self.me and c.board_posting.board in mine
+            if not self.is_me(c.author) and c.board_posting.board in mine
         ]
         return sorted(others, key=lambda c: c.created_at, reverse=True)[:limit]
 
@@ -1079,9 +1099,10 @@ class World:
         return any(s.filters == wanted for s in self.saved_searches)
 
 
-def world() -> World:
-    """Fresh fake data, counted from today. Cheap enough to build on every request."""
-    return World()
+def world(me: Any = None) -> World:
+    """Fresh fake data, counted from today, with `me` (the logged-in user) as "you".
+    Cheap enough to build on every request."""
+    return World(me)
 
 
 def landing_postings() -> list[FakePosting]:

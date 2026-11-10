@@ -559,13 +559,14 @@ def _reverse_first(names, args):
 def page_url(context, name, *args):
     """Link to a page by its contract URL name, or "" if nothing serves it yet.
 
-    On a real page it's the real URL only, so a page nobody has built yet shows as plain
-    text (and a real user never lands in the preview as the fake user). On a preview page
-    it's the preview's stand-in, so a demo stays inside the preview.
+    Real pages win. Until its owner builds a page, its preview stands in when UI_PREVIEW
+    is on (the preview banner says it's sample data); with it off, the link is "" and the
+    nav shows plain text. Preview pages link to other preview pages first, so a demo stays
+    inside the preview.
     """
-    if context.get("ui_preview"):
-        return _reverse_first([PREVIEW_PAGES.get(name), name], args)
-    return _reverse_first([name], args)
+    stand_in = PREVIEW_PAGES.get(name)
+    names = [stand_in, name] if context.get("ui_preview") else [name, stand_in]
+    return _reverse_first(names, args)
 
 
 # Forms that already have a real URL to post to. An action that isn't here gets its URL

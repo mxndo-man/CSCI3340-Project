@@ -1,11 +1,16 @@
 """The preview pages: the real templates rendered with fake objects from fake_data.py,
-so the UI works before the models exist. Nothing here touches the database.
+so the UI works before the models exist. Nothing here writes to the database.
+
+The pages show the sample data on whoever is logged in. Pages that need an account in the
+real app (the prototype's home, add, boards, tracker and settings) send logged-out
+visitors to log in, the same way the real views will.
 """
 
 from datetime import timedelta
 
 from django import forms
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.core.paginator import Paginator
 from django.http import Http404
@@ -46,9 +51,15 @@ FORM_ACTIONS = (
 )
 
 
+def _world(request):
+    """The sample data, with the logged-in user (if any) as "you"."""
+    return fake_data.world(request.user if request.user.is_authenticated else None)
+
+
 def _context(request, world, nav_active="", **extra):
-    """What every preview page gets. ?as=visitor shows the logged-out version."""
-    visitor = request.GET.get("as") == "visitor"
+    """What every preview page gets. Logged out, or with ?as=visitor on a public page, it's
+    the logged-out version."""
+    visitor = not request.user.is_authenticated or request.GET.get("as") == "visitor"
     action_url = reverse("ui_preview:action")
     context = {
         "ui_preview": True,
@@ -133,7 +144,7 @@ INDEX_PAGES = [
 
 def index(request):
     """A list of every preview page."""
-    world = fake_data.world()
+    world = _world(request)
     pages = [
         (label, reverse(name, args=args), template)
         for label, name, args, template in INDEX_PAGES
@@ -144,7 +155,7 @@ def index(request):
 
 
 def discover(request):
-    world = fake_data.world()
+    world = _world(request)
     filters = parse_filters(request.GET)
     sort = request.GET.get("sort", "closing")
     if sort not in SORTS:
@@ -168,7 +179,7 @@ def discover(request):
 
 
 def posting_detail(request, pk):
-    world = fake_data.world()
+    world = _world(request)
     posting = world.posting(pk)
     if posting is None:
         raise Http404("No such posting in the preview data")
@@ -183,19 +194,22 @@ def posting_detail(request, pk):
     return render(request, "postings/detail.html", context)
 
 
+@login_required
 def posting_add(request):
-    world = fake_data.world()
+    world = _world(request)
     return render(request, "postings/add.html", _context(request, world, "postings"))
 
 
+@login_required
 def boards(request):
-    world = fake_data.world()
+    world = _world(request)
     context = _context(request, world, "boards", boards=world.my_boards())
     return render(request, "boards/list.html", context)
 
 
+@login_required
 def board_detail(request, pk):
-    world = fake_data.world()
+    world = _world(request)
     board = world.board(pk)
     if board is None:
         raise Http404("No such board in the preview data")
@@ -230,7 +244,7 @@ class JoinBoardForm(forms.Form):
 
 def _preview_form_page(request, form_class, template):
     """GET shows the form; POST shows its errors, or says nothing was saved."""
-    world = fake_data.world()
+    world = _world(request)
     form = form_class(request.POST or None)
     if request.method == "POST" and form.is_valid():
         messages.info(request, "Preview only, nothing was saved")
@@ -238,16 +252,19 @@ def _preview_form_page(request, form_class, template):
     return render(request, template, _context(request, world, "boards", form=form))
 
 
+@login_required
 def board_create(request):
     return _preview_form_page(request, BoardForm, "boards/create.html")
 
 
+@login_required
 def board_join(request):
     return _preview_form_page(request, JoinBoardForm, "boards/join.html")
 
 
+@login_required
 def applications(request):
-    world = fake_data.world()
+    world = _world(request)
     context = _context(
         request,
         world,
@@ -258,33 +275,38 @@ def applications(request):
     return render(request, "tracker/applications.html", context)
 
 
+@login_required
 def tasks(request):
-    world = fake_data.world()
+    world = _world(request)
     context = _context(request, world, "tracker", tasks=world.tasks)
     return render(request, "tracker/tasks.html", context)
 
 
+@login_required
 def notifications(request):
-    world = fake_data.world()
+    world = _world(request)
     context = _context(request, world, notifications=world.notifications)
     return render(request, "notifications/list.html", context)
 
 
+@login_required
 def saved_searches(request):
-    world = fake_data.world()
+    world = _world(request)
     context = _context(request, world, saved_searches=world.saved_searches)
     return render(request, "notifications/saved_searches.html", context)
 
 
+@login_required
 def preferences(request):
-    world = fake_data.world()
+    world = _world(request)
     context = _context(request, world, preferences=world.preferences)
     return render(request, "notifications/preferences.html", context)
 
 
+@login_required
 def home(request, newcomer=False):
     """The home dashboard. /preview/home/new/ shows it for a brand-new user with nothing yet."""
-    world = fake_data.world()
+    world = _world(request)
     search = (
         None
         if newcomer
