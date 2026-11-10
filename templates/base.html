@@ -1,81 +1,155 @@
-<!-- base.html -->
-{% load static tailwind_cli %}
-<!DOCTYPE html>
+{% load static tailwind_cli ui %}<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}My Project Workspace{% endblock %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Shortlist · Internships you can actually apply to{% endblock %}</title>
 
-    <!-- Alpine.js CDN scripts live here in the head -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400..700&family=Roboto+Mono:wght@400..600&display=swap">
 
-    {% tailwind_css %}
+  {% tailwind_css %}
 
-    <!-- HTMX for fast, seamless network requests -->
-    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg" crossorigin="anonymous"></script>
-
+  {# Alpine shows and hides things: menus, dialogs, tabs and the mobile menu. #}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  {# htmx is for small trips to the server. hx-headers on <body> sends the CSRF token with each one. #}
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg" crossorigin="anonymous"></script>
+  {% block extra_head %}{% endblock %}
 </head>
-<body  class="bg-background-color text-slate-100 min-h-screen flex flex-col"> <!-- No background color chosen -->
-    <div> 
-        <nav class = "bg-[#1e3a5f] text-slate-900 rounded-2xl shadow-lg px-6 py-4 mx-4 mt-4">
-        <div class = "flex-1 text-center">
-            <h1 class = "text-white text-xl font-bold">
-                <a href="/">Job Listings Inc</a>
-            </h1>
-        </div>
+<body class="flex min-h-screen flex-col" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-2 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:shadow-pop">Skip to content</a>
 
-        
-        <div class="flex items-center justify-end gap-3 text-sm font-semibold">
-            {% if user.is_authenticated %}
-            <a href="{% url 'accounts:profile' %}"
-            class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
-                Profile
+  {% main_nav as nav %}
+  {% page_url "landing" as landing_url %}
+  {% page_url "home" as home_url %}
+  {% page_url "notifications:saved_searches" as searches_url %}
+  {% page_url "notifications:preferences" as preferences_url %}
+
+  <header class="sticky top-0 z-30 border-b border-sand-200 bg-sand-50/90 backdrop-blur" x-data="{ mobileOpen: false }" @keydown.escape.window="mobileOpen = false">
+    <div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-6">
+      <a href="{% if user.is_authenticated %}{{ home_url }}{% else %}{{ landing_url }}{% endif %}" class="font-serif text-[22px] font-semibold leading-7 tracking-tight text-bark-900">Shortlist</a>
+
+      <nav aria-label="Main" class="hidden h-full items-center gap-1 md:flex">
+        {% for item in nav %}
+          {% if item.url %}
+            <a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %} class="relative flex h-full items-center px-3 text-sm font-medium transition-colors {% if item.active %}text-bark-900{% else %}text-bark-500 hover:text-bark-900{% endif %}">
+              {{ item.label }}
+              {% if item.active %}<span aria-hidden="true" class="absolute inset-x-3 -bottom-px h-0.5 rounded-full bg-clay-600"></span>{% endif %}
             </a>
-            <form method="post" action="{% url 'logout' %}">
+          {% else %}
+            <span class="flex h-full items-center px-3 text-sm font-medium text-bark-500">{{ item.label }}</span>
+          {% endif %}
+        {% endfor %}
+      </nav>
+
+      <div class="ml-auto flex items-center gap-2">
+        {% if user.is_authenticated %}
+          {# The bell. Azael's notifications app fills `notification_menu` (see docs/frontend-handoff.md). #}
+          {% block nav_notifications %}
+            {% if notification_menu %}{% include "notifications/menu.html" with menu=notification_menu %}{% endif %}
+          {% endblock %}
+
+          <div class="relative hidden md:block" x-data="{ open: false }" @keydown.escape.window="open = false" @click.outside="open = false">
+            <button type="button" @click="open = !open" :aria-expanded="open" aria-expanded="false" aria-haspopup="menu" aria-label="Account menu" class="flex items-center gap-1 rounded-full p-0.5 pr-1.5 hover:bg-sand-100" :class="open && 'bg-sand-100'">
+              {% include "components/avatar.html" with person=user %}
+              <span class="text-bark-500 transition-transform" :class="open && 'rotate-180'">{% icon "chevron-down" "size-4" %}</span>
+            </button>
+            <div x-show="open" x-cloak role="menu" class="popover absolute right-0 top-full z-40 mt-2 w-64 rounded-2xl border border-sand-200 bg-white p-1.5 shadow-pop">
+              <div class="flex items-center gap-3 px-3 py-3">
+                {% include "components/avatar.html" with person=user size="lg" %}
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold text-bark-900">{% display_name user %}</p>
+                  <p class="truncate text-xs text-bark-500">@{{ user.username }}{% if user.graduation_term %} · {{ user.graduation_term }}{% endif %}</p>
+                </div>
+              </div>
+              <div class="my-1 h-px bg-sand-100"></div>
+              <a role="menuitem" href="{% url 'accounts:profile' %}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-bark-900 hover:bg-sand-50">Settings</a>
+              {% if searches_url %}<a role="menuitem" href="{{ searches_url }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-bark-900 hover:bg-sand-50">Saved searches</a>{% endif %}
+              {% if preferences_url %}<a role="menuitem" href="{{ preferences_url }}" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-bark-900 hover:bg-sand-50">Notification settings</a>{% endif %}
+              <div class="my-1 h-px bg-sand-100"></div>
+              <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
-                <button type="submit"
-                class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
-                    Log Out
-                </button>
-            </form>
-            {% else %}
-            <a href="{% url 'login' %}"
-            class="px-4 py-2 bg-gray-400 text-slate-900 rounded-lg hover:bg-sky-300 transition-colors">
-                Log In
-            </a>
+                <button type="submit" role="menuitem" class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-brick-700 hover:bg-brick-50">{% icon "log-out" "size-4" %}Log out</button>
+              </form>
+            </div>
+          </div>
+        {% else %}
+          <span class="hidden md:inline-flex"><a href="{% url 'login' %}" class="{% button_class 'ghost' 'sm' %}">Log in</a></span>
+          <a href="{% url 'accounts:signup' %}" class="{% button_class 'primary' 'sm' %}">Sign up</a>
+        {% endif %}
 
-            <a href="{% url 'accounts:signup' %}"
-            class="px-4 py-2 bg-yellow-400 text-slate-900 rounded-lg hover:bg-yellow-300 transition-colors">
-                Sign Up
-            </a>
-            {% endif %}
-        </div>
+        <button type="button" @click="mobileOpen = !mobileOpen" :aria-expanded="mobileOpen" aria-expanded="false" :aria-label="mobileOpen ? 'Close menu' : 'Open menu'" aria-label="Open menu" class="inline-flex size-9 items-center justify-center rounded-full text-bark-700 hover:bg-sand-100 md:hidden">
+          <span x-show="!mobileOpen">{% icon "menu" "size-5" %}</span>
+          <span x-show="mobileOpen" x-cloak>{% icon "x" "size-5" %}</span>
+        </button>
+      </div>
+    </div>
 
+    <div x-show="mobileOpen" x-cloak class="border-t border-sand-200 bg-sand-50 px-4 pb-4 pt-2 md:hidden">
+      <nav aria-label="Main" class="flex flex-col">
+        {% for item in nav %}
+          {% if item.url %}
+            <a href="{{ item.url }}"{% if item.active %} aria-current="page"{% endif %} class="block rounded-xl px-3 py-3 text-[15px] font-medium {% if item.active %}bg-clay-50 text-clay-700{% else %}text-bark-900 hover:bg-sand-100{% endif %}">{{ item.label }}</a>
+          {% else %}
+            <span class="block rounded-xl px-3 py-3 text-[15px] font-medium text-bark-500">{{ item.label }}</span>
+          {% endif %}
+        {% endfor %}
+      </nav>
+      <div class="mt-2 border-t border-sand-200 pt-2">
+        {% if user.is_authenticated %}
+          <a href="{% url 'accounts:profile' %}" class="block rounded-xl px-3 py-3 text-[15px] font-medium text-bark-900 hover:bg-sand-100">Settings</a>
+          {% if searches_url %}<a href="{{ searches_url }}" class="block rounded-xl px-3 py-3 text-[15px] font-medium text-bark-900 hover:bg-sand-100">Saved searches</a>{% endif %}
+          {% if preferences_url %}<a href="{{ preferences_url }}" class="block rounded-xl px-3 py-3 text-[15px] font-medium text-bark-900 hover:bg-sand-100">Notification settings</a>{% endif %}
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="block w-full rounded-xl px-3 py-3 text-left text-[15px] font-medium text-brick-700 hover:bg-brick-50">Log out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="block rounded-xl px-3 py-3 text-[15px] font-medium text-bark-900 hover:bg-sand-100">Log in</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
 
-        <ul class="flex justify-center gap-8 py-2">
-            <li>
-                <a href='/' class="text-slate-200 hover:text-brand-yellow transition-colors">
-                    <span>Home</span>
-                </a>
-            </li>
-            <li>
-                <a href='#' class="text-slate-200 hover:text-brand-yellow transition-colors">
-                    <span>About</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" class="text-slate-200 hover:text-brand-yellow transition-colors">
-                    <span>Boards</span>
-                </a>
-            </li>
-        </ul>
-        </nav>
-    </div> <!-- End of Nav -->
+  {% if ui_preview %}
+    {# Preview pages show sample data on your account; say so, so nobody thinks it's real. #}
+    {% url "ui_preview:index" as preview_index_url %}
+    <div role="status" class="border-b border-ochre-600/25 bg-ochre-50 text-ochre-800">
+      <p class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 text-sm sm:px-6">
+        {% icon "triangle-alert" "size-4 shrink-0" %}
+        <span><span class="font-semibold">Preview:</span> {% if user.is_authenticated %}sample boards, postings and tasks on your account{% else %}sample data, seen logged out{% endif %} (nothing you do here is saved)</span>
+        {% if preview_index_url %}<a href="{{ preview_index_url }}" class="font-semibold underline underline-offset-2 hover:no-underline">All preview pages</a>{% endif %}
+      </p>
+    </div>
+  {% endif %}
 
-    <!-- This is the hook where subpages are insrted after its extended! -->
-    {% block content %}
-    {% endblock %}
+  <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
+    {% block content %}{% endblock %}
+  </main>
 
+  <footer class="border-t border-sand-200">
+    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 text-sm text-bark-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span class="font-serif text-lg font-semibold text-bark-900">Shortlist</span>
+        <span>Internships you can actually apply to.</span>
+      </p>
+      <p>{% if ui_preview %}Preview · sample data, nothing is saved{% else %}Postings come from employers' public job boards.{% endif %}</p>
+    </div>
+  </footer>
+
+  {# Toasts: Django messages from the server, plus $dispatch('toast', { message }) from Alpine. #}
+  <div aria-live="polite" class="pointer-events-none fixed inset-x-0 bottom-6 z-[60] flex flex-col items-center gap-2 px-4"
+       x-data="{ toasts: [], add(message) { const id = Date.now() + Math.random(); this.toasts.push({ id, message }); setTimeout(() => { this.toasts = this.toasts.filter((t) => t.id !== id) }, 4000) } }"
+       @toast.window="add($event.detail.message)">
+    {% for message in messages %}
+      <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" class="toast-in rounded-full bg-bark-900 px-4 py-2.5 text-center text-sm font-medium text-sand-50 shadow-pop">{{ message }}</div>
+    {% endfor %}
+    <template x-for="toast in toasts" :key="toast.id">
+      <div class="toast-in rounded-full bg-bark-900 px-4 py-2.5 text-center text-sm font-medium text-sand-50 shadow-pop" x-text="toast.message"></div>
+    </template>
+  </div>
+
+  {% block scripts %}{% endblock %}
 </body>
 </html>

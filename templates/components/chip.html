@@ -1,0 +1,6 @@
+{% load ui %}{% comment %}
+A small label that carries meaning by color.
+  {% include "components/chip.html" with tone="good" label="No clearance" %}
+tone: good (moss), warn (ochre), alert (brick), accent (clay), or neutral (sand, the default).
+icon: optional icon name from components/icons/.
+{% endcomment %}<span class="inline-flex h-6 items-center gap-1 whitespace-nowrap rounded-full px-2.5 text-xs font-medium {% if tone == 'good' %}bg-moss-50 text-moss-700{% elif tone == 'warn' %}bg-ochre-50 text-ochre-800{% elif tone == 'alert' %}bg-brick-50 text-brick-700{% elif tone == 'accent' %}bg-clay-50 text-clay-700{% else %}bg-sand-100 text-bark-700{% endif %}">{% if icon %}{% icon icon "size-3.5" %}{% endif %}{{ label }}</span>

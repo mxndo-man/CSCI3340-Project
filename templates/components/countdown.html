@@ -1,0 +1,5 @@
+{% load ui %}{% comment %}
+Time left before a deadline, colored by urgency.
+  {% include "components/countdown.html" with deadline=posting %}
+deadline: a posting (reads deadline, deadline_type and status) or a date. class: extra classes.
+{% endcomment %}{% countdown deadline as cd %}<span class="inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-medium {% if cd.tone == 'urgent' %}text-brick-700{% elif cd.tone == 'soon' %}text-ochre-800{% else %}text-bark-500{% endif %} {{ class }}">{% icon "clock" "size-3.5" %}{{ cd.text }}</span>

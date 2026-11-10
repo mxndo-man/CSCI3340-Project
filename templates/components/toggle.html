@@ -1,0 +1,5 @@
+{% comment %}
+An on/off switch that submits its form. Put it inside a <form method="post">.
+  {% include "components/toggle.html" with name="alerts_enabled" checked=search.alerts_enabled label="Alerts for this search" %}
+It sends name=true when switching on and name=false when switching off.
+{% endcomment %}<button type="submit" role="switch" aria-checked="{% if checked %}true{% else %}false{% endif %}" aria-label="{{ label }}" name="{{ name }}" value="{% if checked %}false{% else %}true{% endif %}" class="relative inline-flex h-6 w-10 shrink-0 items-center rounded-full transition-colors {% if checked %}bg-clay-600{% else %}bg-sand-300{% endif %}"><span class="inline-block size-5 rounded-full bg-white shadow-sm transition-transform {% if checked %}translate-x-[18px]{% else %}translate-x-0.5{% endif %}"></span></button>
