@@ -18,5 +18,9 @@
     {% if tracker_url %}<a href="{{ tracker_url }}" class="{% button_class 'secondary' %}">Your tracker</a>{% endif %}
     <a href="{% url 'accounts:profile' %}" class="{% button_class 'ghost' %}">Edit your profile</a>
   </div>
+  {% url "ui_preview:index" as preview_url %}
+  {% if preview_url %}
+    <p class="mt-10 text-sm text-bark-500">Want to see the finished pages? <a href="{{ preview_url }}" class="font-semibold text-clay-700 hover:underline">Open the preview on sample data</a>.</p>
+  {% endif %}
 </div>
 {% endblock %}

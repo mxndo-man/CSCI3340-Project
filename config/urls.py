@@ -19,7 +19,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
-from apps.ui_preview.views import styleguide
+from apps.ui.views import styleguide
 from config.views import HomeView, landing
 
 urlpatterns = [

@@ -56,7 +56,9 @@ INSTALLED_APPS = [
     "apps.tracker",
     "apps.notifications",
     "apps.ingestion",
-    # Template helpers ({% load ui %}), the style guide and the /preview/ pages. No models.
+    # Template helpers ({% load ui %}) and the style guide. Every page needs it. No models.
+    "apps.ui",
+    # The /preview/ pages on fake data, until the real views exist. No models.
     "apps.ui_preview",
 ]
 

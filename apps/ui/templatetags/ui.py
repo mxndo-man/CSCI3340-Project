@@ -526,8 +526,9 @@ def countdown(posting_or_date):
 
 # ---- Links to pages ---------------------------------------------------------------------
 
-# Contract URL names (docs/contracts.md section 7) and the preview page that stands in for
-# each one until its owner builds it. Delete this map when the preview app goes away.
+# Contract URL names (docs/contracts.md section 7) and the preview page for each one.
+# notifications:preferences isn't in section 7 yet; it's proposed in the handoff doc.
+# Delete this map when the preview app goes away.
 PREVIEW_PAGES = {
     "home": "ui_preview:home",
     "postings:discover": "ui_preview:discover",
@@ -556,12 +557,13 @@ def _reverse_first(names, args):
 def page_url(context, name, *args):
     """Link to a page by its contract URL name, or "" if nothing serves it yet.
 
-    Real pages win. Until a page exists, its preview stands in (when UI_PREVIEW is on).
-    Preview pages link to other preview pages, so a demo stays inside the preview.
+    On a real page it's the real URL only, so a page nobody has built yet shows as plain
+    text (and a real user never lands in the preview as the fake user). On a preview page
+    it's the preview's stand-in, so a demo stays inside the preview.
     """
-    stand_in = PREVIEW_PAGES.get(name)
-    names = [stand_in, name] if context.get("ui_preview") else [name, stand_in]
-    return _reverse_first(names, args)
+    if context.get("ui_preview"):
+        return _reverse_first([PREVIEW_PAGES.get(name), name], args)
+    return _reverse_first([name], args)
 
 
 # Forms that already have a real URL to post to. An action that isn't here gets its URL
