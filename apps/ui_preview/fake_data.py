@@ -8,6 +8,7 @@ same whenever you open the preview. Every company, person and posting here is ma
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
+from functools import cached_property
 from typing import Any
 
 from django.urls import reverse
@@ -711,8 +712,13 @@ class World:
         self.applications = self._build_applications()
         self.tasks = self._build_tasks()
         self.saved_searches = self._build_saved_searches()
-        self.notifications = self._build_notifications()
         self.preferences = FakeNotificationPreference(user=self.me)
+
+    @cached_property
+    def notifications(self) -> list[FakeNotification]:
+        """Built on first use: their links are /preview/ URLs, which only exist with the
+        preview on, and the landing page borrows this world's postings with it off."""
+        return self._build_notifications()
 
     def days(self, n: int) -> date:
         return self.today + timedelta(days=n)
