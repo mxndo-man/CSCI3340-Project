@@ -8,7 +8,8 @@ from .models import CustomUser  # Grabs the custom user model thats in apps
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Email Address")
 
-    class Meta(UserCreationForm.Meta):
+    # django-types' stubs omit UserCreationForm.Meta and clean_username; Django has both.
+    class Meta(UserCreationForm.Meta):  # pyright: ignore[reportAttributeAccessIssue]
         model = CustomUser
         fields = (
             "username",
@@ -16,7 +17,7 @@ class CustomUserCreationForm(UserCreationForm):
         )  # Reqiure usernmae and email when creating new user.
 
     def clean_username(self):
-        username = super().clean_username()
+        username = super().clean_username()  # pyright: ignore[reportAttributeAccessIssue]
         if username and "@" in username:
             raise ValidationError("Usernames cannot contain the '@' symbol.")
         return username
