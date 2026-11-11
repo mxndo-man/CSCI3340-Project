@@ -5,7 +5,7 @@ the same on the preview's fake objects and on the real models.
 """
 
 import json
-from datetime import date, time
+from datetime import date, datetime
 from decimal import Decimal
 from urllib.parse import urlencode
 
@@ -837,7 +837,10 @@ def saved_search_line(search):
 @register.simple_tag
 def digest_hours():
     """(hour, label) for every NotificationPreference.digest_hour: (8, "8:00 AM")."""
-    return [(hour, date_format(time(hour), "g:i A")) for hour in range(24)]
+    # Any date works: the format only shows the hour.
+    return [
+        (hour, date_format(datetime(2000, 1, 1, hour), "g:i A")) for hour in range(24)
+    ]
 
 
 @register.simple_tag
