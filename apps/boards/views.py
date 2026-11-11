@@ -77,7 +77,11 @@ def remove_member_view(request, board_id, user_id):
 
 @login_required
 def board_list_view(request):
-    boards = Board.objects.filter(membership__user=request.user).order_by("-created_at")
+    boards = (
+        Board.objects.filter(membership__user=request.user)
+        .prefetch_related("membership_set__user")
+        .order_by("-created_at")
+    )
     return render(request, "boards/list.html", {"boards": boards})
 
 

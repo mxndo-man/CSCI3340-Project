@@ -24,6 +24,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
+    "django-types>=0.24.0",
     "pyright>=1.1.414",
     "taskipy>=1.14.1",
 ]

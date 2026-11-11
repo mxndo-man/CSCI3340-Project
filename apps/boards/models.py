@@ -1,9 +1,12 @@
 import secrets
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from django.conf import settings
 from django.db import IntegrityError, models, transaction
 from django.urls import reverse
+
+if TYPE_CHECKING:
+    from django.db.models.manager import RelatedManager
 
 
 class Board(models.Model):
@@ -27,6 +30,9 @@ class Board(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Django adds this reverse relation at runtime; the annotation tells pyright about it.
+    membership_set: RelatedManager[Membership]
 
     def save(self, *args, **kwargs):
         """Function to save join_code
