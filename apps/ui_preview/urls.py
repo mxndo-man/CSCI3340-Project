@@ -1,0 +1,29 @@
+"""The preview pages, at /preview/ only when UI_PREVIEW is on (see config/urls.py).
+
+Each path is the real path from docs/contracts.md section 7, under /preview/.
+"""
+
+from django.urls import path
+
+from . import views
+
+app_name = "ui_preview"
+
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("action/", views.action, name="action"),
+    path("home/", views.home, name="home"),
+    path("home/new/", views.home, {"newcomer": True}, name="home_new"),
+    path("postings/", views.discover, name="discover"),
+    path("postings/add/", views.posting_add, name="posting_add"),
+    path("postings/<int:pk>/", views.posting_detail, name="posting_detail"),
+    path("boards/", views.boards, name="boards"),
+    path("boards/new/", views.board_create, name="board_create"),
+    path("boards/join/", views.board_join, name="board_join"),
+    path("boards/<int:pk>/", views.board_detail, name="board_detail"),
+    path("tracker/applications/", views.applications, name="applications"),
+    path("tracker/tasks/", views.tasks, name="tasks"),
+    path("notifications/", views.notifications, name="notifications"),
+    path("notifications/searches/", views.saved_searches, name="saved_searches"),
+    path("notifications/preferences/", views.preferences, name="preferences"),
+]

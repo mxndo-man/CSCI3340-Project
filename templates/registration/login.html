@@ -1,19 +1,30 @@
 {% extends "base.html" %}
+{% load ui %}
 
-{% block title %}Log In | My Project Workspace{% endblock %}
+{% block title %}Log in · Shortlist{% endblock %}
 
 {% block content %}
-<main class="mx-auto mt-8 w-full max-w-xl rounded-2xl bg-slate-800 p-8 shadow-lg">
-    <h1 class="mb-6 text-2xl font-bold">Log In</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="mt-4 rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-slate-900 hover:bg-yellow-300">
-            Log in
-        </button>
+<div class="mx-auto flex max-w-6xl justify-center px-4 py-12 sm:px-6 sm:py-16">
+  <section class="w-full max-w-md rounded-2xl border border-sand-200 bg-white p-6 sm:p-8">
+    <h1 class="font-serif text-h1 font-semibold text-bark-900">Welcome back</h1>
+    <p class="mt-2 text-[15px] text-bark-700">Log in to see your boards and tracker.</p>
+
+    <form method="post" novalidate class="mt-6 space-y-4">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% if form.non_field_errors %}
+        {% include "components/banner.html" with tone="alert" title=form.non_field_errors.0 only %}
+      {% endif %}
+      {% include "components/field.html" with field=form.username label="Email or username" no_hint=True %}
+      {% include "components/field.html" with field=form.password no_hint=True %}
+      <button type="submit" class="{% button_class 'primary' 'md' 'w-full' %}">Log in</button>
     </form>
-    <p class="mt-4">
-        <a class="text-sky-300 hover:underline" href="{% url 'accounts:signup' %}">Create an account</a>
+
+    <p class="mt-6 text-center text-sm text-bark-700">
+      New to Shortlist?
+      <a href="{% url 'accounts:signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}" class="font-semibold text-clay-700 hover:underline">Create an account</a>
     </p>
-</main>
+    <p class="mt-3 text-center text-sm"><a href="{% url 'password_reset' %}" class="text-bark-500 hover:text-bark-900 hover:underline">Forgot your password?</a></p>
+  </section>
+</div>
 {% endblock %}

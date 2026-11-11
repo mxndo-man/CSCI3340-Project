@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Add a posting · Shortlist{% endblock %}
+
+{% block content %}
+{% comment %}
+Add a posting by hand (postings:add). One form, posted to form_urls.add_posting as
+multipart/form-data, with whichever field the chosen tab fills in:
+  source_url   a link to the posting (Greenhouse, Lever or Ashby work best)
+  source_text  the posting's text
+  pdf          a PDF of the posting
+plus next. The view reads it with the extraction client (contracts section 5).
+{% endcomment %}
+{% page_url "postings:discover" as discover_url %}
+<div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+  {% include "components/back_link.html" with href=discover_url label="Back to Discover" only %}
+  <div class="mt-6">
+    <h1 class="font-serif text-h1 font-semibold text-bark-900">Add a posting</h1>
+    <p class="mt-2 text-[15px] text-bark-700">Found an internship that isn't on Shortlist? Add it and we'll pull out the key facts.</p>
+  </div>
+
+  <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <section class="rounded-2xl border border-sand-200 bg-white p-6"
+             x-data="{
+               tab: 'link', error: '', busy: false, fileName: '',
+               tabs: ['link', 'text', 'pdf'],
+               choose(name) { this.tab = name; this.error = ''; },
+               step(by) {
+                 const next = this.tabs[(this.tabs.indexOf(this.tab) + by + 3) % 3];
+                 this.choose(next);
+                 this.$nextTick(() => this.$refs['tab-' + next].focus());
+               },
+               check(form) {
+                 const empty = this.tab === 'pdf' ? !form.pdf.files.length
+                   : !(this.tab === 'link' ? form.source_url : form.source_text).value.trim();
+                 const messages = { link: 'Paste a link to the posting first.', text: 'Paste the posting text first.', pdf: 'Choose a PDF first.' };
+                 this.error = empty ? messages[this.tab] : '';
+                 return !empty;
+               },
+             }">
+      <div role="tablist" aria-label="How do you want to add it?" class="flex flex-wrap gap-1 rounded-full bg-sand-100 p-1" @keydown.arrow-right.prevent="step(1)" @keydown.arrow-left.prevent="step(-1)">
+        <button type="button" role="tab" id="tab-link" x-ref="tab-link" aria-controls="add-panel" @click="choose('link')" :aria-selected="tab === 'link'" :tabindex="tab === 'link' ? 0 : -1" :class="tab === 'link' ? 'bg-white text-bark-900 shadow-sm' : 'text-bark-500 hover:text-bark-900'" class="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors">{% icon "link" "size-4" %}Paste a link</button>
+        <button type="button" role="tab" id="tab-text" x-ref="tab-text" aria-controls="add-panel" @click="choose('text')" :aria-selected="tab === 'text'" :tabindex="tab === 'text' ? 0 : -1" :class="tab === 'text' ? 'bg-white text-bark-900 shadow-sm' : 'text-bark-500 hover:text-bark-900'" class="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors">{% icon "file-text" "size-4" %}Paste the text</button>
+        <button type="button" role="tab" id="tab-pdf" x-ref="tab-pdf" aria-controls="add-panel" @click="choose('pdf')" :aria-selected="tab === 'pdf'" :tabindex="tab === 'pdf' ? 0 : -1" :class="tab === 'pdf' ? 'bg-white text-bark-900 shadow-sm' : 'text-bark-500 hover:text-bark-900'" class="inline-flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors">{% icon "upload" "size-4" %}Upload a PDF</button>
+      </div>
+
+      <form method="post" action="{% form_url "add_posting" %}" enctype="multipart/form-data" novalidate class="mt-6" @submit="if (check($el)) { busy = true } else { $event.preventDefault() }">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <div role="tabpanel" id="add-panel" :aria-labelledby="'tab-' + tab">
+          <div x-show="tab === 'link'">
+            <label for="source_url" class="mb-1.5 block text-sm font-medium text-bark-900">Posting link</label>
+            <input id="source_url" type="url" name="source_url" placeholder="https://boards.greenhouse.io/…" aria-describedby="source_url_hint" @input="error = ''" :aria-invalid="error !== ''" :class="error ? 'border-brick-700' : 'border-sand-400'" class="h-11 w-full rounded-xl border bg-white px-3.5 text-[15px] text-bark-900 transition placeholder:text-bark-500 focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+            <p id="source_url_hint" class="mt-1.5 text-xs text-bark-500">Works best with Greenhouse, Lever and Ashby links.</p>
+          </div>
+          <div x-show="tab === 'text'" x-cloak>
+            <label for="source_text" class="mb-1.5 block text-sm font-medium text-bark-900">Posting text</label>
+            <textarea id="source_text" name="source_text" rows="8" placeholder="Paste everything from the job description…" @input="error = ''" :aria-invalid="error !== ''" :class="error ? 'border-brick-700' : 'border-sand-400'" class="w-full resize-y rounded-xl border bg-white px-3.5 py-3 text-[15px] text-bark-900 transition placeholder:text-bark-500 focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20"></textarea>
+          </div>
+          <div x-show="tab === 'pdf'" x-cloak>
+            <p class="mb-1.5 text-sm font-medium text-bark-900">Posting PDF</p>
+            <label :class="error ? 'border-brick-700' : 'border-sand-400'" class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed px-6 py-10 text-center transition-colors hover:border-clay-600 hover:bg-clay-50/40 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-clay-600">
+              {% icon "upload" "size-6 text-bark-500" %}
+              <span class="text-sm font-semibold text-bark-900" x-text="fileName || 'Choose a PDF or drop it here'">Choose a PDF or drop it here</span>
+              <span class="text-xs text-bark-500">Up to 10 MB</span>
+              <input type="file" name="pdf" accept="application/pdf" class="sr-only" @change="fileName = $event.target.files[0]?.name || ''; error = ''">
+            </label>
+          </div>
+          <p x-show="error" x-cloak x-text="error" role="alert" class="mt-1.5 text-xs text-brick-700"></p>
+        </div>
+        <div class="mt-6 flex flex-wrap items-center gap-3">
+          <button type="submit" :disabled="busy" class="{% button_class 'primary' %}">
+            <span x-show="busy" x-cloak>{% icon "loader-circle" "size-4 animate-spin" %}</span>
+            <span x-text="busy ? 'Reading the posting…' : 'Read the posting'">Read the posting</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="rounded-2xl border border-sand-200 bg-white p-6" aria-labelledby="next-steps">
+      <h2 id="next-steps" class="text-title font-semibold text-bark-900">What happens next</h2>
+      <ol class="mt-4 space-y-4">
+        <li class="flex gap-3">
+          <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-clay-50 text-xs font-semibold text-clay-700">1</span>
+          <span><span class="block text-sm font-semibold text-bark-900">We read it</span><span class="mt-0.5 block text-sm leading-5 text-bark-700">Shortlist pulls out the deadline, pay, citizenship, clearance and more.</span></span>
+        </li>
+        <li class="flex gap-3">
+          <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-clay-50 text-xs font-semibold text-clay-700">2</span>
+          <span><span class="block text-sm font-semibold text-bark-900">You check it</span><span class="mt-0.5 block text-sm leading-5 text-bark-700">Anything we're not sure about is flagged for you to confirm or fix.</span></span>
+        </li>
+        <li class="flex gap-3">
+          <span class="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-clay-50 text-xs font-semibold text-clay-700">3</span>
+          <span><span class="block text-sm font-semibold text-bark-900">Everyone benefits</span><span class="mt-0.5 block text-sm leading-5 text-bark-700">The posting shows up in Discover with the facts up front.</span></span>
+        </li>
+      </ol>
+    </section>
+  </div>
+</div>
+{% endblock %}

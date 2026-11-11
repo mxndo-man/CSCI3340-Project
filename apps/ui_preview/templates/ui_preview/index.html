@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Preview · Shortlist{% endblock %}
+
+{% block content %}
+<div class="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+  <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">UI preview</p>
+  <h1 class="mt-2 font-serif text-h1 font-semibold text-bark-900">Every page, on sample data</h1>
+  <p class="mt-3 text-[15px] leading-7 text-bark-700">These pages render the real templates with fake objects shaped like the models in <code class="font-mono text-sm">docs/contracts.md</code>. They show the sample boards, postings and tasks on whoever is logged in, and pages that need an account ask you to log in first, like the real app. Buttons that would save something only say “Preview only, nothing was saved.” Add <code class="font-mono text-sm">?as=visitor</code> to Discover or a posting to see it logged out. How each page goes live: <code class="font-mono text-sm">docs/frontend-handoff.md</code>.</p>
+
+  <ul class="mt-8 divide-y divide-sand-100 rounded-2xl border border-sand-200 bg-white">
+    {% for label, url, template in pages %}
+      <li>
+        <a href="{{ url }}" class="group flex items-center gap-4 px-5 py-4 hover:bg-sand-50">
+          <span class="min-w-0 flex-1">
+            <span class="block text-[15px] font-semibold text-bark-900 group-hover:text-clay-700">{{ label }}</span>
+            <span class="mt-0.5 block truncate font-mono text-xs text-bark-500">{{ template }}</span>
+          </span>
+          {% icon "chevron-right" "size-4 shrink-0 text-bark-500" %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

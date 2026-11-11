@@ -1,0 +1,8 @@
+{% load ui %}{% comment %}
+A board's members as overlapping avatars: the first four, then "+N".
+  {% include "boards/partials/member_stack.html" with board=board %}
+Reads board.membership_set (prefetch membership_set__user in the view).
+{% endcomment %}{% board_members board as people %}{% member_overflow board as extra %}<div class="flex -space-x-2">
+  {% for person in people|slice:":4" %}{% include "components/avatar.html" with person=person size="sm" ring=True only %}{% endfor %}
+  {% if extra %}<span class="inline-flex size-7 items-center justify-center rounded-full bg-sand-100 text-[11px] font-semibold text-bark-700 ring-2 ring-white">+{{ extra }}</span>{% endif %}
+</div>

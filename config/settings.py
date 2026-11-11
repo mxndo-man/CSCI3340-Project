@@ -19,6 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
+    UI_PREVIEW=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
     REDIS_URL=(str, "redis://localhost:6379/0"),
 )
@@ -32,6 +33,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DJANGO_DEBUG")
+
+# Serve /preview/: every page on sample data, until the real models and views exist.
+UI_PREVIEW = env("UI_PREVIEW")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
@@ -52,6 +56,10 @@ INSTALLED_APPS = [
     "apps.tracker",
     "apps.notifications",
     "apps.ingestion",
+    # Template helpers ({% load ui %}) and the style guide. Every page needs it. No models.
+    "apps.ui",
+    # The /preview/ pages on fake data, until the real views exist. No models.
+    "apps.ui_preview",
 ]
 
 MIDDLEWARE = [
@@ -158,4 +166,6 @@ TAILWIND_CLI_SRC_CSS = (
     "styles/styles.css"  # Custom colors for easy rewrite of those colors
 )
 
-LOGOUT_REDIRECT_URL = "home"
+# After logging in, go to the home dashboard; after logging out, back to the landing page.
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "landing"

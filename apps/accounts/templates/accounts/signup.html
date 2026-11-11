@@ -1,16 +1,30 @@
 {% extends "base.html" %}
+{% load ui %}
 
-{% block title %}Sign Up | My Project Workspace{% endblock %}
+{% block title %}Sign up · Shortlist{% endblock %}
 
 {% block content %}
-<main class="mx-auto mt-8 w-full max-w-xl rounded-2xl bg-slate-800 p-8 shadow-lg">
-    <h1 class="mb-6 text-2xl font-bold">Create an Account</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="mt-4 rounded-lg bg-yellow-400 px-4 py-2 font-semibold text-slate-900 hover:bg-yellow-300">
-            Create account
-        </button>
+<div class="mx-auto flex max-w-6xl justify-center px-4 py-12 sm:px-6 sm:py-16">
+  <section class="w-full max-w-md rounded-2xl border border-sand-200 bg-white p-6 sm:p-8">
+    <h1 class="font-serif text-h1 font-semibold text-bark-900">Create your account</h1>
+    <p class="mt-2 text-[15px] text-bark-700">Save postings, share boards and track every application in one place.</p>
+
+    <form method="post" novalidate class="mt-6 space-y-4">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        {% include "components/banner.html" with tone="alert" title=form.non_field_errors.0 only %}
+      {% endif %}
+      {% include "components/field.html" with field=form.email label="Email" placeholder="you@school.edu" autocomplete="email" %}
+      {% include "components/field.html" with field=form.username placeholder="liamr" hint="Letters, numbers and . + - _ only." %}
+      {% include "components/field.html" with field=form.password1 label="Password" hint="At least 8 characters, and not a common password." %}
+      {% include "components/field.html" with field=form.password2 label="Confirm password" no_hint=True %}
+      <button type="submit" class="{% button_class 'primary' 'md' 'w-full' %}">Create account</button>
     </form>
-</main>
+
+    <p class="mt-6 text-center text-sm text-bark-700">
+      Already have an account?
+      <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="font-semibold text-clay-700 hover:underline">Log in</a>
+    </p>
+  </section>
+</div>
 {% endblock %}

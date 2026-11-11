@@ -1,0 +1,19 @@
+{% load ui %}{% comment %}
+One notification, in the bell's menu and on the notifications page.
+  {% include "notifications/partials/item.html" with notification=notification %}
+Reads notification: id, kind, message, link_url, read, created_at.
+Opening it posts notification and next (its link_url) to {% form_url "open_notification" %}:
+mark it read, then redirect to next. Without a link_url, next is the notifications page.
+{% endcomment %}{% notification_icon notification.kind as icon_name %}{% form_url "open_notification" as open_url %}{% page_url "notifications:list" as list_url %}<form method="post" action="{{ open_url }}">
+  {% csrf_token %}
+  <input type="hidden" name="notification" value="{{ notification.id }}">
+  <input type="hidden" name="next" value="{% firstof notification.link_url list_url %}">
+  <button type="submit" class="flex w-full gap-3 rounded-xl px-3 py-3 text-left hover:bg-sand-50{% if not notification.read %} bg-clay-50/60{% endif %}">
+    <span class="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-sand-100 text-bark-700">{% icon icon_name "size-4" %}</span>
+    <span class="min-w-0 flex-1">
+      <span class="block text-sm leading-5 text-bark-900">{{ notification.message }}</span>
+      <span class="mt-0.5 block text-xs text-bark-500">{{ notification.created_at|timesince }} ago</span>
+    </span>
+    {% if not notification.read %}<span class="mt-2 size-2 shrink-0 rounded-full bg-clay-600"><span class="sr-only">Unread</span></span>{% endif %}
+  </button>
+</form>

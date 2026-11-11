@@ -13,3 +13,6 @@ __pycache__/
 
 
 .vscode/*
+
+# Tailwind CLI binary that django-tailwind-cli downloads on first build
+.django_tailwind_cli/
