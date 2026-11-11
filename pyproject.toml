@@ -28,6 +28,9 @@ dev = [
     "taskipy>=1.14.1",
 ]
 
+#django formatting will always fail CI so we must ignore these errors.
+[tool.ruff.lint.per-file-ignores] 
+"**/migrations/*" = ["RUF012"]
 
 [tool.uv]
 package = false
