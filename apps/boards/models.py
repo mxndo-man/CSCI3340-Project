@@ -3,7 +3,10 @@ from typing import ClassVar
 
 from django.conf import settings
 from django.db import IntegrityError, models, transaction
+from django.urls import reverse
 
+def get_absolute_url(self):
+    return reverse("boards:detail", args=[self.pk])
 
 class Board(models.Model):
     """The board where the users are able to configure their friend space/board
