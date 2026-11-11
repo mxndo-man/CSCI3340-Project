@@ -30,7 +30,8 @@ class CustomUser(AbstractUser):
         max_length=100,
         default="America/Chicago",
         help_text="Select your local timezone.",
-        choices=get_timezone_choices,
+        # Django 5+ accepts a callable here; django-types' stubs don't know that yet.
+        choices=get_timezone_choices,  # pyright: ignore[reportArgumentType]
     )
     # Timezones might require middleware setup for dynamic calls, but for now its being left like this
 
