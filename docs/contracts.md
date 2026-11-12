@@ -480,7 +480,7 @@ for p in fetch_source(provider="greenhouse", token="examplecorp"):
       "organization": "Example Corp", "location_raw": "Austin, TX",
       "url": "https://boards.greenhouse.io/examplecorp/jobs/4012345",
       "updated_at": "2026-10-30T18:22:00Z", "text": "Plain-text description...",
-      "content_hash": "sha256:9f2c...", "structured": { "work_mode": null, "pay": null } }
+      "content_hash": "sha256:9f2c...", "structured": { "work_mode": null, "pay": null, "deadline": null } }
   ]
 }
 ```
