@@ -2,7 +2,7 @@
 
 *Format: "As a ___, I want ___ so that ___," plus acceptance criteria used to check and prove each story is done. Ordered by priority; the product owner keeps the order current.*
 
-**Status:** *Done* = works in the real app. *Prototype* = the page exists at `/preview/` on sample data. *Planned* = not started.
+**Status:** *Done* means it works in the real app. *Prototype* means the page exists at `/preview/` on sample data. *Planned* means not started.
 
 | # | Story | Acceptance criteria | Milestone | Owner | Status |
 | --- | --- | --- | --- | --- | --- |
