@@ -9,7 +9,7 @@
 ## Deliverable 2
 
 **Prototypes**
-- Figma prototype (clickable): <FIGMA_PROTOTYPE_LINK>
+- Figma prototype (clickable): <https://www.figma.com/make/N1iVg8gFKBBEIKYGBZK1Rg/Shortlist-prototype--code--v2?t=lx88OUpSiLne9Xh4-1>
 - Figma wireframes: <https://www.figma.com/design/KTu5qax5QhEQQxMfii0zOZ/Shortlist-UI-wireframes?node-id=0-1&t=YRcq8iTQP7swzcTk-1>
 - Wireframe images: [`docs/wireframes/`](docs/wireframes/)
 - Working prototype in the app: every page at [`/preview/`](http://127.0.0.1:8000/preview/) on sample data (needs `UI_PREVIEW=1` in `.env`, which `.env.example` already sets)
