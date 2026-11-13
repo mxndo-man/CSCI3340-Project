@@ -1,5 +1,7 @@
 """Project-level pages: the public landing page and the logged-in home page."""
 
+from typing import Any
+
 from django.apps import apps
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.staticfiles import finders
@@ -10,7 +12,7 @@ from django.views.generic import TemplateView
 HERO_IMAGE = "img/landing/hero-valley.webp"
 
 
-def _samples():
+def _samples() -> dict[str, Any]:
     """Sample postings, reviews and boards for the landing page's small copies of the app.
 
     They come from the preview's fake data while that app is installed; without it the
