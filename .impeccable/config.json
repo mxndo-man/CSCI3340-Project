@@ -1,0 +1,18 @@
+{
+  "buildPath": "code",
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "templates/pages/landing.html"
+        ],
+        "createdAt": "2026-11-13T10:24:43.401Z",
+        "reason": "agent: detector cannot resolve the Django {% static %} stylesheet link, so it reads every role at 16px; computed sizes are h1 112px, h2 60px, body 17px"
+      }
+    ]
+  }
+}

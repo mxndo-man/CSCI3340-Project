@@ -2,30 +2,42 @@
 
 from django.apps import apps
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.staticfiles import finders
 from django.shortcuts import redirect, render
 from django.views.generic import TemplateView
 
+# The landing page's hero art. Until this file exists, the page shows a flat stand-in.
+HERO_IMAGE = "img/landing/hero-valley.webp"
 
-def _sample_postings():
-    """Two example cards for the hero illustration (they aren't links).
 
-    They come from the preview's fake data while that app is installed, and the hero simply
-    has no cards without it. Swap in real postings once the Posting model exists.
+def _samples():
+    """Sample postings, reviews and boards for the landing page's small copies of the app.
+
+    They come from the preview's fake data while that app is installed; without it the
+    lists are empty and the page skips those blocks. Swap in real querysets (for example
+    a few open postings) once the models exist.
     """
     if not apps.is_installed("apps.ui_preview"):
-        return []
+        return {"sample_postings": [], "sample_reviews": [], "sample_boards": []}
     from apps.ui_preview import fake_data  # only while the preview app exists
 
-    return fake_data.landing_postings()
+    world = fake_data.world()
+    # Two postings that differ on clearance and deadline, so the chips show their range.
+    postings = [world.postings[0], world.postings[2]]
+    return {
+        "sample_postings": postings,
+        "sample_reviews": world.reviews_for(postings[0]) if postings else [],
+        "sample_boards": world.my_boards()[:2],
+    }
 
 
 def landing(request):
     """The public front page at /. Logged-in visitors go straight to their home page."""
     if request.user.is_authenticated:
         return redirect("home")
-    return render(
-        request, "pages/landing.html", {"sample_postings": _sample_postings()}
-    )
+    context = _samples()
+    context["hero_image"] = HERO_IMAGE if finders.find(HERO_IMAGE) else ""
+    return render(request, "pages/landing.html", context)
 
 
 class HomeView(LoginRequiredMixin, TemplateView):

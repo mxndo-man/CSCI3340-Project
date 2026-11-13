@@ -1,53 +1,251 @@
-{% extends "base.html" %}
-{% load ui %}
+{% load static ui %}<!DOCTYPE html>
+{% comment %}
+   The public front page at /. Each section is a small copy of a real page, built from the
+   same data and the same ui helpers, so the landing page can't drift from the app:
+     Discover  the posting cards (postings/partials/card.html) and one posting's
+               "Key facts" tiles (postings/partials/fact_tile.html)
+     Boards    the boards page's cards (boards/partials/board_card.html)
+     Tracker   the application stages (tracker/applications.html)
+   It reads:
+     sample_postings  postings for the cards; the first one also gets the Key facts tiles
+     sample_reviews   that posting's pending FieldReviews, so unsure facts show "Needs a check"
+     sample_boards    boards for the board cards
+     hero_image       static path of the hero art (static/img/landing/hero-valley.webp),
+                      or "" to show a flat sky colour if the file is missing.
+   The sample_* lists come from the preview's fake data until the real models exist; a
+   section's sample block is skipped when its list is empty.
+   This page is the first one in the voxel look, so it has its own nav, footer and
+   stylesheet (static/css/landing.css) and doesn't extend base.html.
+{% endcomment %}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shortlist · Don't hunt for an internship alone</title>
+  <meta name="description" content="Shortlist finds internships you can actually apply to, shows where every fact came from, and lets you and your friends track applications together.">
+  <meta name="theme-color" content="#3e5881">
 
-{% block content %}
-{% page_url "postings:discover" as discover_url %}
-<section class="mx-auto grid grid-cols-1 max-w-6xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 md:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
-  <div>
-    {% include "components/chip.html" with tone="accent" label="Built for students hunting internships" only %}
-    <h1 class="mt-5 text-balance font-serif text-[40px] font-semibold leading-[48px] tracking-[-0.02em] text-bark-900 sm:text-display">Find internships you can actually apply to.</h1>
-    <p class="mt-5 max-w-xl text-lg leading-7 text-bark-700">Shortlist reads every posting for the details that rule you in or out (deadline, citizenship, clearance and pay) and puts them up front.</p>
-    <div class="mt-8 flex flex-wrap items-center gap-3">
-      <a href="{% url 'accounts:signup' %}" class="{% button_class 'primary' %}">Create a free account</a>
-      {% if discover_url %}<a href="{{ discover_url }}" class="{% button_class 'secondary' %}">Browse internships</a>{% endif %}
-    </div>
-    {% if discover_url %}<p class="mt-4 text-sm text-bark-500">No account needed to browse.</p>{% endif %}
-  </div>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400..700&family=Pixelify+Sans:wght@400..700&display=swap">
+  {# Raise the number after ?v= when landing.css changes, so browsers fetch the new file. #}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}?v=2">
+</head>
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+  {% page_url "postings:discover" as discover_url %}
 
-  {# An illustration made of real cards, so it can't drift from the design. #}
-  <div class="rounded-[28px] border border-sand-200 bg-sand-100 p-4 sm:p-6">
-    <div aria-hidden="true" class="mb-4 flex items-center gap-2 rounded-full border border-sand-200 bg-white px-4 py-2.5 text-sm text-bark-500">
-      {% icon "search" "size-4" %}
-      Software engineering · paid · no clearance
+  <header class="hero">
+    {# The hero art slot: a flat colour until the voxel valley image exists (see hero_image above). #}
+    <div class="hero-art" aria-hidden="true">
+      {% if hero_image %}<img src="{% static hero_image %}" alt="" fetchpriority="high">{% endif %}
     </div>
-    <div class="space-y-3">
-      {% for posting in sample_postings %}{% include "postings/partials/card.html" with posting=posting static=True only %}{% endfor %}
-    </div>
-  </div>
-</section>
 
-<section class="border-t border-sand-200 bg-white/60">
-  <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-    <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">How it works</p>
-    <h2 class="mt-2 max-w-2xl font-serif text-h1 font-semibold text-bark-900">From “maybe” to “applied” in three steps</h2>
-    <ol class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-      <li class="rounded-2xl border border-sand-200 bg-white p-6">
-        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "compass" "size-5" %}</span>
-        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">1.</span> Discover</h3>
-        <p class="mt-2 text-[15px] leading-6 text-bark-700">Search internships with the deciding facts up front: deadline, pay, citizenship and clearance.</p>
-      </li>
-      <li class="rounded-2xl border border-sand-200 bg-white p-6">
-        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "bookmark" "size-5" %}</span>
-        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">2.</span> Save to a board</h3>
-        <p class="mt-2 text-[15px] leading-6 text-bark-700">Keep a shortlist for yourself, or share a board with friends and talk postings through.</p>
-      </li>
-      <li class="rounded-2xl border border-sand-200 bg-white p-6">
-        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "list-checks" "size-5" %}</span>
-        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">3.</span> Track your applications</h3>
-        <p class="mt-2 text-[15px] leading-6 text-bark-700">Move each application from saved to offer, with reminders before every deadline.</p>
-      </li>
-    </ol>
-  </div>
-</section>
-{% endblock %}
+    <nav class="nav" aria-label="Main">
+      <a href="{% url 'landing' %}" class="wordmark">Shortlist</a>
+      <div class="nav-links">
+        <a href="#discover">Discover</a>
+        <a href="#boards">Boards</a>
+        <a href="#tracker">Tracker</a>
+      </div>
+      <div class="nav-actions">
+        <a href="{% url 'login' %}" class="nav-login">Log in</a>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-small">Sign up</a>
+      </div>
+    </nav>
+
+    <div class="hero-copy">
+      <h1>Don't hunt alone.<span class="cursor" aria-hidden="true"></span></h1>
+      <p class="hero-sub">Shortlist finds internships you can actually apply to, and lets you and your friends track them together.</p>
+      <div class="hero-actions">
+        <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Create a free account</a>
+        {% if discover_url %}<a href="{{ discover_url }}" class="btn btn-quiet">Browse internships</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="ruler dither px">
+      <span>SL-01</span>
+      <span><span class="wide">Season: Fall 2026 · </span>{% now "D d M Y" %}</span>
+    </div>
+  </header>
+
+  <main id="main">
+    <section id="discover" class="band" aria-labelledby="discover-title">
+      <div class="wrap">
+        <h2 id="discover-title">See only the internships you can apply to.</h2>
+
+        {% if sample_postings %}
+          <p class="sample px">Discover · sample postings</p>
+          <ul class="cards cards-two">
+            {% for posting in sample_postings %}
+              {% posting_chips posting as chips %}
+              {% countdown posting as timer %}
+              <li class="panel card">
+                <h3 class="card-title">{{ posting.title }}</h3>
+                <p class="card-sub">{{ posting.organization }}{% if posting.location %} · {{ posting.location }}{% endif %}{% if posting.work_mode %} · {% work_mode_label posting.work_mode %}{% endif %}</p>
+                {% if chips %}
+                  <ul class="chips">
+                    {% for chip in chips %}<li class="chip chip-{{ chip.tone }}">{{ chip.label }}</li>{% endfor %}
+                  </ul>
+                {% endif %}
+                <p class="card-foot">
+                  <span>{% if posting.deadline %}Closes {{ posting.deadline|date:"D, M j" }}{% endif %}</span>
+                  <span class="px timer-{{ timer.tone }}">{{ timer.text }}</span>
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+
+          {% with posting=sample_postings.0 %}
+            {% facts_for posting sample_reviews as facts %}
+            <div class="facts">
+              <h3 class="sub-title">Every fact shows its source.</h3>
+              <p class="sample px">Key facts · {{ posting.title }}, {{ posting.organization }}</p>
+                <dl class="tiles">
+                  {# Start term and location usually come from the job board, so they are left out here. #}
+                  {% for fact in facts %}{% if fact.key != "start_term" and fact.key != "location" %}
+                    <div class="tile{% if fact.needs_check %} tile-check{% endif %}">
+                      <dt class="px">{{ fact.label }}{% if fact.needs_check %} <span class="tile-flag">Needs a check</span>{% endif %}</dt>
+                      <dd>
+                        <p class="tile-value">{{ fact.value }}</p>
+                        <p class="tile-source">{{ fact.source }}</p>
+                        {% if fact.quote %}<p class="tile-quote">“{{ fact.quote }}”</p>{% endif %}
+                      </dd>
+                    </div>
+                  {% endif %}{% endfor %}
+                </dl>
+            </div>
+          {% endwith %}
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="ruler ruler-mid px">
+      <span>SL-02</span>
+    </div>
+    <section id="boards" class="band band-mid" aria-labelledby="boards-title">
+      <div class="wrap">
+        <h2 id="boards-title">Share a board with your friends.</h2>
+
+        {% if sample_boards %}
+          <p class="sample px">Boards · sample boards</p>
+          <ul class="cards">
+            {% for board in sample_boards %}
+              {% member_count board as count %}
+              {% board_postings board as items %}
+              {% board_members board as people %}
+              {% member_overflow board as extra %}
+              <li class="panel card board-card">
+                <div class="card-head">
+                  <h3 class="card-title">{{ board.name }}</h3>
+                  <span class="chip">{% if count == 1 %}Just you{% else %}{{ count }} members{% endif %}</span>
+                </div>
+                <p class="card-sub">{{ items|length }} posting{{ items|length|pluralize }}{% if board.updated_at %} · Updated {{ board.updated_at|timesince }} ago{% endif %}</p>
+                {% if items %}
+                  <ul class="saved">
+                    {% for item in items|slice:":3" %}<li>{{ item.posting.title }} · {{ item.posting.organization }}</li>{% endfor %}
+                  </ul>
+                {% else %}
+                  <p class="card-sub">No postings yet.</p>
+                {% endif %}
+                <ul class="members" aria-label="Members">
+                  {% for person in people|slice:":4" %}<li class="member px">{% initials person %}</li>{% endfor %}
+                  {% if extra %}<li class="member member-more px">+{{ extra }}</li>{% endif %}
+                </ul>
+              </li>
+            {% endfor %}
+            <li class="card card-new">
+              <a href="{% url 'accounts:signup' %}">Start a new board</a>
+            </li>
+          </ul>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="ruler px">
+      <span>SL-03</span>
+    </div>
+    <section id="tracker" class="band" aria-labelledby="tracker-title">
+      <div class="wrap">
+        <h2 id="tracker-title">Track every application.</h2>
+
+        <div class="path" role="group" aria-label="Application stages">
+          <button type="button" class="stage" data-stage="saved" aria-pressed="false"><span class="px">Saved</span><span class="stage-count px">2</span></button>
+          <button type="button" class="stage" data-stage="applying" aria-pressed="false"><span class="px">Applying</span><span class="stage-count px">1</span></button>
+          <button type="button" class="stage" data-stage="applied" aria-pressed="false"><span class="px">Applied</span><span class="stage-count px">1</span></button>
+          <button type="button" class="stage" data-stage="interview" aria-pressed="true"><span class="px">Interview</span><span class="stage-count px">1</span></button>
+          <button type="button" class="stage" data-stage="offer" aria-pressed="false"><span class="px">Offer</span><span class="stage-count px">0</span></button>
+        </div>
+
+        <div class="stage-list panel" aria-live="polite">
+          <div class="stage-group" data-group="saved" hidden>
+            <h3 class="px">Saved · sample applications</h3>
+            <div class="entry"><p><span class="entry-title">Software Engineering Intern</span> <span class="entry-org">· Halcyon Robotics</span></p><p class="entry-meta px">Closes in 12 days</p></div>
+            <div class="entry"><p><span class="entry-title">Data Science Intern</span> <span class="entry-org">· Marlow Labs</span></p><p class="entry-meta px">Rolling deadline</p></div>
+          </div>
+          <div class="stage-group" data-group="applying" hidden>
+            <h3 class="px">Applying · sample applications</h3>
+            <div class="entry"><p><span class="entry-title">Firmware Intern</span> <span class="entry-org">· Tessel Aerospace</span></p><p class="entry-meta px">Next: finish résumé · due Fri</p></div>
+          </div>
+          <div class="stage-group" data-group="applied" hidden>
+            <h3 class="px">Applied · sample applications</h3>
+            <div class="entry"><p><span class="entry-title">Backend Intern</span> <span class="entry-org">· Quillwork</span></p><p class="entry-meta px">Applied 3 Nov</p></div>
+          </div>
+          <div class="stage-group" data-group="interview">
+            <h3 class="px">Interview · sample applications</h3>
+            <div class="entry"><p><span class="entry-title">Security Intern</span> <span class="entry-org">· Brightwater</span></p><p class="entry-meta px">Interview Thu 2:00 PM</p></div>
+          </div>
+          <div class="stage-group" data-group="offer" hidden>
+            <h3 class="px">Offer · sample applications</h3>
+            <p class="entry-empty">No offers yet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="close band dither" aria-labelledby="close-title">
+      <div class="wrap">
+        <h2 id="close-title">Start the hunt. Bring your friends.</h2>
+        <div class="hero-actions">
+          <a href="{% url 'accounts:signup' %}" class="btn btn-primary">Create a free account</a>
+          {% if discover_url %}<a href="{{ discover_url }}" class="btn btn-quiet">Browse internships</a>{% endif %}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span class="px">Shortlist · Fall 2026</span>
+    <nav aria-label="Footer">
+      <a href="{% url 'login' %}">Log in</a>
+      <a href="{% url 'accounts:signup' %}">Sign up</a>
+      <a href="https://github.com/mxndo-man/CSCI3340-Project">Source on GitHub</a>
+    </nav>
+  </footer>
+
+  {% if messages %}
+    <div class="notices" role="status">
+      {% for message in messages %}<p class="notice">{{ message }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  <script>
+    // The stage path: choosing a stage shows that stage's applications. Without JavaScript every stage is listed.
+    (function () {
+      var stages = document.querySelectorAll(".stage");
+      var groups = document.querySelectorAll(".stage-group");
+      document.documentElement.classList.add("js");
+      stages.forEach(function (stage) {
+        stage.addEventListener("click", function () {
+          stages.forEach(function (other) {
+            other.setAttribute("aria-pressed", other === stage ? "true" : "false");
+          });
+          groups.forEach(function (group) {
+            group.hidden = group.dataset.group !== stage.dataset.stage;
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

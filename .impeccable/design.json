@@ -1,0 +1,502 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T00:00:00Z",
+  "title": "Design System: Shortlist",
+  "extensions": {
+    "colorMeta": {
+      "marigold": {
+        "role": "primary",
+        "displayName": "Marigold",
+        "canonical": "#f2c230",
+        "tonalRamp": [
+          "oklch(20% 0.04 90)",
+          "oklch(32% 0.07 90)",
+          "oklch(45% 0.10 90)",
+          "oklch(58% 0.13 90)",
+          "oklch(70% 0.15 90)",
+          "oklch(83% 0.16 92)",
+          "oklch(91% 0.12 95)",
+          "oklch(96% 0.05 95)"
+        ]
+      },
+      "marigold-hi": {
+        "role": "primary",
+        "displayName": "Marigold Light",
+        "canonical": "#ffe27a",
+        "tonalRamp": [
+          "oklch(20% 0.04 90)",
+          "oklch(32% 0.07 90)",
+          "oklch(45% 0.10 90)",
+          "oklch(58% 0.13 90)",
+          "oklch(70% 0.15 90)",
+          "oklch(83% 0.16 92)",
+          "oklch(91% 0.12 95)",
+          "oklch(96% 0.05 95)"
+        ]
+      },
+      "marigold-lo": {
+        "role": "primary",
+        "displayName": "Marigold Shade",
+        "canonical": "#b5820c",
+        "tonalRamp": [
+          "oklch(20% 0.04 90)",
+          "oklch(32% 0.07 90)",
+          "oklch(45% 0.10 90)",
+          "oklch(58% 0.13 90)",
+          "oklch(70% 0.15 90)",
+          "oklch(83% 0.16 92)",
+          "oklch(91% 0.12 95)",
+          "oklch(96% 0.05 95)"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Ink",
+        "canonical": "#17130a",
+        "tonalRamp": [
+          "oklch(15% 0.015 85)",
+          "oklch(26% 0.02 85)",
+          "oklch(38% 0.02 85)",
+          "oklch(50% 0.02 85)",
+          "oklch(62% 0.02 85)",
+          "oklch(74% 0.015 85)",
+          "oklch(86% 0.01 85)",
+          "oklch(95% 0.005 85)"
+        ]
+      },
+      "sky": {
+        "role": "secondary",
+        "displayName": "Dusk Sky",
+        "canonical": "#3e5881",
+        "tonalRamp": [
+          "oklch(18% 0.03 255)",
+          "oklch(28% 0.04 255)",
+          "oklch(38% 0.05 255)",
+          "oklch(48% 0.055 255)",
+          "oklch(58% 0.05 255)",
+          "oklch(70% 0.04 255)",
+          "oklch(82% 0.03 255)",
+          "oklch(93% 0.015 255)"
+        ]
+      },
+      "sky-deep": {
+        "role": "secondary",
+        "displayName": "Deep Sky",
+        "canonical": "#40566f",
+        "tonalRamp": [
+          "oklch(18% 0.03 255)",
+          "oklch(28% 0.04 255)",
+          "oklch(38% 0.05 255)",
+          "oklch(48% 0.055 255)",
+          "oklch(58% 0.05 255)",
+          "oklch(70% 0.04 255)",
+          "oklch(82% 0.03 255)",
+          "oklch(93% 0.015 255)"
+        ]
+      },
+      "night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "#0f2118",
+        "tonalRamp": [
+          "oklch(15% 0.03 155)",
+          "oklch(22% 0.04 155)",
+          "oklch(30% 0.055 155)",
+          "oklch(40% 0.08 152)",
+          "oklch(52% 0.09 150)",
+          "oklch(66% 0.09 148)",
+          "oklch(80% 0.06 145)",
+          "oklch(93% 0.03 140)"
+        ]
+      },
+      "meadow-900": {
+        "role": "neutral",
+        "displayName": "Meadow 900",
+        "canonical": "#142b1f",
+        "tonalRamp": [
+          "oklch(15% 0.03 155)",
+          "oklch(22% 0.04 155)",
+          "oklch(30% 0.055 155)",
+          "oklch(40% 0.08 152)",
+          "oklch(52% 0.09 150)",
+          "oklch(66% 0.09 148)",
+          "oklch(80% 0.06 145)",
+          "oklch(93% 0.03 140)"
+        ]
+      },
+      "meadow-800": {
+        "role": "neutral",
+        "displayName": "Meadow 800",
+        "canonical": "#1a3828",
+        "tonalRamp": [
+          "oklch(15% 0.03 155)",
+          "oklch(22% 0.04 155)",
+          "oklch(30% 0.055 155)",
+          "oklch(40% 0.08 152)",
+          "oklch(52% 0.09 150)",
+          "oklch(66% 0.09 148)",
+          "oklch(80% 0.06 145)",
+          "oklch(93% 0.03 140)"
+        ]
+      },
+      "meadow-600": {
+        "role": "neutral",
+        "displayName": "Meadow 600",
+        "canonical": "#2e6a41",
+        "tonalRamp": [
+          "oklch(15% 0.03 155)",
+          "oklch(22% 0.04 155)",
+          "oklch(30% 0.055 155)",
+          "oklch(40% 0.08 152)",
+          "oklch(52% 0.09 150)",
+          "oklch(66% 0.09 148)",
+          "oklch(80% 0.06 145)",
+          "oklch(93% 0.03 140)"
+        ]
+      },
+      "leaf": {
+        "role": "neutral",
+        "displayName": "Leaf",
+        "canonical": "#8fbf7a",
+        "tonalRamp": [
+          "oklch(18% 0.04 140)",
+          "oklch(28% 0.06 140)",
+          "oklch(40% 0.09 140)",
+          "oklch(52% 0.11 140)",
+          "oklch(64% 0.12 140)",
+          "oklch(75% 0.11 140)",
+          "oklch(86% 0.08 140)",
+          "oklch(95% 0.04 140)"
+        ]
+      },
+      "mist": {
+        "role": "neutral",
+        "displayName": "Mist",
+        "canonical": "#e6eedf",
+        "tonalRamp": [
+          "oklch(18% 0.015 135)",
+          "oklch(30% 0.02 135)",
+          "oklch(42% 0.025 135)",
+          "oklch(54% 0.03 135)",
+          "oklch(66% 0.03 135)",
+          "oklch(77% 0.03 135)",
+          "oklch(87% 0.025 135)",
+          "oklch(94% 0.02 135)"
+        ]
+      },
+      "mist-dim": {
+        "role": "neutral",
+        "displayName": "Mist Dim",
+        "canonical": "#a8bda5",
+        "tonalRamp": [
+          "oklch(18% 0.015 135)",
+          "oklch(30% 0.02 135)",
+          "oklch(42% 0.025 135)",
+          "oklch(54% 0.03 135)",
+          "oklch(66% 0.03 135)",
+          "oklch(77% 0.03 135)",
+          "oklch(87% 0.025 135)",
+          "oklch(94% 0.02 135)"
+        ]
+      },
+      "haze-line": {
+        "role": "neutral",
+        "displayName": "Haze Line",
+        "canonical": "#b9c8d4",
+        "tonalRamp": [
+          "oklch(18% 0.015 240)",
+          "oklch(30% 0.02 240)",
+          "oklch(42% 0.025 240)",
+          "oklch(54% 0.025 240)",
+          "oklch(66% 0.025 240)",
+          "oklch(78% 0.02 240)",
+          "oklch(88% 0.017 240)",
+          "oklch(95% 0.01 240)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(28% 0 0)",
+          "oklch(42% 0 0)",
+          "oklch(56% 0 0)",
+          "oklch(70% 0 0)",
+          "oklch(82% 0 0)",
+          "oklch(92% 0 0)",
+          "oklch(100% 0 0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The one big headline in the hero. Centred."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings."
+      },
+      "subhead": {
+        "displayName": "Subhead",
+        "purpose": "A second heading inside a section, next to its demo."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "The name at the top of a card."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs. Supporting lines inside cards and tiles step down to 0.9375rem or 0.875rem."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pixel face, uppercase. IDs, dates, timers, counts, stage names, fact names and the sample label."
+      }
+    },
+    "shadows": [
+      {
+        "name": "block-bevel-marigold",
+        "value": "inset 0 -4px 0 #b5820c, inset 0 4px 0 #ffe27a",
+        "purpose": "Lit top edge and shaded bottom edge on marigold blocks: primary button and selected stage."
+      },
+      {
+        "name": "block-bevel-hover",
+        "value": "inset 0 -2px 0 #b5820c, inset 0 4px 0 #ffe27a",
+        "purpose": "Hover state of a marigold block. The bottom edge shrinks as the block moves down 2px."
+      },
+      {
+        "name": "block-bevel-pressed",
+        "value": "inset 0 4px 0 #b5820c",
+        "purpose": "Pressed state of a marigold block. The block has moved down 4px."
+      },
+      {
+        "name": "block-bevel-green",
+        "value": "inset 0 -4px 0 rgb(0 0 0 / 0.3), inset 0 4px 0 rgb(255 255 255 / 0.16)",
+        "purpose": "Bevel for green blocks such as member tiles."
+      },
+      {
+        "name": "pixel-corners",
+        "value": "0 -4px 0 0 #2e6a41, 0 4px 0 0 #2e6a41, -4px 0 0 0 #2e6a41, 4px 0 0 0 #2e6a41",
+        "purpose": "Four hard edges that leave a missing pixel at each corner. Used on panels and cards, which need a 4px margin to make room."
+      },
+      {
+        "name": "quiet-outline",
+        "value": "inset 0 0 0 2px #ffffff",
+        "purpose": "The 2px outline of the quiet button on Dusk Sky."
+      },
+      {
+        "name": "stage-socket",
+        "value": "inset 0 0 0 4px #2e6a41, 0 0 0 4px #0f2118",
+        "purpose": "An unselected stage marker: a green frame inside, and a Night gap outside that cuts the dashed trail."
+      },
+      {
+        "name": "thin-outline",
+        "value": "inset 0 0 0 1px #2e6a41",
+        "purpose": "A 1px line drawn inside the edge. Used on neutral chips, fact tiles and the \"+N\" member tile."
+      },
+      {
+        "name": "warn-outline",
+        "value": "inset 0 0 0 1px #b5820c",
+        "purpose": "The outline of a \"look closer\" chip."
+      },
+      {
+        "name": "check-outline",
+        "value": "inset 0 0 0 2px #b5820c",
+        "purpose": "The outline of a fact tile that still needs a person to confirm it."
+      }
+    ],
+    "motion": [
+      {
+        "name": "step",
+        "value": "120ms steps(3, end)",
+        "purpose": "Every hover, press and state change. Three visible steps, no easing."
+      },
+      {
+        "name": "blink",
+        "value": "1.1s steps(1, end) infinite",
+        "purpose": "The headline cursor. Switches on and off with no fade."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "transition-duration: 0ms; animation: none",
+        "purpose": "When the user asks for reduced motion, changes are instant and the cursor stops blinking."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "stack",
+        "value": "56rem"
+      },
+      {
+        "name": "phone",
+        "value": "34rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main action. One per group of actions.",
+      "html": "<a href=\"#\" class=\"ds-btn ds-btn-primary\">Create a free account</a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: 0.625rem 1.375rem 0.875rem; font: 600 1.0625rem/1.2 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; text-decoration: none; white-space: nowrap; cursor: pointer; border-radius: 0; transition: transform 120ms steps(3, end), box-shadow 120ms steps(3, end), background-color 120ms steps(3, end); } .ds-btn-primary { background: #f2c230; color: #17130a; box-shadow: inset 0 -4px 0 #b5820c, inset 0 4px 0 #ffe27a; } .ds-btn-primary:hover { transform: translateY(2px); box-shadow: inset 0 -2px 0 #b5820c, inset 0 4px 0 #ffe27a; } .ds-btn-primary:active { transform: translateY(4px); box-shadow: inset 0 4px 0 #b5820c; } .ds-btn-primary:focus-visible { outline: 2px solid #f2c230; outline-offset: 3px; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "The second choice next to a primary button, on Dusk Sky.",
+      "html": "<div class=\"ds-sky\"><a href=\"#\" class=\"ds-btn-quiet\">Browse internships</a></div>",
+      "css": ".ds-sky { padding: 1.5rem; background: #3e5881; } .ds-btn-quiet { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: 0.625rem 1.375rem; font: 600 1.0625rem/1.2 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; color: #fff; text-decoration: none; white-space: nowrap; border-radius: 0; box-shadow: inset 0 0 0 2px #fff; transition: background-color 120ms steps(3, end); } .ds-btn-quiet:hover { background: #fff; color: #40566f; } .ds-btn-quiet:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Light Button (small)",
+      "kind": "button",
+      "refersTo": "button-light",
+      "description": "A small white block used in the nav for Sign up.",
+      "html": "<div class=\"ds-sky-b\"><a href=\"#\" class=\"ds-btn-light\">Sign up</a></div>",
+      "css": ".ds-sky-b { padding: 1.5rem; background: #3e5881; } .ds-btn-light { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: 0.375rem 1rem 0.625rem; font: 600 0.9375rem/1.2 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; background: #fff; color: #17130a; text-decoration: none; border-radius: 0; box-shadow: inset 0 -4px 0 #b9c8d4; transition: transform 120ms steps(3, end), box-shadow 120ms steps(3, end); } .ds-btn-light:hover { transform: translateY(2px); box-shadow: inset 0 -2px 0 #b9c8d4; } .ds-btn-light:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "description": "Wordmark, section links, Log in and a small Sign up button, laid over the hero.",
+      "html": "<nav class=\"ds-nav\"><a href=\"#\" class=\"ds-wordmark\">Shortlist</a><div class=\"ds-nav-links\"><a href=\"#\">Discover</a><a href=\"#\">Boards</a><a href=\"#\">Tracker</a></div><a href=\"#\" class=\"ds-nav-login\">Log in</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 1.5rem; padding: 1.25rem 1.5rem; background: #3e5881; color: #fff; font-family: 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; } .ds-nav a { color: inherit; text-decoration: none; } .ds-wordmark { display: inline-flex; align-items: center; gap: 0.625rem; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; } .ds-wordmark::before { content: ''; width: 0.875rem; height: 0.875rem; background: #f2c230; box-shadow: inset 0 -3px 0 #b5820c, inset 0 3px 0 #ffe27a; } .ds-nav-links { display: flex; gap: 2rem; margin-inline: auto; } .ds-nav-links a, .ds-nav-login { padding-block: 0.5rem; font-size: 1rem; font-weight: 500; box-shadow: inset 0 0 0 transparent; transition: box-shadow 120ms steps(3, end); } .ds-nav-links a:hover, .ds-nav-login:hover { box-shadow: inset 0 -2px 0 currentColor; } .ds-nav a:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }"
+    },
+    {
+      "name": "Posting Card with Chips",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "A panel that holds one posting, laid out like the app's Discover page. Chips carry the deciding facts: filled green is in your favour, marigold outline means look closer, plain outline is neutral.",
+      "html": "<div class=\"ds-pc-wrap\"><p class=\"ds-pc-sample\">Discover · sample postings</p><article class=\"ds-pc\"><h3 class=\"ds-pc-title\">Software Engineering Intern</h3><p class=\"ds-pc-sub\">Sample Co. · Remote</p><ul class=\"ds-pc-chips\"><li class=\"ds-chip ds-chip-good\">Paid</li><li class=\"ds-chip ds-chip-warn\">Sponsorship unclear</li><li class=\"ds-chip\">Bachelor's</li></ul><p class=\"ds-pc-foot\"><span>Closes Mon, Nov 30</span><span class=\"ds-pc-timer\">4 days left</span></p></article></div>",
+      "css": ".ds-pc-wrap { padding: 1.25rem; background: #0f2118; color: #e6eedf; font: 400 1.0625rem/1.55 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; } .ds-pc-wrap p, .ds-pc-wrap h3, .ds-pc-wrap ul { margin: 0; padding: 0; list-style: none; } .ds-pc-sample { color: #8fbf7a; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; font-weight: 400; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; } .ds-pc { display: flex; flex-direction: column; max-width: 26rem; min-height: 11rem; margin: 1rem 4px 4px; padding: 1.25rem; background: #1a3828; box-shadow: 0 -4px 0 0 #2e6a41, 0 4px 0 0 #2e6a41, -4px 0 0 0 #2e6a41, 4px 0 0 0 #2e6a41; } .ds-pc-title { font-size: 1.125rem; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; } .ds-pc-sub { margin-top: 0.25rem; color: #a8bda5; font-size: 0.9375rem; } .ds-pc-chips { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-top: 0.875rem; } .ds-chip { flex: none; padding: 0.125rem 0.5rem; color: #e6eedf; font-size: 0.8125rem; font-weight: 500; line-height: 1.5; white-space: nowrap; box-shadow: inset 0 0 0 1px #2e6a41; } .ds-chip-good { background: #2e6a41; box-shadow: none; } .ds-chip-warn { color: #f2c230; box-shadow: inset 0 0 0 1px #b5820c; } .ds-pc-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin-top: auto; padding-top: 1rem; font-size: 0.9375rem; } .ds-pc-timer { color: #f2c230; white-space: nowrap; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; font-weight: 400; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Key Facts Tiles",
+      "kind": "custom",
+      "refersTo": "fact-tile",
+      "description": "One tile per fact, in a two-column grid: the fact's name, its value, where it came from and the quoted sentence. A fact that needs a person to confirm it gets a marigold outline and a \"Needs a check\" tag.",
+      "html": "<div class=\"ds-kf-wrap\"><p class=\"ds-kf-sample\">Key facts · Software Engineering Intern, Sample Co.</p><dl class=\"ds-tiles\"><div class=\"ds-tile\"><dt>Deadline</dt><dd><p class=\"ds-tile-value\">Mon, Nov 30</p><p class=\"ds-tile-source\">From the job board</p></dd></div><div class=\"ds-tile ds-tile-check\"><dt>Sponsorship <span class=\"ds-tile-flag\">Needs a check</span></dt><dd><p class=\"ds-tile-value\">Not offered</p><p class=\"ds-tile-source\">Read by AI from the posting</p><p class=\"ds-tile-quote\">“Applicants must be authorised to work without sponsorship.”</p></dd></div></dl></div>",
+      "css": ".ds-kf-wrap { padding: 1.25rem; background: #0f2118; color: #e6eedf; font: 400 1.0625rem/1.55 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; } .ds-kf-wrap p, .ds-kf-wrap dl, .ds-kf-wrap dd { margin: 0; } .ds-kf-sample { color: #8fbf7a; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; font-weight: 400; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; } .ds-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; margin-top: 1rem; } .ds-tile { padding: 1rem; background: #1a3828; box-shadow: inset 0 0 0 1px #2e6a41; } .ds-tile-check { box-shadow: inset 0 0 0 2px #b5820c; } .ds-tile dt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.25rem 0.75rem; color: #8fbf7a; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; font-weight: 400; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; } .ds-tile-flag { padding: 0 0.375rem; background: #f2c230; color: #17130a; } .ds-tile-value { margin-top: 0.375rem; font-weight: 600; } .ds-tile-source { margin-top: 0.125rem; color: #a8bda5; font-size: 0.875rem; } .ds-tile-quote { margin-top: 0.5rem; font-size: 0.875rem; line-height: 1.45; }"
+    },
+    {
+      "name": "Board Card with Member Tiles",
+      "kind": "card",
+      "refersTo": "board-card",
+      "description": "A Night-faced card that holds one board, laid out like the app's Boards page: name, member count chip, saved postings and 2rem member tiles with a \"+N\" overflow tile. Beside it, the dashed card that starts a new board.",
+      "html": "<div class=\"ds-bc-wrap\"><article class=\"ds-bc\"><div class=\"ds-bc-head\"><h3 class=\"ds-bc-title\">Summer search</h3><span class=\"ds-bc-chip\">6 members</span></div><p class=\"ds-bc-sub\">2 postings · Updated 3 hours ago</p><ul class=\"ds-bc-saved\"><li>Software Engineering Intern · Sample Co.</li><li>Data Science Intern · Example Labs</li></ul><ul class=\"ds-bc-members\"><li class=\"ds-bc-member\">MR</li><li class=\"ds-bc-member\">DL</li><li class=\"ds-bc-member\">SO</li><li class=\"ds-bc-member\">AK</li><li class=\"ds-bc-member ds-bc-more\">+2</li></ul></article><a href=\"#\" class=\"ds-bc-new\">Start a new board</a></div>",
+      "css": ".ds-bc-wrap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; padding: 1.25rem; background: #142b1f; color: #e6eedf; font: 400 1.0625rem/1.55 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; } .ds-bc-wrap h3, .ds-bc-wrap p, .ds-bc-wrap ul { margin: 0; padding: 0; list-style: none; } .ds-bc { display: flex; flex-direction: column; min-height: 13rem; margin: 4px; padding: 1.25rem; background: #0f2118; box-shadow: 0 -4px 0 0 #2e6a41, 0 4px 0 0 #2e6a41, -4px 0 0 0 #2e6a41, 4px 0 0 0 #2e6a41; } .ds-bc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; } .ds-bc-title { font-size: 1.125rem; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; } .ds-bc-chip { flex: none; padding: 0.125rem 0.5rem; font-size: 0.8125rem; font-weight: 500; line-height: 1.5; white-space: nowrap; box-shadow: inset 0 0 0 1px #2e6a41; } .ds-bc-sub { margin-top: 0.25rem; color: #a8bda5; font-size: 0.9375rem; } .ds-bc-saved { display: grid; gap: 0.375rem; margin-top: 1rem; font-size: 0.9375rem; } .ds-bc-saved li { overflow: hidden; padding-left: 0.875rem; text-overflow: ellipsis; white-space: nowrap; background: linear-gradient(#2e6a41, #2e6a41) 0 0.6em / 6px 6px no-repeat; } .ds-bc-members { display: flex; gap: 0.375rem; margin-top: auto; padding-top: 1.25rem; } .ds-bc-member { display: grid; place-items: center; width: 2rem; height: 2rem; background: #2e6a41; color: #e6eedf; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; line-height: 1.3; letter-spacing: 0; text-transform: uppercase; box-shadow: inset 0 -4px 0 rgb(0 0 0 / 0.3), inset 0 4px 0 rgb(255 255 255 / 0.16); } .ds-bc-more { background: none; color: #a8bda5; box-shadow: inset 0 0 0 1px #2e6a41; } .ds-bc-new { display: grid; place-items: center; min-height: 8rem; margin: 4px; color: #a8bda5; font-weight: 600; text-decoration: none; background: repeating-linear-gradient(90deg, #2e6a41 0 8px, transparent 8px 16px) 0 0 / 100% 2px no-repeat, repeating-linear-gradient(90deg, #2e6a41 0 8px, transparent 8px 16px) 0 100% / 100% 2px no-repeat, repeating-linear-gradient(0deg, #2e6a41 0 8px, transparent 8px 16px) 0 0 / 2px 100% no-repeat, repeating-linear-gradient(0deg, #2e6a41 0 8px, transparent 8px 16px) 100% 0 / 2px 100% no-repeat; transition: color 120ms steps(3, end); } .ds-bc-new:hover { color: #e6eedf; } .ds-bc-new:focus-visible { outline: 2px solid #f2c230; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ruler with Dither Seam",
+      "kind": "custom",
+      "refersTo": "ruler",
+      "description": "The tick strip that runs along the top of a section, joined to the band above by a checker seam.",
+      "html": "<div class=\"ds-ruler-demo\"><div class=\"ds-ruler\"><span>SL-01</span><span>Fall 2026</span></div></div>",
+      "css": ".ds-ruler-demo { padding-top: 3rem; background: #3e5881; } .ds-ruler { position: relative; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; padding: 1rem 1.5rem 0.625rem; color: #a8bda5; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; background: repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 80px) 0 0 / 100% 10px no-repeat, repeating-linear-gradient(90deg, currentColor 0 2px, transparent 2px 8px) 0 0 / 100% 5px no-repeat; background-color: #0f2118; } .ds-ruler::before { content: ''; position: absolute; inset: -8px 0 auto; height: 8px; background: conic-gradient(#0f2118 25%, transparent 0 50%, #0f2118 0 75%, transparent 0) 0 0 / 8px 8px; pointer-events: none; }"
+    },
+    {
+      "name": "Stage Path",
+      "kind": "custom",
+      "refersTo": "stage-marker",
+      "description": "The signature component. Five square markers on a dashed trail; the selected stage turns marigold and sits 4px higher.",
+      "html": "<div class=\"ds-path\"><button type=\"button\" class=\"ds-stage\" aria-pressed=\"false\"><span>Saved</span><span class=\"ds-count\">2</span></button><button type=\"button\" class=\"ds-stage\" aria-pressed=\"false\"><span>Applying</span><span class=\"ds-count\">1</span></button><button type=\"button\" class=\"ds-stage\" aria-pressed=\"false\"><span>Applied</span><span class=\"ds-count\">1</span></button><button type=\"button\" class=\"ds-stage\" aria-pressed=\"true\"><span>Interview</span><span class=\"ds-count\">1</span></button><button type=\"button\" class=\"ds-stage\" aria-pressed=\"false\"><span>Offer</span><span class=\"ds-count\">0</span></button></div>",
+      "css": ".ds-path { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); padding: 1.5rem 0 1rem; background: #0f2118; } .ds-path::before { content: ''; position: absolute; left: 10%; right: 10%; top: calc(1.5rem + 1.25rem - 2px); height: 4px; background: repeating-linear-gradient(90deg, #2e6a41 0 8px, transparent 8px 16px); } .ds-stage { position: relative; display: grid; justify-items: center; gap: 0.75rem; padding: 0 0 0.5rem; border: 0; background: none; color: #a8bda5; cursor: pointer; font-family: 'Pixelify Sans', ui-monospace, Consolas, monospace; font-size: 0.8125rem; line-height: 1.3; letter-spacing: 0.05em; text-transform: uppercase; } .ds-stage::before { content: ''; width: 2.5rem; height: 2.5rem; background: #1a3828; box-shadow: inset 0 0 0 4px #2e6a41, 0 0 0 4px #0f2118; transition: background-color 120ms steps(3, end), box-shadow 120ms steps(3, end), transform 120ms steps(3, end); } .ds-stage:hover::before { transform: translateY(-2px); } .ds-stage[aria-pressed='true'] { color: #e6eedf; } .ds-stage[aria-pressed='true']::before { background: #f2c230; box-shadow: inset 0 -4px 0 #b5820c, inset 0 4px 0 #ffe27a, 0 0 0 4px #0f2118; transform: translateY(-4px); } .ds-stage:focus-visible { outline: 2px solid #f2c230; outline-offset: 3px; } .ds-count { color: #8fbf7a; }"
+    },
+    {
+      "name": "Notice",
+      "kind": "custom",
+      "refersTo": "notice",
+      "description": "A short system message, fixed to the bottom right of the page.",
+      "html": "<p class=\"ds-notice\">You have been logged out.</p>",
+      "css": ".ds-notice { margin: 0; max-width: 24rem; padding: 0.75rem 1rem; background: #e6eedf; color: #0f2118; font: 400 1.0625rem/1.55 'Familjen Grotesk', 'Segoe UI', system-ui, sans-serif; box-shadow: inset 0 -4px 0 #8fbf7a; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Valley at Dusk",
+    "overview": "Shortlist looks like a small world built out of blocks. A dusk-blue sky sits at the top of the page, and everything under it is deep meadow green. Buttons and markers are solid blocks with a light top edge and a dark bottom edge, so they look like something you can press.\n\nThe look is friendly, but the words stay plain. Labels say what things are: posting, board, tracker, deadline. The blocky style is in the shapes, colours and motion, never in the wording.\n\nNothing is rounded, blurred or faded. Colour areas are flat, corners are square, and things move in a few visible steps instead of gliding.",
+    "keyCharacteristics": [
+      "Square corners everywhere (no rounding).",
+      "Blocks have a lit top edge and a shaded bottom edge.",
+      "Panels and cards have stepped \"pixel\" corners.",
+      "A checker pattern (a \"dither\") joins one colour band to the next.",
+      "Ruler ticks run along the top of sections, with a short ID.",
+      "Marigold is the only warm colour.",
+      "Motion moves in steps and never eases.",
+      "Two typefaces: a warm grotesk for reading, a pixel face for IDs, dates, codes, timers and small labels.",
+      "A feature section is a heading plus a small working copy of the real app page."
+    ],
+    "rules": [
+      {
+        "name": "The One Warm Colour Rule",
+        "body": "Marigold is the only warm colour on a page. Use it for the main action, the current step, or something the user must notice. Never use it as a band background or for body text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat Band Rule",
+        "body": "Every band is one flat colour. No gradients. To join two bands, use the dither strip (see Components).",
+        "section": "colors"
+      },
+      {
+        "name": "The Chip Colour Rule",
+        "body": "A chip's colour is its meaning. Filled green means the fact is in your favour. A marigold outline means look closer. A plain green outline is neutral. Never pick a chip colour for decoration.",
+        "section": "colors"
+      },
+      {
+        "name": "The Readout Rule",
+        "body": "The pixel face is for IDs, dates, codes, timers and small labels. Sentences, big headings and button text are always in Familjen Grotesk.",
+        "section": "typography"
+      },
+      {
+        "name": "The Show It Rule",
+        "body": "A feature section is a heading plus a demo of the feature. It does not describe the feature in a paragraph. If the demo needs explaining, fix the demo.",
+        "section": "layout"
+      },
+      {
+        "name": "The Real Page Rule",
+        "body": "Every landing section is a small copy of a real app page, built from the same data and the same template helpers (small functions the app's own pages call to format a chip, a countdown or a fact). That way the landing page cannot drift from the app. Discover and Boards work this way today; the Tracker demo is still written by hand and should follow.",
+        "section": "layout"
+      },
+      {
+        "name": "The Hard Edge Rule",
+        "body": "Every shadow has zero blur. A shadow here is a drawn edge, not a glow.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Press Rule",
+        "body": "A pressed block moves down and loses its bottom edge: 2px on hover, 4px when pressed. The change happens in 3 steps over 120ms (`steps(3, end)`), not as a smooth slide.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep every corner square.",
+      "Do give pressable blocks a lit top edge and a shaded bottom edge.",
+      "Do use Marigold for one main action per view, the current step, and things the user must notice.",
+      "Do use the pixel face for IDs, dates, codes, timers and small labels.",
+      "Do join colour bands with the dither seam.",
+      "Do move things in steps (`120ms steps(3, end)`), and turn motion off when the user asks for reduced motion.",
+      "Do label demonstration content as sample data, with a sample label above the block.",
+      "Do show a feature with a small copy of its real app page, built from the same data and template helpers.",
+      "Do let a chip's colour carry its meaning: filled green, marigold outline or plain outline.",
+      "Do write labels in plain product words: posting, board, tracker, stage, deadline.",
+      "Do keep text contrast at WCAG 2.1 AA (at least 4.5:1 for normal text). White on Dusk Sky is 7.2:1."
+    ],
+    "donts": [
+      "Don't round corners.",
+      "Don't use blurred shadows, glows or gradients.",
+      "Don't use smooth easing (`ease`, `ease-in-out`) on transitions or animations.",
+      "Don't add a second warm colour, and don't use Marigold as a band background or for body text.",
+      "Don't set sentences, big headings or button text in the pixel face.",
+      "Don't describe a feature in a paragraph under its section heading. Show the feature.",
+      "Don't hand-write a landing demo that the app's own data and helpers can build.",
+      "Don't use game words (party, quest, XP, levels) in copy, component names or section names.",
+      "Don't show where the team is: no coordinates, city names or campus names. A posting's own job location is product data and stays.",
+      "Don't copy colours or fonts from the older app pages into new work."
+    ]
+  }
+}
