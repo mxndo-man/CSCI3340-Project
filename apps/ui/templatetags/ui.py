@@ -855,7 +855,8 @@ def digest_hours():
 @register.simple_tag
 def unread_count(notifications):
     return sum(
-        1 for notification in notifications or ()
+        1
+        for notification in notifications or ()
         if not getattr(notification, "read", getattr(notification, "is_read", False))
     )
 

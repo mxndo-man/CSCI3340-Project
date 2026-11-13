@@ -26,9 +26,7 @@ class MarkAllReadView(LoginRequiredMixin, RedirectURLMixin, View):
             recipient_id=request.user.pk,
             is_read=False,
         ).update(is_read=True)
-        return redirect(
-            self.get_redirect_url() or reverse("notifications:list")
-        )
+        return redirect(self.get_redirect_url() or reverse("notifications:list"))
 
 
 class OpenNotificationView(LoginRequiredMixin, RedirectURLMixin, View):
@@ -40,6 +38,4 @@ class OpenNotificationView(LoginRequiredMixin, RedirectURLMixin, View):
         )
         notification.is_read = True
         notification.save(update_fields=["is_read"])
-        return redirect(
-            self.get_redirect_url() or reverse("notifications:list")
-        )
+        return redirect(self.get_redirect_url() or reverse("notifications:list"))
