@@ -576,6 +576,8 @@ FORM_URL_NAMES = {
     "join_board": "boards:join",
     "leave_board": "boards:leave",
     "remove_member": "boards:remove",
+    "mark_all_read": "notifications:mark_all_read",
+    "open_notification": "notifications:open_notification",
 }
 
 
@@ -839,13 +841,24 @@ def digest_hours():
     """(hour, label) for every NotificationPreference.digest_hour: (8, "8:00 AM")."""
     # Any date works: the format only shows the hour.
     return [
-        (hour, date_format(datetime(2000, 1, 1, hour), "g:i A")) for hour in range(24)
+        (
+            hour,
+            date_format(
+                datetime(2000, 1, 1, hour, tzinfo=timezone.get_current_timezone()),
+                "g:i A",
+            ),
+        )
+        for hour in range(24)
     ]
 
 
 @register.simple_tag
 def unread_count(notifications):
-    return sum(1 for n in notifications or () if not n.read)
+    return sum(
+        1
+        for notification in notifications or ()
+        if not getattr(notification, "read", getattr(notification, "is_read", False))
+    )
 
 
 # ---- Home -------------------------------------------------------------------------------

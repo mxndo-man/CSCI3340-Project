@@ -254,7 +254,14 @@ class TrackerHelperTests(TestCase):
     def test_application_line(self):
         applied = self.application("APPLIED", applied_on=date(2026, 10, 28))
         self.assertEqual(ui.application_line(applied), "Applied Oct 28")
-        moment = timezone.make_aware(datetime(2026, 11, 12, 14, 0))
+        moment = datetime(
+            2026,
+            11,
+            12,
+            14,
+            0,
+            tzinfo=timezone.get_current_timezone(),
+        )
         interview = self.application("INTERVIEW", next_step_at=moment)
         self.assertEqual(
             ui.application_line(interview), "Interview Thu, Nov 12 · 2:00 PM"

@@ -2,6 +2,7 @@
 .venv
 .env
 db.sqlite3
+celerybeat-schedule*
 
 
 # Python bytecode (machine-specific, rebuilt on every run)

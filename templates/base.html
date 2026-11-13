@@ -118,7 +118,7 @@
     <div role="status" class="border-b border-ochre-600/25 bg-ochre-50 text-ochre-800">
       <p class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-2 gap-y-1 px-4 py-2 text-sm sm:px-6">
         {% icon "triangle-alert" "size-4 shrink-0" %}
-        <span><span class="font-semibold">Preview:</span> {% if user.is_authenticated %}sample boards, postings and tasks on your account{% else %}sample data, seen logged out{% endif %} (nothing you do here is saved)</span>
+        <span><span class="font-semibold">Preview:</span> {% if ui_preview_live_notifications %}these are your real notifications; opening one or marking them read updates your account{% elif user.is_authenticated %}sample boards, postings and tasks on your account (nothing you do here is saved){% else %}sample data, seen logged out{% endif %}</span>
         {% if preview_index_url %}<a href="{{ preview_index_url }}" class="font-semibold underline underline-offset-2 hover:no-underline">All preview pages</a>{% endif %}
       </p>
     </div>
