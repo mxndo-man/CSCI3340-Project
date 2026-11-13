@@ -1,10 +1,13 @@
 # Create your views here.
 # apps/accounts/views.py
+from typing import cast
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
 from .forms import CustomUserCreationForm, ProfileForm
+from .models import CustomUser
 
 
 class SignUpView(CreateView):
@@ -18,5 +21,6 @@ class ProfileView(LoginRequiredMixin, UpdateView):
     template_name = "accounts/profile.html"
     success_url = reverse_lazy("accounts:profile")
 
-    def get_object(self):
-        return self.request.user
+    def get_object(self, queryset=None) -> CustomUser:
+        # LoginRequiredMixin guarantees a logged-in user, so this is never AnonymousUser.
+        return cast(CustomUser, self.request.user)

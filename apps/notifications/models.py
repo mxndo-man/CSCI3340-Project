@@ -1,6 +1,7 @@
 # Create your models here.
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 
 class Notifications(models.Model):
     recipient = models.ForeignKey(
@@ -14,14 +15,12 @@ class Notifications(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
-        indexes = [
+        ordering = ("-created_at",)
+        indexes = (
             # 1. Speeds up the default chronological ordering
-            models.Index(fields=['-created_at']),
-            
+            models.Index(fields=["-created_at"]),
             # 2. Speeds up fetching a specific user's  notifications
-            models.Index(fields=['recipient', '-created_at']),
-            
+            models.Index(fields=["recipient", "-created_at"]),
             # 3. unread/recent
             models.Index(fields=["recipient", "is_read", "-created_at"]),
-        ]
+        )

@@ -1,0 +1,20 @@
+{% load ui %}{% comment %}
+One task with its checkbox.
+  {% include "tracker/partials/task_row.html" with task=task %}
+  {% include "tracker/partials/task_row.html" with task=task boxed=True %}   (in a grid)
+Reads task: id, title, due_at, done, and application.posting.organization if it has one.
+Ticking it posts task, done (1 or 0: the new value), next to {% form_url "toggle_task" %}.
+{% endcomment %}{% task_due task as due %}{% form_url "toggle_task" as toggle_url %}<li id="task-{{ task.id }}" class="scroll-mt-24">
+  <form method="post" action="{{ toggle_url }}" x-data class="flex items-start gap-3 rounded-xl px-3 py-2.5 {% if boxed %}border border-sand-200 bg-sand-50/70{% else %}hover:bg-sand-50{% endif %}">
+    {% csrf_token %}
+    <input type="hidden" name="task" value="{{ task.id }}">
+    <input type="hidden" name="done" value="{% if task.done %}0{% else %}1{% endif %}">
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <input id="task-box-{{ task.id }}" type="checkbox"{% if task.done %} checked{% endif %} @change="$el.form.requestSubmit()" class="mt-0.5 size-4 shrink-0 cursor-pointer accent-clay-600">
+    <label for="task-box-{{ task.id }}" class="min-w-0 flex-1 cursor-pointer">
+      <span class="block text-sm font-medium {% if task.done %}text-bark-500 line-through{% else %}text-bark-900{% endif %}">{{ task.title }}</span>
+      <span class="mt-0.5 block text-xs {% if due.urgent %}text-brick-700{% else %}text-bark-500{% endif %}">{% if task.application %}{{ task.application.posting.organization }} · {% endif %}{{ due.text }}</span>
+    </label>
+    <button type="submit" class="sr-only focus:not-sr-only {% button_class 'ghost' 'sm' %}">{% if task.done %}Mark not done{% else %}Mark done{% endif %}</button>
+  </form>
+</li>

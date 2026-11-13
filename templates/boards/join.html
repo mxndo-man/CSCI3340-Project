@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Join a board · Shortlist{% endblock %}
+
+{% block content %}
+{% comment %}
+Join with a code as its own page (boards:join). The boards page opens the same form in a
+dialog; this page is what the join view renders on GET and when the code is wrong.
+The view passes:
+  form   field join_code (apps/boards/forms.py JoinBoardForm)
+It posts to the page itself.
+{% endcomment %}
+{% page_url "boards:list" as boards_url %}
+<div class="mx-auto w-full max-w-md px-4 py-8 sm:py-12">
+  {% include "components/back_link.html" with href=boards_url label="All boards" only %}
+  <h1 class="mt-6 font-serif text-h1 font-semibold text-bark-900">Join a board</h1>
+  <p class="mt-2 text-[15px] text-bark-700">Ask someone on the board for its join code.</p>
+  <form method="post" novalidate class="mt-6 space-y-5 rounded-2xl border border-sand-200 bg-white p-6">
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+      {% include "components/banner.html" with tone="alert" title=error only %}
+    {% endfor %}
+    {# Codes are case-sensitive, so the input shows exactly what was typed. #}
+    {% include "components/field.html" with field=form.join_code hint="Capital letters matter." autocomplete="off" input_class="font-mono tracking-wider" %}
+    <div class="flex justify-end gap-2">
+      {% if boards_url %}<a href="{{ boards_url }}" class="{% button_class 'ghost' %}">Cancel</a>{% endif %}
+      <button type="submit" class="{% button_class 'primary' %}">Join board</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

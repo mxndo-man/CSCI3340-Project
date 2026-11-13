@@ -15,14 +15,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
-from django.views.generic import TemplateView
+
+from apps.ui.views import styleguide
+from config.views import HomeView, landing
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
-    path("", TemplateView.as_view(template_name="base.html"), name="home"),
+    path("", landing, name="landing"),
+    path("home/", HomeView.as_view(), name="home"),
     path("accounts/", include("apps.accounts.urls")),
     path("boards/", include("apps.boards.urls")),
     path("postings/", include("apps.postings.urls")),
@@ -30,3 +34,11 @@ urlpatterns = [
     path("notifications/", include("apps.notifications.urls")),
     path("ingestion/", include("apps.ingestion.urls")),
 ]
+
+# Every page on sample data, until the real views exist (UI_PREVIEW=1 in .env).
+if settings.UI_PREVIEW:
+    urlpatterns += [path("preview/", include("apps.ui_preview.urls"))]
+
+# Every UI component on one page, for copying markup. Development only.
+if settings.DEBUG:
+    urlpatterns += [path("styleguide/", styleguide, name="styleguide")]
