@@ -4,7 +4,24 @@
 
 *CSCI 3340 Software Engineering 1, UTRGV, Fall 2026.*
 
-> **Status (Deliverable 1, Oct 23):** the Django project runs locally, and the plan, issues, and user stories are in place. Features are being built over the next sprints.
+> **Status (Deliverable 2, Nov 14):** accounts and boards work for real. every other page is a clickable prototype on sample data.
+
+## Deliverable 2
+
+**Prototypes**
+- Figma prototype (clickable): <https://www.figma.com/make/N1iVg8gFKBBEIKYGBZK1Rg/Shortlist-prototype--code--v2?t=lx88OUpSiLne9Xh4-1>
+- Figma wireframes: <https://www.figma.com/design/KTu5qax5QhEQQxMfii0zOZ/Shortlist-UI-wireframes?node-id=0-1&t=YRcq8iTQP7swzcTk-1>
+- Wireframe images: [`docs/wireframes/`](docs/wireframes/)
+- Working prototype in the app: every page at [`/preview/`](http://127.0.0.1:8000/preview/) on sample data (needs `UI_PREVIEW=1` in `.env`, which `.env.example` already sets)
+
+| Requirement | Where to see it |
+| --- | --- |
+| User stories | [`docs/user_stories.md`](docs/user_stories.md): 13 stories with acceptance criteria, owner, milestone, and status |
+| Home view | `/preview/home/` (a returning user) and `/preview/home/new/` (a brand-new user with nothing yet) |
+| User management | Sign up `/accounts/signup/`, log in (username or email) `/accounts/login/`, profile `/accounts/profile/`, password reset `/accounts/password_reset/` (the email prints in the terminal), admin `/admin/` |
+| Boards (working) | `/boards/`: create a board, join with a code, leave; the owner can remove members |
+
+**To try it:** follow [Run it locally](#run-it-locally), run `createsuperuser`, then log in and open `/preview/`.
 
 ---
 
@@ -68,7 +85,7 @@ uv run python manage.py migrate
 uv run python manage.py runserver
 ```
 
-Open http://127.0.0.1:8000/admin/ to check it's running. The home page (`/`) shows "Page not found" until the landing page is added (#10). This behavior is expected.
+Open http://127.0.0.1:8000/ for the landing page, or `/preview/` for every page on sample data.
 
 | Task | Command |
 | --- | --- |
@@ -77,7 +94,7 @@ Open http://127.0.0.1:8000/admin/ to check it's running. The home page (`/`) sho
 | Format and lint before a PR | `uv run ruff format .` then `uv run ruff check . --fix` |
 | Add a package | `uv add <package>` (never `pip install`); commit `uv.lock` |
 
-**Coming soon:** `docker compose up` will run the whole system (#9). Once the Tailwind PR merges, `uv run task run` starts Django and the CSS watcher together.
+**Coming soon:** `docker compose up` will run the whole system (#9).
 
 ## Project layout
 
@@ -85,10 +102,12 @@ Open http://127.0.0.1:8000/admin/ to check it's running. The home page (`/`) sho
 config/      settings, root URLs, Celery
 apps/        one folder per feature: accounts, boards, postings, tracker,
              notifications, ingestion, extraction_client
-templates/   base.html (shared layout) and one folder per app
+             ui (shared template tags), ui_preview (the /preview/ pages)
+templates/   base.html (shared layout), components/, and one folder per app
 static/      project CSS, JS, images
 fixtures/    fake sample data for development
-docs/        contracts.md, research/, wireframes/ (published, so nothing private)
+docs/        user_stories.md, contracts.md, frontend-handoff.md, wireframes/
+             (published, so nothing private)
 ```
 
 ## Team
@@ -108,7 +127,7 @@ Each owner builds inside their own apps. Shared files (`base.html`, `config/sett
 
 **Work items**
 - One GitHub issue per app or feature, plus integration issues where apps connect. Each has an owner, labels, and a milestone (D1 Oct 23, D2 Nov 14, Final Dec 7).
-- **User stories** take the form *"As a ___, I want ___ so that ___,"* with acceptance criteria. The product owner orders the backlog. First draft: [`docs/user_stories.md`](docs/user_stories.md)
+- **User stories** take the form *"As a ___, I want ___ so that ___,"* with acceptance criteria. The product owner orders the backlog. Current list: [docs/user_stories.md](docs/user_stories.md)
 
 **Sprint plan**
 
