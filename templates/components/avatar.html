@@ -1,0 +1,5 @@
+{% load ui %}{% comment %}
+A person's initials in a colored circle.
+  {% include "components/avatar.html" with person=user size="sm" ring=True %}
+size: sm, md (default) or lg. ring: a white outline, for overlapping stacks.
+{% endcomment %}{% display_name person as name %}{% initials person as letters %}{% avatar_tone person as tone %}<span role="img" aria-label="{{ name }}" title="{{ name }}" class="inline-flex shrink-0 items-center justify-center rounded-full font-semibold {% if size == 'sm' %}size-7 text-[11px]{% elif size == 'lg' %}size-10 text-sm{% else %}size-8 text-xs{% endif %} {% if tone == 'clay' %}bg-clay-100 text-clay-700{% elif tone == 'moss' %}bg-moss-50 text-moss-700{% elif tone == 'ochre' %}bg-ochre-50 text-ochre-800{% else %}bg-sand-200 text-bark-700{% endif %}{% if ring %} ring-2 ring-white{% endif %}">{{ letters }}</span>

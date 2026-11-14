@@ -1,0 +1,34 @@
+{% load ui %}{% comment %}
+One Django form field: label, input, hint and errors, styled and linked for screen readers.
+  {% include "components/field.html" with field=form.email %}
+  {% include "components/field.html" with field=form.username label="Email or username" no_hint=True %}
+label: replaces the form's label. hint: replaces the help text. no_hint=True: no help text.
+optional: shows "Optional" next to the label. placeholder and autocomplete: set on the input.
+class: classes for the wrapper. input_class: extra classes for the input itself.
+{% endcomment %}{% if no_hint %}{% firstof "" as hint_text %}{% else %}{% firstof hint field.help_text as hint_text %}{% endif %}<div class="{{ class }}">
+  {% if field.widget_type == "checkbox" %}
+    <label class="flex items-start gap-3 text-sm text-bark-900">
+      {% ui_widget field hint_text input_class %}
+      <span>{% firstof label field.label %}</span>
+    </label>
+  {% else %}
+    <label for="{{ field.id_for_label }}" class="mb-1.5 flex items-baseline justify-between gap-2 text-sm font-medium text-bark-900">
+      {% firstof label field.label %}
+      {% if optional %}<span class="text-xs font-normal text-bark-500">Optional</span>{% endif %}
+    </label>
+    {% if field.widget_type == "select" %}
+      <div class="relative">
+        {% ui_widget field hint_text input_class placeholder autocomplete %}
+        {% icon "chevron-down" "pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-bark-500" %}
+      </div>
+    {% else %}
+      {% ui_widget field hint_text input_class placeholder autocomplete %}
+    {% endif %}
+  {% endif %}
+  {% if field.errors %}
+    <p id="{{ field.auto_id }}_error" class="mt-1.5 text-xs text-brick-700">{{ field.errors|join:" " }}</p>
+  {% endif %}
+  {% if hint_text %}
+    <p id="{{ field.auto_id }}_helptext" class="mt-1.5 text-xs text-bark-500">{{ hint_text }}</p>
+  {% endif %}
+</div>

@@ -1,0 +1,16 @@
+{% load ui %}{% comment %}
+One posting as a compact row, for lists inside a card (the home page's new matches).
+  <ul>{% include "postings/partials/row.html" with posting=posting %}</ul>
+Reads posting: title, organization, location, deadline, deadline_type, status, pay_min,
+pay_max, pay_period, clearance, citizenship, degree_levels, get_absolute_url.
+The whole row is one link. Shows the first two chips and the countdown.
+{% endcomment %}{% posting_chips posting as chips %}<li class="group relative flex items-center gap-4 rounded-xl px-3 py-3 hover:bg-sand-50">
+  <div class="min-w-0 flex-1">
+    <a href="{{ posting.get_absolute_url }}" class="text-[15px] font-semibold text-bark-900 after:absolute after:inset-0 after:rounded-xl group-hover:text-clay-700">{{ posting.title }}</a>
+    <p class="mt-0.5 truncate text-sm text-bark-500">{{ posting.organization }}{% if posting.location %} · {{ posting.location }}{% endif %}</p>
+    <div class="mt-2 flex flex-wrap gap-1.5">
+      {% for chip in chips|slice:":2" %}{% include "components/chip.html" with tone=chip.tone label=chip.label only %}{% endfor %}
+    </div>
+  </div>
+  <span class="shrink-0">{% include "components/countdown.html" with deadline=posting only %}</span>
+</li>

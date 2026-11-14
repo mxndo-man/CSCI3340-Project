@@ -19,6 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
     DJANGO_DEBUG=(bool, False),
+    UI_PREVIEW=(bool, False),
     ALLOWED_HOSTS=(list, ["localhost", "127.0.0.1"]),
     REDIS_URL=(str, "redis://localhost:6379/0"),
 )
@@ -33,6 +34,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DJANGO_DEBUG")
 
+# Serve /preview/: every page on sample data, until the real models and views exist.
+UI_PREVIEW = env("UI_PREVIEW")
+
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
 
@@ -45,12 +49,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_tailwind_cli",
     "apps.accounts",
     "apps.boards",
     "apps.postings",
     "apps.tracker",
     "apps.notifications",
     "apps.ingestion",
+    # Template helpers ({% load ui %}) and the style guide. Every page needs it. No models.
+    "apps.ui",
+    # The /preview/ pages on fake data, until the real views exist. No models.
+    "apps.ui_preview",
 ]
 
 MIDDLEWARE = [
@@ -75,6 +84,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.notifications.context_processors.notification_menu",
             ],
         },
     },
@@ -114,6 +124,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "accounts.CustomUser"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
@@ -136,6 +148,8 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
+AUTHENTICATION_BACKENDS = ["apps.accounts.backend.EmailOrUsernameModelBackend"]
+
 MAILERS = {
     "default": {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
@@ -148,10 +162,11 @@ CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TIMEZONE = TIME_ZONE
 
-STATICFILES_DIRS = [
-    BASE_DIR / "assets",
-]  # Where the tailwind files exist, they dont need to be touched
 
 TAILWIND_CLI_SRC_CSS = (
     "styles/styles.css"  # Custom colors for easy rewrite of those colors
 )
+
+# After logging in, go to the home dashboard; after logging out, back to the landing page.
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "landing"

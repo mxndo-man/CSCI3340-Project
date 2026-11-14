@@ -1,0 +1,35 @@
+{% load ui %}{% comment %}
+The bell in the top bar and its menu. base.html shows it when the page has
+notification_menu = {"notifications": the latest few, newest first, "unread_count": all unread}.
+Add that to every page with a context processor (see docs/frontend-handoff.md).
+"Mark all as read" posts next to {% form_url "mark_all_read" %}.
+{% endcomment %}{% form_url "mark_all_read" as mark_url %}{% page_url "notifications:list" as list_url %}{% page_url "notifications:preferences" as preferences_url %}<div class="relative" x-data="{ open: false }" @keydown.escape.window="open = false" @click.outside="open = false">
+  <button type="button" @click="open = !open" :aria-expanded="open" aria-expanded="false" aria-haspopup="true" aria-label="Notifications{% if menu.unread_count %}, {{ menu.unread_count }} unread{% endif %}" class="relative inline-flex size-9 items-center justify-center rounded-full text-bark-700 hover:bg-sand-100" :class="open && 'bg-sand-100'">
+    {% icon "bell" "size-5" %}
+    {% if menu.unread_count %}<span aria-hidden="true" class="absolute right-2 top-2 size-2 rounded-full bg-clay-600 ring-2 ring-sand-50"></span>{% endif %}
+  </button>
+
+  <div x-show="open" x-cloak class="popover fixed inset-x-4 top-[60px] z-40 rounded-2xl border border-sand-200 bg-white shadow-pop md:absolute md:inset-x-auto md:right-0 md:top-full md:mt-2 md:w-96">
+    <div class="flex items-center justify-between border-b border-sand-100 px-4 py-3">
+      <p class="text-sm font-semibold text-bark-900">Notifications</p>
+      <form method="post" action="{{ mark_url }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit"{% if not menu.unread_count %} disabled{% endif %} class="text-xs font-semibold text-clay-700 hover:underline disabled:cursor-default disabled:text-bark-500 disabled:no-underline">Mark all as read</button>
+      </form>
+    </div>
+    {% if menu.notifications %}
+      <ul class="max-h-[60vh] overflow-y-auto p-1.5">
+        {% for notification in menu.notifications %}<li>{% include "notifications/partials/item.html" with notification=notification %}</li>{% endfor %}
+      </ul>
+    {% else %}
+      <p class="px-4 py-8 text-center text-sm text-bark-500">You're all caught up.</p>
+    {% endif %}
+    {% if list_url or preferences_url %}
+      <div class="flex border-t border-sand-100 p-1.5">
+        {% if list_url %}<a href="{{ list_url }}" class="flex-1 rounded-xl px-3 py-2.5 text-center text-sm font-medium text-bark-700 hover:bg-sand-50">See all</a>{% endif %}
+        {% if preferences_url %}<a href="{{ preferences_url }}" class="flex-1 rounded-xl px-3 py-2.5 text-center text-sm font-medium text-bark-700 hover:bg-sand-50">Notification settings</a>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>

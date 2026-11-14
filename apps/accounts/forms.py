@@ -1,6 +1,6 @@
 from django import forms
-from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 
 from .models import CustomUser  # Grabs the custom user model thats in apps
 
@@ -8,39 +8,35 @@ from .models import CustomUser  # Grabs the custom user model thats in apps
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Email Address")
 
-    class Meta(UserCreationForm.Meta):
+    # django-types' stubs omit UserCreationForm.Meta and clean_username; Django has both.
+    class Meta(UserCreationForm.Meta):  # pyright: ignore[reportAttributeAccessIssue]
         model = CustomUser
         fields = (
             "username",
             "email",
         )  # Reqiure usernmae and email when creating new user.
 
-        # Input validation, will later be fixed.
+    def clean_username(self):
+        username = super().clean_username()  # pyright: ignore[reportAttributeAccessIssue]
+        if username and "@" in username:
+            raise ValidationError("Usernames cannot contain the '@' symbol.")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+
+        if email and CustomUser.objects.filter(email__iexact=email).exists():
+            raise ValidationError("A user with that email address already exists.")
+
+        return email
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.help_text = ""
 
 
-class CustomLoginForm(forms.Form):
-    username_or_email = forms.CharField(label="Username or Email")
-
-    password = forms.CharField(widget=forms.PasswordInput)
-
-    def clean(self):
-
-        cleaned_data = super().clean()  # Input Safety Validation
-        identifier = cleaned_data.get(
-            "username_or_email"
-        )  # Grabs the "cleaned" username_or_email
-        password = cleaned_data.get("password")  # Grabs the "cleaned" password
-
-        if identifier and password:
-            self.user_cache = authenticate(
-                username=identifier,
-                password=password,
-                backend="apps.accounts.backend.EmailOrUsernameModelBackend",  # Back end that checks email/password for login
-            )
-
-            # If the backend returned None, it means authentication failed
-            if self.user_cache is None:
-                raise forms.ValidationError(
-                    "Invalid username/email or password. Please try again."
-                )
-        return cleaned_data
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ("display_name", "graduation_term", "time_zone")

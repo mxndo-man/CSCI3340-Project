@@ -1,0 +1,4 @@
+{% load ui %}{% comment %}
+A quiet link back to the page you came from.
+  {% include "components/back_link.html" with href=discover_url label="Back to Discover" %}
+{% endcomment %}{% if href %}<a href="{{ href }}" class="inline-flex items-center gap-1.5 rounded-full text-sm font-medium text-bark-700 hover:text-bark-900">{% icon "arrow-left" "size-4" %}{{ label }}</a>{% endif %}

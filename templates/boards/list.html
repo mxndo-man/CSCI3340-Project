@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Boards · Shortlist{% endblock %}
+
+{% block content %}
+{% comment %}
+My boards (boards:list). The view passes:
+  boards  the user's boards; prefetch membership_set__user and boardposting_set__posting
+The dialogs post to boards:create (name, description, next) and boards:join
+(join_code, next) through {% form_url %}; a form_urls dict in the context overrides them.
+/boards/?new=1 opens the "New board" dialog (the save menu links there).
+{% endcomment %}
+{% form_url "create_board" as create_url %}
+{% form_url "join_board" as join_url %}
+<div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10" x-data x-init="if (new URLSearchParams(location.search).has('new')) $refs.newBoard.showModal()">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="min-w-0">
+      <h1 class="font-serif text-h1 font-semibold text-bark-900">Boards</h1>
+      <p class="mt-2 text-[15px] text-bark-700">Save postings to a board, then share its code so friends can add theirs and talk them through.</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button type="button" @click="$refs.joinBoard.showModal()" class="{% button_class 'secondary' %}">Join with a code</button>
+      <button type="button" @click="$refs.newBoard.showModal()" class="{% button_class 'primary' %}">{% icon "plus" "size-4" %}New board</button>
+    </div>
+  </div>
+
+  <ul class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {% for board in boards %}
+      <li>{% include "boards/partials/board_card.html" with board=board only %}</li>
+    {% endfor %}
+    <li>
+      <button type="button" @click="$refs.newBoard.showModal()" class="flex h-full min-h-52 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-sand-300 text-bark-700 transition-colors hover:border-clay-600 hover:bg-white hover:text-clay-700">
+        {% icon "plus" "size-6" %}
+        <span class="text-sm font-semibold">Start a new board</span>
+      </button>
+    </li>
+  </ul>
+
+  <dialog x-ref="newBoard" aria-labelledby="new-board-title" class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-sand-200 bg-white p-6 shadow-pop backdrop:bg-bark-900/30 backdrop:backdrop-blur-[2px]">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="new-board-title" class="font-serif text-h2 font-semibold text-bark-900">New board</h2>
+      <button type="button" aria-label="Close" @click="$refs.newBoard.close()" class="-mr-2 -mt-1 inline-flex size-9 items-center justify-center rounded-full text-bark-500 hover:bg-sand-100 hover:text-bark-900">{% icon "x" "size-5" %}</button>
+    </div>
+    <form method="post" action="{{ create_url }}" class="mt-4 space-y-5">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div>
+        <label for="board-name" class="mb-1.5 block text-sm font-medium text-bark-900">Board name</label>
+        <input id="board-name" name="name" required maxlength="100" autofocus placeholder="e.g. Summer 2027 hunt" class="h-11 w-full rounded-xl border border-sand-400 bg-white px-3.5 text-[15px] text-bark-900 transition placeholder:text-bark-500 focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+      </div>
+      <div>
+        <label for="board-description" class="mb-1.5 flex items-baseline justify-between gap-2 text-sm font-medium text-bark-900">Description <span class="text-xs font-normal text-bark-500">Optional</span></label>
+        <textarea id="board-description" name="description" rows="2" class="w-full resize-y rounded-xl border border-sand-400 bg-white px-3.5 py-3 text-[15px] text-bark-900 transition placeholder:text-bark-500 focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20"></textarea>
+      </div>
+      <p class="text-xs text-bark-500">Anyone with the board's join code can join and comment.</p>
+      <div class="flex justify-end gap-2">
+        <button type="button" @click="$refs.newBoard.close()" class="{% button_class 'ghost' %}">Cancel</button>
+        <button type="submit" class="{% button_class 'primary' %}">Create board</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog x-ref="joinBoard" aria-labelledby="join-board-title" class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-sand-200 bg-white p-6 shadow-pop backdrop:bg-bark-900/30 backdrop:backdrop-blur-[2px]">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="join-board-title" class="font-serif text-h2 font-semibold text-bark-900">Join a board</h2>
+      <button type="button" aria-label="Close" @click="$refs.joinBoard.close()" class="-mr-2 -mt-1 inline-flex size-9 items-center justify-center rounded-full text-bark-500 hover:bg-sand-100 hover:text-bark-900">{% icon "x" "size-5" %}</button>
+    </div>
+    <form method="post" action="{{ join_url }}" class="mt-4 space-y-5">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <div>
+        <label for="join-code" class="mb-1.5 block text-sm font-medium text-bark-900">Join code</label>
+        {# Codes are case-sensitive, so the input shows exactly what was typed. #}
+        <input id="join-code" name="join_code" required maxlength="12" autofocus autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="join-code-hint" class="h-11 w-full rounded-xl border border-sand-400 bg-white px-3.5 font-mono text-[15px] tracking-wider text-bark-900 transition placeholder:text-bark-500 focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+        <p id="join-code-hint" class="mt-1.5 text-xs text-bark-500">Ask a board member for their code. Capital letters matter.</p>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" @click="$refs.joinBoard.close()" class="{% button_class 'ghost' %}">Cancel</button>
+        <button type="submit" class="{% button_class 'primary' %}">Join board</button>
+      </div>
+    </form>
+  </dialog>
+</div>
+{% endblock %}

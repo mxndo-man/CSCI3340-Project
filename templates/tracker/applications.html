@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Tracker · Shortlist{% endblock %}
+
+{% block content %}
+{% comment %}
+Applications by status (tracker:applications). The view passes:
+  applications  the user's Applications: select_related("posting"), prefetch task_set
+  tasks         the user's Tasks (for "Due this week"): select_related("application__posting")
+Moving a card posts application, status, next to {% form_url "move_application" %}; the
+Closed list's Reopen does the same with status=SAVED.
+"Add an application" points to Add a posting: Application.posting is required, so a role
+found outside Shortlist gets its posting added first, then tracked from the posting page.
+{% endcomment %}
+{% tracker_columns applications as columns %}
+{% closed_applications applications as closed %}
+{% active_count applications as active %}
+{% due_this_week tasks as week_tasks %}
+{% page_url "postings:add" as add_url %}
+{% form_url "move_application" as move_url %}
+<div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10" x-data>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="min-w-0">
+      <h1 class="font-serif text-h1 font-semibold text-bark-900">Tracker</h1>
+      <p class="mt-2 text-[15px] text-bark-700">{{ active }} application{{ active|pluralize }} in progress · {{ week_tasks|length }} task{{ week_tasks|length|pluralize }} due this week</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button type="button" @click="$refs.addApplication.showModal()" class="{% button_class 'primary' %}">{% icon "plus" "size-4" %}Add an application</button>
+    </div>
+  </div>
+
+  {% include "tracker/partials/tabs.html" with active="applications" %}
+
+  {% if week_tasks %}
+    <section aria-labelledby="due-this-week" class="mt-6 rounded-2xl border border-sand-200 bg-white p-5">
+      <h2 id="due-this-week" class="text-sm font-semibold text-bark-900">Due this week</h2>
+      <ul class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
+        {% for task in week_tasks %}{% include "tracker/partials/task_row.html" with task=task boxed=True %}{% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% comment %}
+  Five columns don't fit on a phone, so the board scrolls sideways below 1280 px. `relative`
+  keeps the cards' screen-reader-only elements (position: absolute) inside the scroll.
+  {% endcomment %}
+  <div class="relative -mx-4 mt-6 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 xl:mx-0 xl:overflow-visible xl:px-0">
+    <div class="grid min-w-[1100px] grid-cols-5 gap-4 xl:min-w-0">
+      {% for column in columns %}
+        <section aria-label="{{ column.label }}" class="flex flex-col rounded-2xl bg-sand-100/70 p-3">
+          <h2 class="flex items-center justify-between px-1 pb-3 pt-1 text-sm font-semibold text-bark-900">
+            {{ column.label }}
+            <span class="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-bark-700">{{ column.applications|length }}</span>
+          </h2>
+          {% if column.applications %}
+            <ul class="space-y-2">
+              {% for application in column.applications %}{% include "tracker/partials/application_card.html" with application=application %}{% endfor %}
+            </ul>
+          {% else %}
+            <p class="rounded-xl border border-dashed border-sand-300 px-3 py-6 text-center text-xs leading-5 text-bark-500">{% if column.status == "OFFER" %}No offers yet. Move an application here when you get one.{% else %}Nothing here yet.{% endif %}</p>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
+  </div>
+
+  <details class="group mt-6 rounded-2xl border border-sand-200 bg-white">
+    <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold text-bark-900 [&::-webkit-details-marker]:hidden">
+      Closed ({{ closed|length }})
+      <span class="text-bark-500 transition-transform group-open:rotate-180">{% icon "chevron-down" "size-4" %}</span>
+    </summary>
+    <ul class="divide-y divide-sand-100 border-t border-sand-100">
+      {% for application in closed %}
+        {% application_line application as line %}
+        <li id="application-{{ application.id }}" class="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+          <div class="min-w-0">
+            <a href="{{ application.posting.get_absolute_url }}" class="block truncate text-sm font-semibold text-bark-900 hover:text-clay-700">{{ application.posting.title }}</a>
+            <p class="text-xs text-bark-500">{{ application.posting.organization }} · {{ line }}</p>
+          </div>
+          <form method="post" action="{{ move_url }}">
+            {% csrf_token %}
+            <input type="hidden" name="application" value="{{ application.id }}">
+            <input type="hidden" name="status" value="SAVED">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="text-sm font-semibold text-clay-700 hover:underline">Reopen<span class="sr-only"> {{ application.posting.title }}</span></button>
+          </form>
+        </li>
+      {% empty %}
+        <li class="px-5 py-4 text-sm text-bark-500">Nothing closed yet.</li>
+      {% endfor %}
+    </ul>
+  </details>
+
+  <dialog x-ref="addApplication" aria-labelledby="add-application-title" class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl border border-sand-200 bg-white p-6 shadow-pop backdrop:bg-bark-900/30 backdrop:backdrop-blur-[2px]">
+    <div class="flex items-start justify-between gap-4">
+      <h2 id="add-application-title" class="font-serif text-h2 font-semibold text-bark-900">Add an application</h2>
+      <button type="button" aria-label="Close" @click="$refs.addApplication.close()" class="-mr-2 -mt-1 inline-flex size-9 items-center justify-center rounded-full text-bark-500 hover:bg-sand-100 hover:text-bark-900">{% icon "x" "size-5" %}</button>
+    </div>
+    <p class="mt-3 text-sm leading-6 text-bark-700">Every application is tied to a posting, so its deadline and facts stay in one place.</p>
+    <ol class="mt-4 space-y-3 text-sm text-bark-900">
+      <li class="flex gap-3"><span class="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-clay-50 text-xs font-semibold text-clay-700">1</span><span>Found it on Shortlist? Open the posting and press <span class="font-semibold">Track this application</span>.</span></li>
+      <li class="flex gap-3"><span class="inline-flex size-6 shrink-0 items-center justify-center rounded-full bg-clay-50 text-xs font-semibold text-clay-700">2</span><span>Found it somewhere else? Add the posting with a link, its text or a PDF, then track it.</span></li>
+    </ol>
+    <div class="mt-6 flex justify-end gap-2">
+      <button type="button" @click="$refs.addApplication.close()" class="{% button_class 'ghost' %}">Cancel</button>
+      {% if add_url %}<a href="{{ add_url }}" class="{% button_class 'primary' %}">{% icon "plus" "size-4" %}Add a posting</a>{% endif %}
+    </div>
+  </dialog>
+</div>
+{% endblock %}

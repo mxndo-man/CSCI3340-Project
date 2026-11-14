@@ -1,0 +1,11 @@
+{% load ui %}{% comment %}
+What a list shows when it has nothing in it.
+  {% include "components/empty_state.html" with title="No postings yet" body="Save one from Discover." action_label="Go to Discover" action_href=discover_url %}
+action_kind: the button style (primary by default). class: extra classes, such as a top margin.
+{% endcomment %}<div class="rounded-2xl border border-dashed border-sand-300 bg-white/50 px-6 py-14 text-center {{ class }}">
+  <p class="font-serif text-h2 font-semibold text-bark-900">{{ title }}</p>
+  {% if body %}<p class="mx-auto mt-2 max-w-sm text-[15px] text-bark-700">{{ body }}</p>{% endif %}
+  {% if action_label and action_href %}
+    <div class="mt-6 flex justify-center"><a href="{{ action_href }}" class="{% button_class action_kind|default:'primary' %}">{{ action_label }}</a></div>
+  {% endif %}
+</div>

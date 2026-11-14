@@ -2,6 +2,7 @@
 .venv
 .env
 db.sqlite3
+celerybeat-schedule*
 
 
 # Python bytecode (machine-specific, rebuilt on every run)
@@ -13,3 +14,6 @@ __pycache__/
 
 
 .vscode/*
+
+# Tailwind CLI binary that django-tailwind-cli downloads on first build
+.django_tailwind_cli/

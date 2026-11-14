@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load ui %}
+
+{% block title %}Notification settings · Shortlist{% endblock %}
+
+{% block content %}
+{% comment %}
+Notification settings (notifications:preferences, proposed; contracts section 7 doesn't name
+this page yet). The view passes:
+  preferences  the user's NotificationPreference (get_or_create it)
+Both controls post next to {% form_url "update_preferences" %}: the switch sends
+email_enabled (true or false); the menu sends digest_hour (0 to 23, in the user's time zone).
+The prototype's other switches (deadline reminders, board comments, instant matches) have no
+field in the contracts, so they're not here.
+{% endcomment %}
+{% form_url "update_preferences" as update_url %}
+{% digest_hours as hours %}
+<div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+  <h1 class="font-serif text-h1 font-semibold text-bark-900">Settings</h1>
+  <div class="mt-8 grid grid-cols-1 gap-8 md:grid-cols-[200px_minmax(0,1fr)]">
+    {% include "components/settings_nav.html" with active="notifications" %}
+    <div class="min-w-0 max-w-2xl">
+      <section class="rounded-2xl border border-sand-200 bg-white p-6">
+        <h2 class="font-serif text-h2 font-semibold text-bark-900">Notifications</h2>
+        <p class="mt-1 text-sm text-bark-500">Changes save as you make them. Alerts always show under the bell, whatever you choose here.</p>
+        <ul class="mt-4 divide-y divide-sand-100">
+          <li>
+            <form method="post" action="{{ update_url }}" class="flex items-start justify-between gap-6 py-4">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <div>
+                <p class="text-sm font-semibold text-bark-900">Daily digest email</p>
+                <p class="mt-0.5 text-sm text-bark-500">One email a day with deadlines coming up, tasks due and new matches for searches with alerts on.</p>
+              </div>
+              {% include "components/toggle.html" with name="email_enabled" checked=preferences.email_enabled label="Daily digest email" only %}
+            </form>
+          </li>
+          {% if preferences.email_enabled %}
+            <li>
+              <form method="post" action="{{ update_url }}" x-data class="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-4">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <label for="digest-hour" class="text-sm font-medium text-bark-900">Send it at <span class="font-normal text-bark-500">({% firstof user.time_zone user.timezone "your time zone" %})</span></label>
+                <div class="relative w-40">
+                  <select id="digest-hour" name="digest_hour" @change="$el.form.requestSubmit()" class="h-11 w-full appearance-none rounded-xl border border-sand-400 bg-white px-3.5 pr-10 text-[15px] text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+                    {% for hour, label in hours %}<option value="{{ hour }}"{% if hour == preferences.digest_hour %} selected{% endif %}>{{ label }}</option>{% endfor %}
+                  </select>
+                  {% icon "chevron-down" "pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-bark-500" %}
+                </div>
+                <button type="submit" class="sr-only focus:not-sr-only {% button_class 'secondary' 'sm' %}">Save</button>
+              </form>
+            </li>
+          {% endif %}
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}

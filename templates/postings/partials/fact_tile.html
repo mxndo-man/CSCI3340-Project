@@ -1,0 +1,83 @@
+{% load ui %}{% comment %}
+One "Key facts" tile on the posting page.
+  {% facts_for posting reviews as facts %}
+  {% for fact in facts %}{% include "postings/partials/fact_tile.html" %}{% endfor %}
+fact: one dict from {% facts_for %}. A fact with a pending FieldReview gets two forms,
+both posting to form_urls.review_field:
+  Looks right: review, status=ACCEPTED, next
+  Fix it:      review, status=EDITED, next, and the corrected value as `value`
+               (pay sends pay_min, pay_max and pay_period instead; degree sends one
+               `value` per ticked level)
+{% endcomment %}<div id="fact-{{ fact.key }}" class="rounded-xl border p-4 {% if fact.needs_check %}border-ochre-600/40 bg-ochre-50{% else %}border-sand-200 bg-sand-50/60{% endif %}" x-data="{ editing: false }">
+  <dt class="flex items-center justify-between gap-2 text-xs font-semibold uppercase tracking-wider text-bark-500">
+    {{ fact.label }}
+    {% if fact.needs_check %}<span class="inline-flex items-center gap-1 normal-case tracking-normal text-ochre-800">{% icon "triangle-alert" "size-3.5" %}Needs a check</span>{% endif %}
+  </dt>
+  <dd class="mt-1.5">
+    <p class="text-[15px] font-semibold text-bark-900" x-show="!editing">{{ fact.value }}</p>
+
+    {% if fact.needs_check and user.is_authenticated %}
+      <form method="post" action="{% form_url "review_field" %}" class="space-y-2" x-show="editing" x-cloak>
+        {% csrf_token %}
+        <input type="hidden" name="review" value="{{ fact.review.id }}">
+        <input type="hidden" name="status" value="EDITED">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% if fact.input == "select" %}
+          <label for="fix-{{ fact.key }}" class="sr-only">Correct {{ fact.label|lower }}</label>
+          <div class="relative">
+            <select id="fix-{{ fact.key }}" name="value" class="h-10 w-full appearance-none rounded-xl border border-sand-400 bg-white pl-3.5 pr-10 text-sm text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+              {% for value, label in fact.choices %}<option value="{{ value }}"{% if value == fact.initial %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+            {% icon "chevron-down" "pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-bark-500" %}
+          </div>
+        {% elif fact.input == "pay" %}
+          <fieldset class="grid grid-cols-[1fr_1fr_auto] items-center gap-2">
+            <legend class="sr-only">Correct the pay</legend>
+            <label class="sr-only" for="fix-pay-min">Lowest pay</label>
+            <input id="fix-pay-min" type="number" min="0" step="0.01" name="pay_min" value="{{ fact.initial.min }}" class="h-10 w-full rounded-xl border border-sand-400 bg-white px-3 text-sm text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+            <label class="sr-only" for="fix-pay-max">Highest pay</label>
+            <input id="fix-pay-max" type="number" min="0" step="0.01" name="pay_max" value="{{ fact.initial.max }}" class="h-10 w-full rounded-xl border border-sand-400 bg-white px-3 text-sm text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+            <label class="sr-only" for="fix-pay-period">Paid per</label>
+            <select id="fix-pay-period" name="pay_period" class="h-10 rounded-xl border border-sand-400 bg-white px-2 text-sm text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+              {% for value, label in fact.choices %}<option value="{{ value }}"{% if value == fact.initial.period %} selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+          </fieldset>
+        {% elif fact.input == "checkboxes" %}
+          <fieldset class="space-y-1">
+            <legend class="sr-only">Correct the degree levels</legend>
+            {% for value, label in fact.choices %}
+              <label class="flex items-center gap-2 text-sm text-bark-900"><input type="checkbox" name="value" value="{{ value }}" class="size-4 accent-clay-600"{% if value in fact.initial %} checked{% endif %}>{{ label }}</label>
+            {% endfor %}
+          </fieldset>
+        {% else %}
+          <label for="fix-{{ fact.key }}" class="sr-only">Correct {{ fact.label|lower }}</label>
+          <input id="fix-{{ fact.key }}" type="{% if fact.input == 'date' %}date{% else %}text{% endif %}" name="value" value="{{ fact.initial }}" class="h-10 w-full rounded-xl border border-sand-400 bg-white px-3.5 text-sm text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+        {% endif %}
+        <div class="flex gap-2">
+          <button type="submit" class="{% button_class 'primary' 'sm' %}">Save fix</button>
+          <button type="button" @click="editing = false" class="{% button_class 'ghost' 'sm' %}">Cancel</button>
+        </div>
+      </form>
+    {% endif %}
+
+    <p class="mt-1 text-xs text-bark-500">{{ fact.source }}</p>
+    {% if fact.quote %}<p class="mt-2 border-l-2 border-sand-300 pl-2.5 text-xs italic leading-5 text-bark-700">“{{ fact.quote }}”</p>{% endif %}
+
+    {% if fact.needs_check %}
+      <div class="mt-3 flex flex-wrap gap-2" x-show="!editing">
+        {% if user.is_authenticated %}
+          <form method="post" action="{% form_url "review_field" %}">
+            {% csrf_token %}
+            <input type="hidden" name="review" value="{{ fact.review.id }}">
+            <input type="hidden" name="status" value="ACCEPTED">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <button type="submit" class="{% button_class 'secondary' 'sm' %}">{% icon "check" "size-4" %}Looks right</button>
+          </form>
+          <button type="button" @click="editing = true" class="{% button_class 'ghost' 'sm' %}">{% icon "pencil" "size-4" %}Fix it</button>
+        {% else %}
+          <a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}" class="{% button_class 'secondary' 'sm' %}">Log in to check this fact</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </dd>
+</div>

@@ -1,1 +1,137 @@
 @import "tailwindcss";
+
+/* Shortlist design tokens: the same values as the prototype and the "Shortlist tokens" in Figma.
+   Tailwind's default colors are still on, because the old account templates use slate and yellow.
+   Once no template uses them, add `--color-*: initial;` at the top of this block (brief, PR 3). */
+@theme {
+  --color-white: #ffffff;
+
+  --color-sand-50: #fbf8f3;
+  --color-sand-100: #f4eee4;
+  --color-sand-200: #e9e0d2;
+  --color-sand-300: #d8cab6;
+  --color-sand-400: #9c8e7c;
+
+  --color-bark-500: #75685b;
+  --color-bark-700: #4e443b;
+  --color-bark-900: #2c2620;
+
+  --color-clay-50: #fbefe7;
+  --color-clay-100: #f5dccb;
+  --color-clay-600: #a65a32;
+  --color-clay-700: #8a4927;
+
+  --color-moss-50: #eef2e7;
+  --color-moss-600: #5b6e4c;
+  --color-moss-700: #4a5a3e;
+
+  --color-ochre-50: #fbf2dc;
+  --color-ochre-600: #b8861f;
+  --color-ochre-800: #76540f;
+
+  --color-brick-50: #f9e8e3;
+  --color-brick-700: #9a3b2c;
+
+  /* Loaded from Google Fonts in base.html */
+  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Type scale from the style guide */
+  --text-display: 3.25rem;
+  --text-display--line-height: 3.75rem;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 2.75rem;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 2rem;
+  --text-title: 1.125rem;
+  --text-title--line-height: 1.625rem;
+
+  --shadow-soft: 0 1px 2px rgb(44 38 32 / 0.05), 0 8px 24px rgb(44 38 32 / 0.07);
+  --shadow-pop: 0 2px 6px rgb(44 38 32 / 0.08), 0 16px 40px rgb(44 38 32 / 0.14);
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-sand-200);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 4.5rem;
+  }
+
+  body {
+    background-color: var(--color-sand-50);
+    color: var(--color-bark-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--color-clay-100);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-clay-600);
+    outline-offset: 2px;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+}
+
+/* Alpine shows these once it has loaded, so menus don't flash open first. */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Small motion: popovers and toasts ease in. Turned off for people who ask for less motion. */
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.popover {
+  animation: pop-in 140ms ease-out;
+}
+.toast-in {
+  animation: toast-in 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover,
+  .toast-in {
+    animation: none;
+  }
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0ms !important;
+  }
+}
