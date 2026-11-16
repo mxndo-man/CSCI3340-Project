@@ -11,10 +11,6 @@
     --color-sky-300: oklch(82.8% 0.111 230.318);
     --color-slate-100: oklch(96.8% 0.007 247.896);
     --color-slate-200: oklch(92.9% 0.013 255.508);
-    --color-slate-300: oklch(86.9% 0.022 252.894);
-    --color-slate-400: oklch(70.4% 0.04 256.788);
-    --color-slate-600: oklch(44.6% 0.043 257.281);
-    --color-slate-800: oklch(27.9% 0.041 260.031);
     --color-slate-900: oklch(20.8% 0.042 265.755);
     --color-gray-400: oklch(70.7% 0.022 261.325);
     --color-white: #ffffff;
@@ -33,8 +29,6 @@
     --text-lg--line-height: calc(1.75 / 1.125);
     --text-xl: 1.25rem;
     --text-xl--line-height: calc(1.75 / 1.25);
-    --text-2xl: 1.5rem;
-    --text-2xl--line-height: calc(2 / 1.5);
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
@@ -413,9 +407,6 @@
   }
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
-  }
-  .mb-6 {
-    margin-bottom: calc(var(--spacing) * 6);
   }
   .mb-8 {
     margin-bottom: calc(var(--spacing) * 8);
@@ -850,9 +841,6 @@
   .border-sand-400 {
     border-color: var(--color-sand-400);
   }
-  .border-slate-600 {
-    border-color: var(--color-slate-600);
-  }
   .border-transparent {
     border-color: transparent;
   }
@@ -945,9 +933,6 @@
   }
   .bg-sand-400 {
     background-color: var(--color-sand-400);
-  }
-  .bg-slate-800 {
-    background-color: var(--color-slate-800);
   }
   .bg-white {
     background-color: var(--color-white);
@@ -1105,9 +1090,6 @@
   .pb-4 {
     padding-bottom: calc(var(--spacing) * 4);
   }
-  .pb-8 {
-    padding-bottom: calc(var(--spacing) * 8);
-  }
   .pb-16 {
     padding-bottom: calc(var(--spacing) * 16);
   }
@@ -1147,10 +1129,6 @@
     font-size: var(--text-h1);
     line-height: var(--tw-leading, var(--text-h1--line-height));
     letter-spacing: var(--tw-tracking, var(--text-h1--letter-spacing));
-  }
-  .text-2xl {
-    font-size: var(--text-2xl);
-    line-height: var(--tw-leading, var(--text-2xl--line-height));
   }
   .text-h2 {
     font-size: var(--text-h2);
@@ -1206,10 +1184,6 @@
   .leading-\[48px\] {
     --tw-leading: 48px;
     line-height: 48px;
-  }
-  .font-bold {
-    --tw-font-weight: var(--font-weight-bold);
-    font-weight: var(--font-weight-bold);
   }
   .font-medium {
     --tw-font-weight: var(--font-weight-medium);
@@ -1272,20 +1246,8 @@
   .text-sand-50 {
     color: var(--color-sand-50);
   }
-  .text-slate-200 {
-    color: var(--color-slate-200);
-  }
-  .text-slate-300 {
-    color: var(--color-slate-300);
-  }
-  .text-slate-400 {
-    color: var(--color-slate-400);
-  }
   .text-white {
     color: var(--color-white);
-  }
-  .text-yellow-300 {
-    color: var(--color-yellow-300);
   }
   .normal-case {
     text-transform: none;

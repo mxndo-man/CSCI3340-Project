@@ -856,7 +856,7 @@ def digest_hours():
 def unread_count(notifications):
     return sum(
         1 for notification in notifications or ()
-        if not getattr(notification, "read", getattr(notification, "is_read", False))
+        if not notification.read
     )
 
 

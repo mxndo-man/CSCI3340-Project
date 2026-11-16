@@ -4,7 +4,7 @@ and none exist with it off."""
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from apps.notifications.models import Notifications
+from apps.notifications.models import Notification
 from apps.ui.templatetags import ui
 from apps.ui.tests import DEV, LIVE, make_user, status_of
 
@@ -66,7 +66,7 @@ class PreviewOnTests(TestCase):
         )
 
     def test_preview_notification_action_marks_the_real_notification_read(self):
-        notification = Notifications.objects.get(recipient_id=self.user.pk)
+        notification = Notification.objects.get(user_id=self.user.pk)
 
         response = self.client.post(
             reverse("notifications:open_notification"),
@@ -77,7 +77,7 @@ class PreviewOnTests(TestCase):
         )
 
         notification.refresh_from_db()
-        self.assertTrue(notification.is_read)
+        self.assertTrue(notification.read)
         self.assertRedirects(response, "/preview/notifications/")
 
     def test_only_you_are_you(self):

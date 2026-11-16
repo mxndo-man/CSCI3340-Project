@@ -1,8 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
-from .models import Notifications
+from .models import Notification
 from .tasks import send_daily_digest
 
 
@@ -19,11 +21,22 @@ class NotificationViewsTests(TestCase):
             email="other@example.com",
             password="test-password",
         )
-        self.notification = Notifications.objects.create(
-            recipient=self.user,
+        self.notification = Notification.objects.create(
+            user=self.user,
+            kind=Notification.Kind.DEADLINE_SOON,
             title="Application deadline",
             message="Your application is due soon.",
+            dedupe_key="TEST:deadline",
         )
+
+    def test_dedupe_key_is_unique_per_user(self):
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Notification.objects.create(
+                user=self.user,
+                kind=Notification.Kind.DEADLINE_SOON,
+                message="Duplicate notification.",
+                dedupe_key="TEST:deadline",
+            )
 
     def test_list_renders_real_notification_fields_and_menu(self):
         self.client.force_login(self.user)
@@ -40,10 +53,12 @@ class NotificationViewsTests(TestCase):
         )
 
     def test_list_only_shows_the_signed_in_users_notifications(self):
-        Notifications.objects.create(
-            recipient=self.other_user,
+        Notification.objects.create(
+            user=self.other_user,
+            kind=Notification.Kind.TASK_DUE,
             title="Private",
             message="Not yours.",
+            dedupe_key="TEST:private",
         )
         self.client.force_login(self.user)
 
@@ -53,10 +68,12 @@ class NotificationViewsTests(TestCase):
         self.assertNotContains(response, "Not yours.")
 
     def test_mark_all_read_updates_only_the_signed_in_users_notifications(self):
-        other_notification = Notifications.objects.create(
-            recipient=self.other_user,
+        other_notification = Notification.objects.create(
+            user=self.other_user,
+            kind=Notification.Kind.TASK_DUE,
             title="Private",
             message="Not yours.",
+            dedupe_key="TEST:private",
         )
         self.client.force_login(self.user)
 
@@ -67,8 +84,8 @@ class NotificationViewsTests(TestCase):
 
         self.notification.refresh_from_db()
         other_notification.refresh_from_db()
-        self.assertTrue(self.notification.is_read)
-        self.assertFalse(other_notification.is_read)
+        self.assertTrue(self.notification.read)
+        self.assertFalse(other_notification.read)
         self.assertRedirects(response, reverse("notifications:list"))
 
     def test_open_notification_marks_own_notification_read(self):
@@ -83,14 +100,16 @@ class NotificationViewsTests(TestCase):
         )
 
         self.notification.refresh_from_db()
-        self.assertTrue(self.notification.is_read)
+        self.assertTrue(self.notification.read)
         self.assertRedirects(response, reverse("notifications:list"))
 
     def test_cannot_open_another_users_notification(self):
-        other_notification = Notifications.objects.create(
-            recipient=self.other_user,
+        other_notification = Notification.objects.create(
+            user=self.other_user,
+            kind=Notification.Kind.TASK_DUE,
             title="Private",
             message="Not yours.",
+            dedupe_key="TEST:private",
         )
         self.client.force_login(self.user)
 
@@ -101,7 +120,7 @@ class NotificationViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         other_notification.refresh_from_db()
-        self.assertFalse(other_notification.is_read)
+        self.assertFalse(other_notification.read)
 
     def test_notification_actions_require_authentication_and_post(self):
         response = self.client.post(reverse("notifications:mark_all_read"))
@@ -139,12 +158,15 @@ class NotificationTasksTests(TestCase):
         self.assertEqual(created_count, 2)
         self.assertEqual(repeat_count, 0)
         self.assertEqual(
-            Notifications.objects.filter(title="Daily digest").count(),
+            Notification.objects.filter(
+                dedupe_key=f"DIGEST:{timezone.localdate().isoformat()}",
+                title="Daily digest",
+            ).count(),
             len(active_users),
         )
         self.assertFalse(
-            Notifications.objects.filter(
-                recipient=inactive_user,
+            Notification.objects.filter(
+                user=inactive_user,
                 title="Daily digest",
             ).exists()
         )

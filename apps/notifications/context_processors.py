@@ -1,14 +1,14 @@
-from .models import Notifications
+from .models import Notification
 
 
 def notification_menu(request):
     if not request.user.is_authenticated:
         return {}
 
-    notifications = Notifications.objects.filter(recipient=request.user)
+    notifications = Notification.objects.filter(user=request.user)
     return {
         "notification_menu": {
             "notifications": notifications[:5],
-            "unread_count": notifications.filter(is_read=False).count(),
+            "unread_count": notifications.filter(read=False).count(),
         }
     }

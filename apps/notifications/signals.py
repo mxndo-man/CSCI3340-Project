@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from apps.accounts.models import CustomUser
 
-from .models import Notifications
+from .models import Notification
 
 
 @receiver(post_save, sender=CustomUser)
@@ -11,8 +11,10 @@ def create_welcome_notification(sender, instance, created, **kwargs):
     if not created:
         return
 
-    Notifications.objects.create(
-        recipient=instance,
+    Notification.objects.create(
+        user=instance,
+        kind=Notification.Kind.WELCOME,
         title="Welcome!",
-        message="Your account has been created successfully. Make connections and find oppurtunities!",
+        message="Your account has been created successfully. Make connections and find opportunities!",
+        dedupe_key=f"WELCOME:{instance.pk}",
     )

@@ -21,7 +21,7 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from apps.notifications.models import Notifications
+from apps.notifications.models import Notification
 from apps.ui.templatetags import ui
 
 from . import fake_data
@@ -288,11 +288,11 @@ def tasks(request):
 @login_required
 def notifications(request):
     world = _world(request)
-    notifications = Notifications.objects.filter(recipient_id=request.user.pk)
+    notifications = Notification.objects.filter(user_id=request.user.pk)
     context = _context(request, world, notifications=notifications)
     context["notification_menu"] = {
         "notifications": notifications[:5],
-        "unread_count": notifications.filter(is_read=False).count(),
+        "unread_count": notifications.filter(read=False).count(),
     }
     context["form_urls"].update(
         {

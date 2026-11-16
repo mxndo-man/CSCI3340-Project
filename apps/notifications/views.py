@@ -8,24 +8,24 @@ from django.urls import reverse
 from django.views import View
 from django.views.generic import ListView
 
-from .models import Notifications
+from .models import Notification
 
 
 class NotificationListView(LoginRequiredMixin, ListView):
-    model = Notifications
+    model = Notification
     template_name = "notifications/list.html"
     context_object_name = "notifications"
 
     def get_queryset(self):
-        return Notifications.objects.filter(recipient_id=self.request.user.pk)
+        return Notification.objects.filter(user_id=self.request.user.pk)
 
 
 class MarkAllReadView(LoginRequiredMixin, RedirectURLMixin, View):
     def post(self, request: HttpRequest):
-        Notifications.objects.filter(
-            recipient_id=request.user.pk,
-            is_read=False,
-        ).update(is_read=True)
+        Notification.objects.filter(
+            user_id=request.user.pk,
+            read=False,
+        ).update(read=True)
         return redirect(
             self.get_redirect_url() or reverse("notifications:list")
         )
@@ -34,12 +34,12 @@ class MarkAllReadView(LoginRequiredMixin, RedirectURLMixin, View):
 class OpenNotificationView(LoginRequiredMixin, RedirectURLMixin, View):
     def post(self, request: HttpRequest):
         notification = get_object_or_404(
-            Notifications,
+            Notification,
             pk=request.POST.get("notification"),
-            recipient_id=request.user.pk,
+            user_id=request.user.pk,
         )
-        notification.is_read = True
-        notification.save(update_fields=["is_read"])
+        notification.read = True
+        notification.save(update_fields=["read"])
         return redirect(
             self.get_redirect_url() or reverse("notifications:list")
         )

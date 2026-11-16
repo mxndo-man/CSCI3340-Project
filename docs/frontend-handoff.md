@@ -151,7 +151,7 @@ The helpers do the grouping, so the view passes plain querysets: `tracker_column
 | `notifications/list.html` | `notifications:list` | `notifications` (the user's, newest first) |
 | `notifications/saved_searches.html` | `notifications:saved_searches` | `saved_searches` (the user's, newest first) |
 | `notifications/preferences.html` | `notifications:preferences` (proposed: not in contracts section 7 yet) | `preferences` (the user's NotificationPreference; `get_or_create` it) |
-| `notifications/partials/item.html` | (partial) | `notification` (`kind`, `message`, `link_url`, `read`, `created_at`) |
+| `notifications/partials/item.html` | (partial) | `notification` (`kind`, optional `title`, `message`, `link_url`, `read`, `created_at`) |
 
 **The bell.** `base.html` shows it when the page's context has `notification_menu`. To put it on every page, add a context processor: a function Django calls on every render that adds variables to the context.
 
