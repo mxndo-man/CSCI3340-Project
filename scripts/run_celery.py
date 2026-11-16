@@ -53,7 +53,11 @@ def main() -> int:
             time.sleep(0.25)
 
         return next(
-            (process.returncode for process in processes if process.returncode not in (None, 0)),
+            (
+                process.returncode
+                for process in processes
+                if process.returncode not in (None, 0)
+            ),
             1,
         )
     except KeyboardInterrupt:
