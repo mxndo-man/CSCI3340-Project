@@ -37,4 +37,3 @@ class Notification(models.Model):
                 name="notif_user_dedupe_uniq",
             ),
         )
-
