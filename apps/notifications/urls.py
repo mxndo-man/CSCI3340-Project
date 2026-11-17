@@ -1,2 +1,10 @@
+from django.urls import path
+
+from . import views
+
 app_name = "notifications"
-urlpatterns: list = []
+urlpatterns = [
+    path("", views.NotificationListView.as_view(), name="list"),
+    path("mark-all-read/", views.MarkAllReadView.as_view(), name="mark_all_read"),
+    path("open/", views.OpenNotificationView.as_view(), name="open_notification"),
+]

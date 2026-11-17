@@ -74,7 +74,7 @@ flowchart LR
 
 ## Run it locally
 
-**You need:** [Git](https://git-scm.com/) and [uv](https://docs.astral.sh/uv/getting-started/installation/).
+**You need:** [Git](https://git-scm.com/), [uv](https://docs.astral.sh/uv/getting-started/installation/), and Docker Desktop for Redis/Celery.
 
 ```powershell
 git clone https://github.com/mxndo-man/CSCI3340-Project.git
@@ -91,6 +91,8 @@ Open http://127.0.0.1:8000/ for the landing page, or `/preview/` for every page 
 | --- | --- |
 | Admin login for yourself | `uv run python manage.py createsuperuser`, then visit `/admin/` |
 | Run the tests | `uv run python manage.py test` |
+| Run Celery worker and Beat | `uv run task celery` (starts Redis and both processes in one terminal) |
+| Stop the Redis container | `uv run task redis-down` |
 | Format and lint before a PR | `uv run ruff format .` then `uv run ruff check . --fix` |
 | Add a package | `uv add <package>` (never `pip install`); commit `uv.lock` |
 

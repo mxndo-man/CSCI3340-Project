@@ -310,11 +310,14 @@ Constraint: unique (user, posting).
 ### 2.6 notifications (Azaelp2005)
 
 `Notification`: one alert for one user, shown in the app and included in the daily email digest.
+The welcome alert is a contract extension: it uses the `WELCOME` kind, and `title` is an
+optional display heading used for welcome and digest notifications.
 
 | Field | Type | Meaning |
 | --- | --- | --- |
 | user | FK → User, `CASCADE` | |
-| kind | Choices: `TASK_DUE`, `DEADLINE_SOON`, `NEW_MATCH`, `POSTING_CLOSED` | What triggered it |
+| kind | Choices: `TASK_DUE`, `DEADLINE_SOON`, `NEW_MATCH`, `POSTING_CLOSED`, `WELCOME` | What triggered it |
+| title | CharField(255), blank | Optional display heading (contract extension) |
 | message | CharField(300) | |
 | link_url | CharField(300), blank | Where clicking it goes |
 | dedupe_key | CharField(200) | For example `"TASK_DUE:task-12:2026-11-03"`; stops the same alert twice in one day |
