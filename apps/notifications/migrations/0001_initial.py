@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name='Notification',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('kind', models.CharField(choices=[('TASK_DUE', 'Task due'), ('DEADLINE_SOON', 'Deadline soon'), ('NEW_MATCH', 'New match'), ('POSTING_CLOSED', 'Posting closed'), ('WELCOME', 'Welcome')], max_length=20)),
+                ('kind', models.CharField(choices=[('TASK_DUE', 'Task due'), ('DEADLINE_SOON', 'Deadline soon'), ('NEW_MATCH', 'New match'), ('POSTING_CLOSED', 'Posting closed'), ('WELCOME', 'Welcome'), ('NEW_BOARD', 'New board'), ('MEMBER_JOINED', 'Member joined')], max_length=20)),
                 ('title', models.CharField(blank=True, max_length=255)),
                 ('message', models.CharField(max_length=300)),
                 ('link_url', models.CharField(blank=True, max_length=300)),

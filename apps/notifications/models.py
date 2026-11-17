@@ -9,6 +9,8 @@ class Notification(models.Model):
         NEW_MATCH = "NEW_MATCH", "New match"
         POSTING_CLOSED = "POSTING_CLOSED", "Posting closed"
         WELCOME = "WELCOME", "Welcome"
+        NEW_BOARD = "NEW_BOARD", "New board"
+        MEMBER_JOINED = "MEMBER_JOINED", "Member joined"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

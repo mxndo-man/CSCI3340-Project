@@ -4,6 +4,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from apps.boards.models import Board, Membership
+
 from .models import Notification
 from .tasks import send_daily_digest
 
@@ -168,5 +170,65 @@ class NotificationTasksTests(TestCase):
             Notification.objects.filter(
                 user=inactive_user,
                 title="Daily digest",
+            ).exists()
+        )
+
+
+class MembershipNotificationSignalTests(TestCase):
+    def test_member_join_sends_notifications_to_member_and_board_owner(self):
+        user_model = get_user_model()
+        owner = user_model.objects.create_user(
+            username="board-owner",
+            email="owner@example.com",
+            password="test-password",
+        )
+        member = user_model.objects.create_user(
+            username="new-member",
+            email="member@example.com",
+            password="test-password",
+        )
+        board = Board.objects.create(created_by=owner, name="Study group")
+
+        Membership.objects.create(
+            board=board,
+            user=owner,
+            role=Membership.Role.OWNER,
+        )
+        membership = Membership.objects.create(
+            board=board,
+            user=member,
+            role=Membership.Role.MEMBER,
+        )
+
+        member_notice = Notification.objects.get(
+            user=member,
+            dedupe_key=f"MEMBER_JOINED:{membership.pk}:JOINER",
+        )
+        owner_notice = Notification.objects.get(
+            user=owner,
+            dedupe_key=f"MEMBER_JOINED:{membership.pk}:OWNER",
+        )
+
+        self.assertIn("Study group", member_notice.message)
+        self.assertIn("new-member", owner_notice.message)
+        self.assertIn("Study group", owner_notice.message)
+
+    def test_owner_membership_does_not_send_member_join_notifications(self):
+        user = get_user_model().objects.create_user(
+            username="board-owner",
+            email="owner@example.com",
+            password="test-password",
+        )
+        board = Board.objects.create(created_by=user, name="Study group")
+
+        membership = Membership.objects.create(
+            board=board,
+            user=user,
+            role=Membership.Role.OWNER,
+        )
+
+        self.assertFalse(
+            Notification.objects.filter(
+                dedupe_key__startswith=f"MEMBER_JOINED:{membership.pk}:"
             ).exists()
         )
