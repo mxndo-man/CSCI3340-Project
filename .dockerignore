@@ -1,0 +1,23 @@
+# dot files 
+.env
+.venv
+.git
+.github
+.vscode/
+
+#docs
+docs/
+#db
+db.sqlite3
+#celerybeat
+celerybeat-schedule*
+
+# Python bytecode (machine-specific, rebuilt on every run)
+**/__pycache__/
+**/*.py[cod]
+
+# Tool caches (ruff already self-ignores; listed for clarity)
+.ruff_cache/
+
+# Tailwind CLI binary that django-tailwind-cli downloads on first build
+.django_tailwind_cli/
