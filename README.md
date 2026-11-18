@@ -94,7 +94,10 @@ Open http://127.0.0.1:8000/ for the landing page, or `/preview/` for every page 
 | Format and lint before a PR | `uv run ruff format .` then `uv run ruff check . --fix` |
 | Add a package | `uv add <package>` (never `pip install`); commit `uv.lock` |
 
-**Coming soon:** `docker compose up` will run the whole system (#9).
+**Docker:** `docker compose up` will run the whole system, Checkout scripts and docs to understand how to set up docker.
+
+On Windows, `uv run task celery` uses a small Python supervisor because Celery does not support embedded Beat on Windows. Press Ctrl+C to stop the worker and Beat. If `task.exe` is blocked, run `uv run python -c "from taskipy.cli import main; main()" celery`. If you already have a standalone Redis container using port 6379, stop it before the first Compose startup.
+
 
 ## Project layout
 
