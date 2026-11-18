@@ -20,6 +20,7 @@ def create_welcome_notification(sender, instance, created, **kwargs):
         dedupe_key=f"WELCOME:{instance.pk}",
     )
 
+
 @receiver(post_save, sender=Board)
 def notify_board_created(sender, instance, created, **kwargs):
     if not created or instance.created_by is None:
@@ -32,6 +33,7 @@ def notify_board_created(sender, instance, created, **kwargs):
         message=f'You created a board called "{instance.name}". Great Job!',
         dedupe_key=f"NEW_BOARD:{instance.pk}",
     )
+
 
 @receiver(post_save, sender=Membership)
 def notify_member_joined(sender, instance, created, **kwargs):
