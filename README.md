@@ -74,7 +74,7 @@ flowchart LR
 
 ## Run it locally
 
-**You need:** [Git](https://git-scm.com/), [uv](https://docs.astral.sh/uv/getting-started/installation/), and Docker Desktop for Redis/Celery.
+**You need:** [Git](https://git-scm.com/) and [uv](https://docs.astral.sh/uv/getting-started/installation/).
 
 ```powershell
 git clone https://github.com/mxndo-man/CSCI3340-Project.git
@@ -91,16 +91,9 @@ Open http://127.0.0.1:8000/ for the landing page, or `/preview/` for every page 
 | --- | --- |
 | Admin login for yourself | `uv run python manage.py createsuperuser`, then visit `/admin/` |
 | Run the tests | `uv run python manage.py test` |
-| Run Celery worker and Beat | `uv run task celery` (starts Redis and both processes in one terminal) |
-| Stop the Redis container | `uv run task redis-down` |
 | Format and lint before a PR | `uv run ruff format .` then `uv run ruff check . --fix` |
 | Add a package | `uv add <package>` (never `pip install`); commit `uv.lock` |
 
-
-On Windows, `uv run task celery` uses a small Python supervisor because Celery does not support embedded Beat on Windows. Press Ctrl+C to stop the worker and Beat. If `task.exe` is blocked, run `uv run python -c "from taskipy.cli import main; main()" celery`. If you already have a standalone Redis container using port 6379, stop it before the first Compose startup.
-
-**Coming soon:** `docker compose up` will run the whole system (#9). Once the Tailwind PR merges, `uv run task run` starts Django and the CSS watcher together.
-=======
 **Coming soon:** `docker compose up` will run the whole system (#9).
 
 ## Project layout
@@ -128,7 +121,18 @@ docs/        user_stories.md, contracts.md, frontend-handoff.md, wireframes/
 Each owner builds inside their own apps. Shared files (`base.html`, `config/settings.py`, `pyproject.toml`, `uv.lock`, CI) change only through a PR all three approve.
 
 ## Agile planning
-**Cadence** **One-week sprints, Thursday to Wednesday,** so the Wednesday class status update is the board itself: done, in progress, next. **Work items** One GitHub issue per app or feature, plus integration issues where apps connect. Each has an owner, labels, and a milestone (D1 Oct 23, D2 Nov 14, Final Dec 7). **User stories** take the form *"As a ___, I want ___ so that ___,"* with acceptance criteria. The product owner orders the backlog. Current list: [docs/user_stories.md](docs/user_stories.md) **Sprint plan** | Sprint | Dates | Goal | | --- | --- | --- |
+
+**Cadence**
+- **One-week sprints, Thursday to Wednesday,** so the Wednesday class status update is the board itself: done, in progress, next.
+
+**Work items**
+- One GitHub issue per app or feature, plus integration issues where apps connect. Each has an owner, labels, and a milestone (D1 Oct 23, D2 Nov 14, Final Dec 7).
+- **User stories** take the form *"As a ___, I want ___ so that ___,"* with acceptance criteria. The product owner orders the backlog. Current list: [docs/user_stories.md](docs/user_stories.md)
+
+**Sprint plan**
+
+| Sprint | Dates | Goal |
+| --- | --- | --- |
 | 0 | Oct 8–14 | Repo, CI, Django skeleton, issues |
 | 1 | Oct 15–21 | Foundation: base layout, contracts agreed, README, branch rules, extractor stub |
 | 2 | Oct 22–28 | **D1 (Oct 23)**; Docker Compose; sign-up and login; user interviews |
