@@ -20,4 +20,8 @@ app.conf.beat_schedule = {
             minute=0, hour=8
         ),  # Creates daily digest to all users at 8am Chicago Time
     },
+    "sync-sources": {
+        "task": "apps.ingestion.tasks.sync_sources",
+        "schedule": crontab(minute=0, hour="*/6"),
+    },
 }
