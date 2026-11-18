@@ -16,6 +16,8 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     "daily-digest": {
         "task": "apps.notifications.tasks.send_daily_digest",
-        "schedule": crontab(minute=0, hour=8), # Creates daily digest to all users at 8am Chicago Time
+        "schedule": crontab(
+            minute=0, hour=8
+        ),  # Creates daily digest to all users at 8am Chicago Time
     },
 }

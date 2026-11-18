@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('kind', models.CharField(choices=[('TASK_DUE', 'Task due'), ('DEADLINE_SOON', 'Deadline soon'), ('NEW_MATCH', 'New match'), ('POSTING_CLOSED', 'Posting closed'), ('WELCOME', 'Welcome'), ('NEW_BOARD', 'New board'), ('MEMBER_JOINED', 'Member joined')], max_length=20)),
@@ -28,9 +28,25 @@ class Migration(migrations.Migration):
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'ordering': ('-created_at',),
-                'indexes': [models.Index(fields=['-created_at'], name='notificatio_created_ae6ed6_idx'), models.Index(fields=['user', '-created_at'], name='notificatio_user_id_05b4bc_idx'), models.Index(fields=['user', 'read', '-created_at'], name='notificatio_user_id_4fcc58_idx')],
-                'constraints': [models.UniqueConstraint(fields=('user', 'dedupe_key'), name='notif_user_dedupe_uniq')],
+                "ordering": ("-created_at",),
+                "indexes": [
+                    models.Index(
+                        fields=["-created_at"], name="notificatio_created_ae6ed6_idx"
+                    ),
+                    models.Index(
+                        fields=["user", "-created_at"],
+                        name="notificatio_user_id_05b4bc_idx",
+                    ),
+                    models.Index(
+                        fields=["user", "read", "-created_at"],
+                        name="notificatio_user_id_4fcc58_idx",
+                    ),
+                ],
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=("user", "dedupe_key"), name="notif_user_dedupe_uniq"
+                    )
+                ],
             },
         ),
     ]
