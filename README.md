@@ -99,10 +99,6 @@ Open http://127.0.0.1:8000/ for the landing page, or `/preview/` for every page 
 
 On Windows, `uv run task celery` uses a small Python supervisor because Celery does not support embedded Beat on Windows. Press Ctrl+C to stop the worker and Beat. If `task.exe` is blocked, run `uv run python -c "from taskipy.cli import main; main()" celery`. If you already have a standalone Redis container using port 6379, stop it before the first Compose startup.
 
-**Coming soon:** `docker compose up` will run the whole system (#9). Once the Tailwind PR merges, `uv run task run` starts Django and the CSS watcher together.
-=======
-**Coming soon:** `docker compose up` will run the whole system (#9).
-
 ## Project layout
 
 ```
