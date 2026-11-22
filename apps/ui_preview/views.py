@@ -1,7 +1,5 @@
-"""The preview pages: real templates rendered with fake objects from fake_data.py.
-
-The notifications page is an exception: it displays the signed-in user's real
-notifications and uses the real mark-as-read actions.
+"""The preview pages: the real templates rendered with fake objects from fake_data.py,
+so the UI works before the models exist. Nothing here writes to the database.
 
 The pages show the sample data on whoever is logged in. Pages that need an account in the
 real app (the prototype's home, add, boards, tracker and settings) send logged-out
@@ -21,7 +19,6 @@ from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from apps.notifications.models import Notification
 from apps.ui.templatetags import ui
 
 from . import fake_data
@@ -129,7 +126,6 @@ INDEX_PAGES = [
         "tracker/applications.html",
     ),
     ("Tracker: tasks", "ui_preview:tasks", [], "tracker/tasks.html"),
-    ("Notifications", "ui_preview:notifications", [], "notifications/list.html"),
     (
         "Saved searches",
         "ui_preview:saved_searches",
@@ -283,25 +279,6 @@ def tasks(request):
     world = _world(request)
     context = _context(request, world, "tracker", tasks=world.tasks)
     return render(request, "tracker/tasks.html", context)
-
-
-@login_required
-def notifications(request):
-    world = _world(request)
-    notifications = Notification.objects.filter(user_id=request.user.pk)
-    context = _context(request, world, notifications=notifications)
-    context["notification_menu"] = {
-        "notifications": notifications[:5],
-        "unread_count": notifications.filter(read=False).count(),
-    }
-    context["form_urls"].update(
-        {
-            "mark_all_read": reverse("notifications:mark_all_read"),
-            "open_notification": reverse("notifications:open_notification"),
-        }
-    )
-    context["ui_preview_live_notifications"] = True
-    return render(request, "notifications/list.html", context)
 
 
 @login_required

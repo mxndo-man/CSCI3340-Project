@@ -4,7 +4,6 @@ and none exist with it off."""
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from apps.notifications.models import Notification
 from apps.ui.templatetags import ui
 from apps.ui.tests import DEV, LIVE, make_user, status_of
 
@@ -39,46 +38,16 @@ class PreviewOnTests(TestCase):
                 self.assertEqual(status_of(response), 200)
                 self.assertContains(response, "Preview:")  # the banner
 
+    def test_notifications_list_is_not_a_preview_route(self):
+        response = self.client.get("/preview/notifications/")
+        self.assertEqual(status_of(response), 404)
+
     def test_the_preview_is_on_your_account(self):
         response = self.client.get("/preview/boards/1/")
         self.assertContains(response, "Quinn A. (you)")  # in the Members dialog
         self.assertNotContains(response, "Liam R.")
         home = self.client.get("/preview/home/")
         self.assertContains(home, ", Quinn</h1>")  # "Good morning, Quinn"
-
-    def test_preview_notifications_show_the_real_signup_notification(self):
-        response = self.client.get("/preview/notifications/")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            list(response.context["notifications"].values_list("title", flat=True)),
-            ["Welcome!"],
-        )
-        self.assertContains(response, "Your account has been created successfully.")
-        self.assertContains(response, "these are your real notifications")
-        self.assertContains(
-            response,
-            f'action="{reverse("notifications:open_notification")}"',
-        )
-        self.assertEqual(
-            response.context["notification_menu"]["unread_count"],
-            1,
-        )
-
-    def test_preview_notification_action_marks_the_real_notification_read(self):
-        notification = Notification.objects.get(user_id=self.user.pk)
-
-        response = self.client.post(
-            reverse("notifications:open_notification"),
-            {
-                "notification": notification.pk,
-                "next": "/preview/notifications/",
-            },
-        )
-
-        notification.refresh_from_db()
-        self.assertTrue(notification.read)
-        self.assertRedirects(response, "/preview/notifications/")
 
     def test_only_you_are_you(self):
         # Board 1's first posting has a comment by you and one by Maya K.

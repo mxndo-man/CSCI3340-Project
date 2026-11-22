@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
-from django.utils import timezone
 
 from apps.boards.models import Board, Membership
 
@@ -53,6 +52,20 @@ class NotificationViewsTests(TestCase):
             response.context["notification_menu"]["unread_count"],
             2,
         )
+
+    def test_list_renders_the_real_signup_notification(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get("/notifications/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Welcome!")
+        self.assertContains(response, "Your account has been created successfully.")
+        self.assertContains(
+            response,
+            f'action="{reverse("notifications:open_notification")}"',
+        )
+        self.assertEqual(response.context["notification_menu"]["unread_count"], 2)
 
     def test_list_only_shows_the_signed_in_users_notifications(self):
         Notification.objects.create(
@@ -105,6 +118,25 @@ class NotificationViewsTests(TestCase):
         self.assertTrue(self.notification.read)
         self.assertRedirects(response, reverse("notifications:list"))
 
+    def test_open_signup_notification_redirects_to_the_real_list(self):
+        welcome_notification = Notification.objects.get(
+            user=self.user,
+            kind=Notification.Kind.WELCOME,
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("notifications:open_notification"),
+            {
+                "notification": welcome_notification.pk,
+                "next": "/notifications/",
+            },
+        )
+
+        welcome_notification.refresh_from_db()
+        self.assertTrue(welcome_notification.read)
+        self.assertRedirects(response, "/notifications/")
+
     def test_cannot_open_another_users_notification(self):
         other_notification = Notification.objects.create(
             user=self.other_user,
@@ -124,6 +156,17 @@ class NotificationViewsTests(TestCase):
         other_notification.refresh_from_db()
         self.assertFalse(other_notification.read)
 
+    def test_open_notification_with_non_numeric_id_returns_404(self):
+        self.client.force_login(self.user)
+
+        for notification_id in ("abc", ""):
+            with self.subTest(notification_id=notification_id):
+                response = self.client.post(
+                    reverse("notifications:open_notification"),
+                    {"notification": notification_id},
+                )
+                self.assertEqual(response.status_code, 404)
+
     def test_notification_actions_require_authentication_and_post(self):
         response = self.client.post(reverse("notifications:mark_all_read"))
         self.assertRedirects(
@@ -137,7 +180,7 @@ class NotificationViewsTests(TestCase):
 
 
 class NotificationTasksTests(TestCase):
-    def test_daily_digest_notifies_active_users_only_once_per_day(self):
+    def test_daily_digest_is_a_no_op_until_email_delivery_is_implemented(self):
         user_model = get_user_model()
         active_users = [
             user_model.objects.create_user(
@@ -147,28 +190,23 @@ class NotificationTasksTests(TestCase):
             )
             for number in range(2)
         ]
-        inactive_user = user_model.objects.create_user(
+        user_model.objects.create_user(
             username="inactive",
             email="inactive@example.com",
             password="test-password",
             is_active=False,
         )
 
+        notification_count = Notification.objects.count()
         created_count = send_daily_digest()
         repeat_count = send_daily_digest()
 
-        self.assertEqual(created_count, 2)
+        self.assertEqual(created_count, 0)
         self.assertEqual(repeat_count, 0)
-        self.assertEqual(
-            Notification.objects.filter(
-                dedupe_key=f"DIGEST:{timezone.localdate().isoformat()}",
-                title="Daily digest",
-            ).count(),
-            len(active_users),
-        )
+        self.assertEqual(Notification.objects.count(), notification_count)
         self.assertFalse(
             Notification.objects.filter(
-                user=inactive_user,
+                user__in=active_users,
                 title="Daily digest",
             ).exists()
         )
@@ -212,6 +250,8 @@ class MembershipNotificationSignalTests(TestCase):
         self.assertIn("Study group", member_notice.message)
         self.assertIn("new-member", owner_notice.message)
         self.assertIn("Study group", owner_notice.message)
+        self.assertEqual(member_notice.link_url, board.get_absolute_url())
+        self.assertEqual(owner_notice.link_url, board.get_absolute_url())
 
     def test_owner_membership_does_not_send_member_join_notifications(self):
         user = get_user_model().objects.create_user(
@@ -232,3 +272,17 @@ class MembershipNotificationSignalTests(TestCase):
                 dedupe_key__startswith=f"MEMBER_JOINED:{membership.pk}:"
             ).exists()
         )
+
+    def test_new_board_notification_links_to_the_board(self):
+        owner = get_user_model().objects.create_user(
+            username="board-owner",
+            email="owner@example.com",
+        )
+        board = Board.objects.create(created_by=owner, name="Study group")
+
+        notification = Notification.objects.get(
+            user=owner,
+            dedupe_key=f"NEW_BOARD:{board.pk}",
+        )
+
+        self.assertEqual(notification.link_url, board.get_absolute_url())

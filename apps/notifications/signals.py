@@ -31,6 +31,7 @@ def notify_board_created(sender, instance, created, **kwargs):
         kind=Notification.Kind.NEW_BOARD,
         title="Nice Board!",
         message=f'You created a board called "{instance.name}". Great Job!',
+        link_url=instance.get_absolute_url(),
         dedupe_key=f"NEW_BOARD:{instance.pk}",
     )
 
@@ -45,6 +46,7 @@ def notify_member_joined(sender, instance, created, **kwargs):
         kind=Notification.Kind.MEMBER_JOINED,
         title="A Step Towards Success!",
         message=f'You joined a board called "{instance.board.name}". Great Job!',
+        link_url=instance.board.get_absolute_url(),
         dedupe_key=f"MEMBER_JOINED:{instance.pk}:JOINER",
     )
 
@@ -55,5 +57,6 @@ def notify_member_joined(sender, instance, created, **kwargs):
             kind=Notification.Kind.MEMBER_JOINED,
             title="A Member Joined Your Board",
             message=f'{instance.user.username} joined your board "{instance.board.name}". Welcome them!',
+            link_url=instance.board.get_absolute_url(),
             dedupe_key=f"MEMBER_JOINED:{instance.pk}:OWNER",
         )

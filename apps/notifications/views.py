@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (
     RedirectURLMixin,  # pyright: ignore[reportAttributeAccessIssue]
 )
-from django.http import HttpRequest
+from django.http import Http404, HttpRequest
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views import View
@@ -31,9 +31,13 @@ class MarkAllReadView(LoginRequiredMixin, RedirectURLMixin, View):
 
 class OpenNotificationView(LoginRequiredMixin, RedirectURLMixin, View):
     def post(self, request: HttpRequest):
+        notification_id = request.POST.get("notification", "")
+        if not notification_id.isdigit():
+            raise Http404
+
         notification = get_object_or_404(
             Notification,
-            pk=request.POST.get("notification"),
+            pk=notification_id,
             user_id=request.user.pk,
         )
         notification.read = True

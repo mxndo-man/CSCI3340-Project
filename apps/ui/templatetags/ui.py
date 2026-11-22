@@ -538,7 +538,6 @@ PREVIEW_PAGES = {
     "boards:list": "ui_preview:boards",
     "tracker:applications": "ui_preview:applications",
     "tracker:tasks": "ui_preview:tasks",
-    "notifications:list": "ui_preview:notifications",
     "notifications:saved_searches": "ui_preview:saved_searches",
     "notifications:preferences": "ui_preview:preferences",
 }
@@ -796,6 +795,9 @@ NOTIFICATION_ICON = {
     "DEADLINE_SOON": "clock",
     "NEW_MATCH": "compass",
     "POSTING_CLOSED": "lock",
+    "WELCOME": "bell",
+    "NEW_BOARD": "plus",
+    "MEMBER_JOINED": "check",
 }
 
 
