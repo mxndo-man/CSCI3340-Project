@@ -25,118 +25,118 @@ Every card has an empty state, so a brand-new user sees what to do first.
 {% page_url "boards:list" as boards_url %}
 <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
   <header class="mb-8">
-    <h1 class="font-serif text-h1 font-semibold text-bark-900">{{ hello }}, {% first_name user %}</h1>
-    <p class="mt-2 text-[15px] text-bark-700">{{ closing|length }} posting{{ closing|length|pluralize }} close{{ closing|length|pluralize:"s," }} in the next two weeks, and {{ week_tasks|length }} task{{ week_tasks|length|pluralize:" is,s are" }} due this week.</p>
+    <h1 class="text-h1 font-semibold text-ink">{{ hello }}, {% first_name user %}</h1>
+    <p class="mt-2 text-base text-ink-soft">{{ closing|length }} posting{{ closing|length|pluralize }} close{{ closing|length|pluralize:"s," }} in the next two weeks, and {{ week_tasks|length }} task{{ week_tasks|length|pluralize:" is,s are" }} due this week.</p>
   </header>
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <div class="space-y-6 lg:col-span-2">
-      <section aria-labelledby="closing-title" class="rounded-2xl border border-sand-200 bg-white p-6">
+      <section aria-labelledby="closing-title" class="bg-paper p-6 shadow-pixel">
         <div class="flex items-start justify-between gap-4">
-          <h2 id="closing-title" class="font-serif text-h2 font-semibold text-bark-900">Closing soon</h2>
-          {% if discover_url %}<a href="{{ discover_url }}" class="text-sm font-semibold text-clay-700 hover:underline">See all</a>{% endif %}
+          <h2 id="closing-title" class="text-h2 font-semibold text-ink">Closing soon</h2>
+          {% if discover_url %}<a href="{{ discover_url }}" class="text-sm font-semibold text-action-ink hover:underline">See all</a>{% endif %}
         </div>
         {% if closing %}
           <ul class="-mx-3 mt-4">
             {% for posting in closing %}
               <li>
-                <a href="{{ posting.get_absolute_url }}" class="group flex items-center gap-4 rounded-xl px-3 py-3 hover:bg-sand-50">
-                  <span class="flex w-12 shrink-0 flex-col items-center rounded-xl border border-sand-200 bg-sand-50 py-1.5">
-                    <span class="text-[10px] font-semibold uppercase tracking-wider text-bark-500">{{ posting.deadline|date:"M" }}</span>
-                    <span class="font-serif text-xl font-semibold leading-6 text-bark-900">{{ posting.deadline|date:"j" }}</span>
+                <a href="{{ posting.get_absolute_url }}" class="group flex items-center gap-4 px-3 py-3 hover:bg-canvas">
+                  <span class="flex w-12 shrink-0 flex-col items-center bg-canvas py-1.5">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-ink-muted">{{ posting.deadline|date:"M" }}</span>
+                    <span class="text-xl font-semibold leading-6 text-ink">{{ posting.deadline|date:"j" }}</span>
                   </span>
                   <span class="min-w-0 flex-1">
-                    <span class="block truncate text-[15px] font-semibold text-bark-900 group-hover:text-clay-700">{{ posting.title }}</span>
-                    <span class="block truncate text-sm text-bark-500">{{ posting.organization }} · {{ posting.deadline|date:"l, M j" }}</span>
+                    <span class="block truncate text-base font-semibold text-ink group-hover:text-action-ink">{{ posting.title }}</span>
+                    <span class="block truncate text-sm text-ink-muted">{{ posting.organization }} · {{ posting.deadline|date:"l, M j" }}</span>
                   </span>
                   <span class="hidden shrink-0 sm:block">{% include "components/countdown.html" with deadline=posting only %}</span>
-                  <span class="shrink-0 text-bark-500">{% icon "chevron-right" "size-4" %}</span>
+                  <span class="shrink-0 text-ink-muted">{% icon "chevron-right" "size-4" %}</span>
                 </a>
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <p class="mt-4 text-sm leading-6 text-bark-500">Nothing closes in the next two weeks.{% if discover_url %} <a href="{{ discover_url }}" class="font-semibold text-clay-700 hover:underline">Find postings in Discover</a> and save the ones you like.{% endif %}</p>
+          <p class="mt-4 text-sm leading-6 text-ink-muted">Nothing closes in the next two weeks.{% if discover_url %} <a href="{{ discover_url }}" class="font-semibold text-action-ink hover:underline">Find postings in Discover</a> and save the ones you like.{% endif %}</p>
         {% endif %}
       </section>
 
-      <section aria-labelledby="matches-title" class="rounded-2xl border border-sand-200 bg-white p-6">
-        <h2 id="matches-title" class="font-serif text-h2 font-semibold text-bark-900">New matches</h2>
+      <section aria-labelledby="matches-title" class="bg-paper p-6 shadow-pixel">
+        <h2 id="matches-title" class="text-h2 font-semibold text-ink">New matches</h2>
         {% if saved_search %}
-          <p class="mt-1 text-sm text-bark-500">From your saved search “{{ saved_search.name }}”</p>
+          <p class="mt-1 text-sm text-ink-muted">From your saved search “{{ saved_search.name }}”</p>
           {% if new_matches %}
             <ul class="-mx-3 mt-4">
               {% for posting in new_matches %}{% include "postings/partials/row.html" with posting=posting only %}{% endfor %}
             </ul>
           {% else %}
-            <p class="mt-4 text-sm text-bark-500">Nothing new since you last looked.</p>
+            <p class="mt-4 text-sm text-ink-muted">Nothing new since you last looked.</p>
           {% endif %}
           {% if discover_url %}
-            <div class="mt-4 border-t border-sand-100 pt-4">
-              <a href="{{ discover_url }}?{{ saved_search.filters|discover_query }}" class="text-sm font-semibold text-clay-700 hover:underline">See all in Discover</a>
+            <div class="mt-4 border-t border-line pt-4">
+              <a href="{{ discover_url }}?{{ saved_search.filters|discover_query }}" class="text-sm font-semibold text-action-ink hover:underline">See all in Discover</a>
             </div>
           {% endif %}
         {% else %}
-          <p class="mt-2 text-sm leading-6 text-bark-500">Set your filters in Discover and choose “Save this search”. New postings that match show up here and in your daily digest.</p>
+          <p class="mt-2 text-sm leading-6 text-ink-muted">Set your filters in Discover and choose “Save this search”. New postings that match show up here and in your daily digest.</p>
           {% if discover_url %}<a href="{{ discover_url }}" class="mt-4 {% button_class 'secondary' 'sm' %}">Go to Discover</a>{% endif %}
         {% endif %}
       </section>
     </div>
 
     <div class="space-y-6">
-      <section aria-labelledby="applications-title" class="rounded-2xl border border-sand-200 bg-white p-6">
+      <section aria-labelledby="applications-title" class="bg-paper p-6 shadow-pixel">
         <div class="flex items-start justify-between gap-4">
-          <h2 id="applications-title" class="font-serif text-h2 font-semibold text-bark-900">Applications</h2>
-          {% if tracker_url %}<a href="{{ tracker_url }}" class="text-sm font-semibold text-clay-700 hover:underline">Open tracker</a>{% endif %}
+          <h2 id="applications-title" class="text-h2 font-semibold text-ink">Applications</h2>
+          {% if tracker_url %}<a href="{{ tracker_url }}" class="text-sm font-semibold text-action-ink hover:underline">Open tracker</a>{% endif %}
         </div>
         {% if applications %}
-          <p class="mt-1 text-sm text-bark-500">{{ active }} in progress</p>
-          <ul class="mt-3 divide-y divide-sand-100">
+          <p class="mt-1 text-sm text-ink-muted">{{ active }} in progress</p>
+          <ul class="mt-3 divide-y divide-line">
             {% for column in columns %}
               <li class="flex items-center justify-between gap-3 py-2 text-sm">
-                <span class="text-bark-700">{{ column.label }}</span>
-                <span class="rounded-full px-2 py-0.5 text-xs font-semibold {% if column.applications %}bg-sand-100 text-bark-900{% else %}text-bark-500{% endif %}">{{ column.applications|length }}</span>
+                <span class="text-ink-soft">{{ column.label }}</span>
+                <span class="px-2 py-0.5 text-xs font-semibold {% if column.applications %} bg-sunk text-ink {% else %} text-ink-muted {% endif %}">{{ column.applications|length }}</span>
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <p class="mt-2 text-sm leading-6 text-bark-500">Nothing tracked yet. On any posting, press “Track this application” to follow it from saved to offer.</p>
+          <p class="mt-2 text-sm leading-6 text-ink-muted">Nothing tracked yet. On any posting, press “Track this application” to follow it from saved to offer.</p>
         {% endif %}
       </section>
 
-      <section aria-labelledby="tasks-title" class="rounded-2xl border border-sand-200 bg-white p-6">
-        <h2 id="tasks-title" class="font-serif text-h2 font-semibold text-bark-900">Tasks this week</h2>
+      <section aria-labelledby="tasks-title" class="bg-paper p-6 shadow-pixel">
+        <h2 id="tasks-title" class="text-h2 font-semibold text-ink">Tasks this week</h2>
         {% if week_tasks %}
           <ul class="-mx-3 mt-3 space-y-1">
             {% for task in week_tasks %}{% include "tracker/partials/task_row.html" with task=task %}{% endfor %}
           </ul>
         {% else %}
-          <p class="mt-2 text-sm text-bark-500">Nothing due this week.</p>
+          <p class="mt-2 text-sm text-ink-muted">Nothing due this week.</p>
         {% endif %}
       </section>
 
-      <section aria-labelledby="activity-title" class="rounded-2xl border border-sand-200 bg-white p-6">
+      <section aria-labelledby="activity-title" class="bg-paper p-6 shadow-pixel">
         <div class="flex items-start justify-between gap-4">
-          <h2 id="activity-title" class="font-serif text-h2 font-semibold text-bark-900">Board activity</h2>
-          {% if boards_url %}<a href="{{ boards_url }}" class="text-sm font-semibold text-clay-700 hover:underline">Boards</a>{% endif %}
+          <h2 id="activity-title" class="text-h2 font-semibold text-ink">Board activity</h2>
+          {% if boards_url %}<a href="{{ boards_url }}" class="text-sm font-semibold text-action-ink hover:underline">Boards</a>{% endif %}
         </div>
         {% if activity %}
           <ul class="-mx-3 mt-3 space-y-1">
             {% for comment in activity %}
               <li>
-                <a href="{{ comment.get_absolute_url }}" class="flex gap-3 rounded-xl px-3 py-3 hover:bg-sand-50">
+                <a href="{{ comment.get_absolute_url }}" class="flex gap-3 px-3 py-3 hover:bg-canvas">
                   {% if comment.author %}{% include "components/avatar.html" with person=comment.author size="sm" only %}{% endif %}
                   <span class="min-w-0 flex-1">
-                    <span class="block text-sm text-bark-900"><span class="font-semibold">{% if comment.author %}{% display_name comment.author %}{% else %}A former member{% endif %}</span> on {{ comment.board_posting.posting.title }}</span>
-                    <span class="mt-1 line-clamp-2 block text-sm leading-5 text-bark-700">{{ comment.body }}</span>
-                    <span class="mt-1 block text-xs text-bark-500">{{ comment.board_posting.board.name }} · {{ comment.created_at|timesince }} ago</span>
+                    <span class="block text-sm text-ink"><span class="font-semibold">{% if comment.author %}{% display_name comment.author %}{% else %}A former member{% endif %}</span> on {{ comment.board_posting.posting.title }}</span>
+                    <span class="mt-1 line-clamp-2 block text-sm leading-5 text-ink-soft">{{ comment.body }}</span>
+                    <span class="mt-1 block text-xs text-ink-muted">{{ comment.board_posting.board.name }} · {{ comment.created_at|timesince }} ago</span>
                   </span>
                 </a>
               </li>
             {% endfor %}
           </ul>
         {% else %}
-          <p class="mt-2 text-sm leading-6 text-bark-500">When friends comment on postings in your boards, it shows up here.{% if boards_url %} <a href="{{ boards_url }}" class="font-semibold text-clay-700 hover:underline">Start or join a board</a>.{% endif %}</p>
+          <p class="mt-2 text-sm leading-6 text-ink-muted">When friends comment on postings in your boards, it shows up here.{% if boards_url %} <a href="{{ boards_url }}" class="font-semibold text-action-ink hover:underline">Start or join a board</a>.{% endif %}</p>
         {% endif %}
       </section>
     </div>

@@ -5,9 +5,9 @@
 
 {% block content %}
 <div class="mx-auto flex max-w-6xl justify-center px-4 py-12 sm:px-6 sm:py-16">
-  <section class="w-full max-w-md rounded-2xl border border-sand-200 bg-white p-6 sm:p-8">
-    <h1 class="font-serif text-h1 font-semibold text-bark-900">Create your account</h1>
-    <p class="mt-2 text-[15px] text-bark-700">Save postings, share boards and track every application in one place.</p>
+  <section class="w-full max-w-md bg-paper p-6 sm:p-8 shadow-pixel">
+    <h1 class="text-h1 font-semibold text-ink">Create your account</h1>
+    <p class="mt-2 text-base text-ink-soft">Save postings, share boards and track every application in one place.</p>
 
     <form method="post" novalidate class="mt-6 space-y-4">
       {% csrf_token %}
@@ -21,9 +21,9 @@
       <button type="submit" class="{% button_class 'primary' 'md' 'w-full' %}">Create account</button>
     </form>
 
-    <p class="mt-6 text-center text-sm text-bark-700">
+    <p class="mt-6 text-center text-sm text-ink-soft">
       Already have an account?
-      <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="font-semibold text-clay-700 hover:underline">Log in</a>
+      <a href="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="font-semibold text-action-ink hover:underline">Log in</a>
     </p>
   </section>
 </div>

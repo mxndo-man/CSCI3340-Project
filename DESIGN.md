@@ -1,52 +1,77 @@
 ---
 name: Shortlist
-description: A voxel-style look for a shared internship tracker. Square blocks, dusk sky, meadow greens, one marigold accent.
+description: A cozy, blocky mountain look for a shared internship tracker. Square pixel boxes, warm cream by day, the landing page's valley greens by night, one gold for "look here".
 colors:
-  marigold: "#f2c230"
-  marigold-hi: "#ffe27a"
-  marigold-lo: "#b5820c"
-  ink: "#17130a"
-  sky: "#3e5881"
-  sky-deep: "#40566f"
-  night: "#0f2118"
-  meadow-900: "#142b1f"
-  meadow-800: "#1a3828"
-  meadow-600: "#2e6a41"
-  leaf: "#8fbf7a"
-  mist: "#e6eedf"
-  mist-dim: "#a8bda5"
-  haze-line: "#b9c8d4"
-  white: "#ffffff"
+  canvas: "#f4ebdb"
+  paper: "#fffbf3"
+  sunk: "#ebddc6"
+  line: "#decbae"
+  edge: "#c4a983"
+  line-strong: "#9a825f"
+  bar: "#fffbf3"
+  ink: "#2e2419"
+  ink-soft: "#4a3a28"
+  ink-muted: "#6e583d"
+  action: "#b4532f"
+  action-hover: "#953f1f"
+  action-ink: "#9a4423"
+  action-soft: "#f6dccb"
+  on-action: "#fffbf3"
+  gold: "#f2b92e"
+  gold-hi: "#ffd977"
+  gold-lo: "#b9861a"
+  on-gold: "#2e2419"
+  gold-ink: "#7a5208"
+  gold-soft: "#fbe7b0"
+  band-pine: "#4e5c37"
+  on-pine: "#f4ebdb"
+  good-ink: "#45602e"
+  good-soft: "#dde6c4"
+  alert-ink: "#a3362b"
+  alert-soft: "#f6d6ce"
+  info-ink: "#2f5482"
+  info-soft: "#d8e3f1"
+  hero-sky: "#3e5881"
 typography:
-  display:
+  hero:
     fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
     fontSize: "clamp(3.25rem, 9.2vw, 7rem)"
     fontWeight: 500
     lineHeight: 0.96
     letterSpacing: "-0.035em"
-  headline:
+  wordmark:
     fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(2.25rem, 5vw, 3.75rem)"
-    fontWeight: 500
-    lineHeight: 1.02
-    letterSpacing: "-0.03em"
-  subhead:
-    fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
-    fontSize: "clamp(1.5rem, 2.6vw, 2rem)"
-    fontWeight: 500
-    lineHeight: 1.12
+    fontSize: "1.375rem"
+    fontWeight: 700
     letterSpacing: "-0.02em"
+  display:
+    fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
+    fontSize: "3.25rem"
+    fontWeight: 600
+    lineHeight: 1
+    letterSpacing: "-0.03em"
+  h1:
+    fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
+    fontSize: "2.25rem"
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: "-0.025em"
+  h2:
+    fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.015em"
   title:
     fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
     fontSize: "1.125rem"
     fontWeight: 600
     lineHeight: 1.3
-    letterSpacing: "-0.01em"
   body:
     fontFamily: "Familjen Grotesk, Segoe UI, system-ui, sans-serif"
-    fontSize: "1.0625rem"
+    fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.55
+    lineHeight: 1.5
   label:
     fontFamily: "Pixelify Sans, ui-monospace, Consolas, monospace"
     fontSize: "0.8125rem"
@@ -57,291 +82,132 @@ rounded:
   none: "0px"
 spacing:
   voxel: "4px"
-  gutter: "clamp(1.25rem, 4vw, 3rem)"
-  band: "clamp(4.5rem, 10vw, 8.5rem)"
-  wrap: "76rem"
-components:
-  button-primary:
-    backgroundColor: "{colors.marigold}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.none}"
-    padding: "0.625rem 1.375rem 0.875rem"
-    height: "3rem"
-  button-quiet:
-    backgroundColor: "transparent"
-    textColor: "{colors.white}"
-    rounded: "{rounded.none}"
-    padding: "0.625rem 1.375rem"
-    height: "3rem"
-  button-quiet-hover:
-    backgroundColor: "{colors.white}"
-    textColor: "{colors.sky-deep}"
-  button-light:
-    backgroundColor: "{colors.white}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.none}"
-    padding: "0.375rem 1rem 0.625rem"
-    height: "2.5rem"
-  panel:
-    backgroundColor: "{colors.meadow-800}"
-    textColor: "{colors.mist}"
-    rounded: "{rounded.none}"
-  card:
-    backgroundColor: "{colors.meadow-800}"
-    textColor: "{colors.mist}"
-    rounded: "{rounded.none}"
-    padding: "1.25rem"
-  board-card:
-    backgroundColor: "{colors.night}"
-    textColor: "{colors.mist}"
-    rounded: "{rounded.none}"
-    padding: "1.25rem"
-  chip:
-    backgroundColor: "transparent"
-    textColor: "{colors.mist}"
-    rounded: "{rounded.none}"
-    padding: "0.125rem 0.5rem"
-  chip-good:
-    backgroundColor: "{colors.meadow-600}"
-    textColor: "{colors.mist}"
-  chip-warn:
-    backgroundColor: "transparent"
-    textColor: "{colors.marigold}"
-  fact-tile:
-    backgroundColor: "{colors.meadow-800}"
-    textColor: "{colors.mist}"
-    rounded: "{rounded.none}"
-    padding: "1rem"
-  check-tag:
-    backgroundColor: "{colors.marigold}"
-    textColor: "{colors.ink}"
-    typography: "{typography.label}"
-    padding: "0 0.375rem"
-  sample-label:
-    textColor: "{colors.leaf}"
-    typography: "{typography.label}"
-  ruler:
-    backgroundColor: "{colors.night}"
-    textColor: "{colors.mist-dim}"
-    typography: "{typography.label}"
-  stage-marker:
-    backgroundColor: "{colors.meadow-800}"
-    textColor: "{colors.mist-dim}"
-    size: "2.5rem"
-  stage-marker-current:
-    backgroundColor: "{colors.marigold}"
-    textColor: "{colors.mist}"
-    size: "2.5rem"
-  member-tile:
-    backgroundColor: "{colors.meadow-600}"
-    textColor: "{colors.mist}"
-    typography: "{typography.label}"
-    size: "2rem"
-  member-tile-more:
-    backgroundColor: "transparent"
-    textColor: "{colors.mist-dim}"
-    typography: "{typography.label}"
-    size: "2rem"
-  notice:
-    backgroundColor: "{colors.mist}"
-    textColor: "{colors.night}"
-    padding: "0.75rem 1rem"
 ---
 
 # Design System: Shortlist
 
-This file describes how Shortlist looks, so new pages match the ones already built. The block at the top (between the `---` lines) lists the exact values, called **tokens**: named colours, type sizes and spacings. The text below explains when to use them.
+This file describes how Shortlist looks, so every page matches. The block at the top lists the exact values, called **tokens** (named colours, sizes and fonts). The tokens live in `styles/styles.css`; this file explains when to use each one.
 
-**Where this applies today:** only the landing page (`templates/pages/landing.html` with `static/css/landing.css`). The app pages that extend `base.html` still use the older look and have not been migrated yet.
+**Where this applies:** every page. App pages get it through `templates/base.html` and the Tailwind classes made from the tokens (for example `bg-paper`, `text-ink`, `shadow-pixel`).
 
 ## Overview
 
-**Creative North Star: "The Valley at Dusk"**
+**North star: "Golden hour in a mountain town."** Approachable, cozy and a little game-like. Boxes are solid blocks with square, stepped "pixel" corners. Buttons are blocks with a lit top edge and a shaded bottom edge that sink when pressed. Things move in a few visible steps instead of gliding. The words stay plain and human; the game feel lives in shapes, colour and motion, never in game words.
 
-Shortlist looks like a small world built out of blocks. A dusk-blue sky sits at the top of the page, and everything under it is deep meadow green. Buttons and markers are solid blocks with a light top edge and a dark bottom edge, so they look like something you can press.
-
-The look is friendly, but the words stay plain. Labels say what things are: posting, board, tracker, deadline. The blocky style is in the shapes, colours and motion, never in the wording.
-
-Nothing is rounded, blurred or faded. Colour areas are flat, corners are square, and things move in a few visible steps instead of gliding.
-
-**Key Characteristics:**
-- Square corners everywhere (no rounding).
-- Blocks have a lit top edge and a shaded bottom edge.
-- Panels and cards have stepped "pixel" corners.
-- A checker pattern (a "dither") joins one colour band to the next.
-- Ruler ticks run along the top of sections, with a short ID.
-- Marigold is the only warm colour.
-- Motion moves in steps and never eases.
-- Two typefaces: a warm grotesk for reading, a pixel face for IDs, dates, codes, timers and small labels.
-- A feature section is a heading plus a small working copy of the real app page.
+**Two modes, same roles.** Dark mode (the landing page's valley greens) is the default; light mode is warm cream and terracotta. A visitor switches with the sun/moon switch in the header: a square track with a gold block that slides, in steps, to the current mode. The choice is kept in their browser.
 
 ## Colors
 
-A cool, dark page (sky blue over meadow green) with one warm colour, marigold, that always means "look here".
+Templates use **roles** (what a colour is for), never raw hex values. Each role has a light and a dark value, so a page written with roles works in both modes.
 
-### Primary
-- **Marigold** (`marigold`, #f2c230): the single warm accent. It marks the thing to act on or the place you are: the main button, the selected stage, the "Needs a check" tag, the text of a "look closer" chip, a countdown that is running out, the keyboard focus ring, the small block in the wordmark and the headline cursor.
-- **Marigold Light** (`marigold-hi`, #ffe27a): the lit top edge of a marigold block.
-- **Marigold Shade** (`marigold-lo`, #b5820c): the shaded bottom edge of a marigold block. Also the thin outline of a "look closer" chip and of a fact tile that needs a check.
-- **Ink** (`ink`, #17130a): text on marigold and on white buttons.
+| Role | Light | Dark | Use |
+|---|---|---|---|
+| `canvas` | #f4ebdb (Sand) | #0f2118 (Night) | the page background |
+| `bar` | #fffbf3 | #142b1f | the header |
+| `paper` | #fffbf3 | #1a3828 (Meadow 800) | the face of every box: cards, panels, menus, dialogs, inputs |
+| `sunk` | #ebddc6 | #21422f | hover fills, the selected item in a list, pressed-in areas |
+| `line` | #decbae (Clay) | #2e6a41 | thin dividers inside boxes |
+| `edge` | #c4a983 | #2e6a41 (Meadow 600) | the 4px pixel edge around every box |
+| `line-strong` | #9a825f | #5f8f62 | input borders and edges that must be seen (3:1) |
+| `ink` | #2e2419 | #e6eedf (Mist) | main text |
+| `ink-soft` | #4a3a28 | #cfdccb | secondary text that still reads as body |
+| `ink-muted` | #6e583d | #a8bda5 | supporting text, captions, placeholders |
+| `action` | #b4532f (Adobe) | #b4532f | buttons you press to do something |
+| `action-hover` | #953f1f | #953f1f | an action under the pointer, and its shaded edge |
+| `action-ink` | #9a4423 | #f2a27b | links and accent text |
+| `action-soft` | #f6dccb (Pueblo) | #3d2a1c | tinted background for something selected |
+| `on-action` | #fffbf3 | #fffbf3 | text on an action fill |
+| `gold` | #f2b92e | #f2b92e | "look here": the wordmark block, Sign up, toast edges, selection, current stage |
+| `hero-sky` | #3e5881 | #3e5881 | the landing hero's sky, matched to the top edge of its image |
+| `gold-ink` / `gold-soft` | #7a5208 / #fbe7b0 | #f5c85a / #3a3514 | "look closer" chips and notices, the preview banner |
+| `good-ink` / `good-soft` | #45602e / #dde6c4 (Sage) | #e6eedf / #2e6a41 | in your favour |
+| `alert-ink` / `alert-soft` | #a3362b / #f6d6ce | #f09a88 / #45231f | closed, unpaid, delete, form errors |
+| `info-ink` / `info-soft` | #2f5482 / #d8e3f1 | #9dbde6 / #1c2f3c | neutral information |
+| `band-pine` / `on-pine` | #4e5c37 / #f4ebdb | #0a1710 / #e6eedf | the footer band |
 
-### Secondary
-- **Dusk Sky** (`sky`, #3e5881): the hero at the top of the page and the closing band at the bottom. Text on it is white.
-- **Deep Sky** (`sky-deep`, #40566f): text on a white button when the pointer is over it.
-
-### Neutral
-- **Night** (`night`, #0f2118): the page background and the darkest green. Also the face of a board card.
-- **Meadow 900** (`meadow-900`, #142b1f): the alternate band, one step lighter than Night.
-- **Meadow 800** (`meadow-800`, #1a3828): the face of a panel, a posting card and a fact tile.
-- **Meadow 600** (`meadow-600`, #2e6a41): panel edges, divider lines, thin outlines, member tiles, the dashed trail and the fill of an "in your favour" chip.
-- **Leaf** (`leaf`, #8fbf7a): small labels on green, such as fact names, counts and the sample label.
-- **Mist** (`mist`, #e6eedf): main text on green.
-- **Mist Dim** (`mist-dim`, #a8bda5): supporting text on green, and ruler ticks.
-- **Haze Line** (`haze-line`, #b9c8d4): the shaded bottom edge of a white button.
-- **White** (`white`, #ffffff): text and outlines on Dusk Sky.
+Gold uses `on-gold` (#2e2419) for text in both modes.
 
 ### Named Rules
-**The One Warm Colour Rule.** Marigold is the only warm colour on a page. Use it for the main action, the current step, or something the user must notice. Never use it as a band background or for body text.
+**The Gold Rule.** Gold means "look here or you're here": the next thing to do, the current step, something that needs a check, something done. Use it sparingly; never as a large background.
 
-**The Flat Band Rule.** Every band is one flat colour. No gradients. To join two bands, use the dither strip (see Components).
+**The Action Rule.** Adobe (`action`) is for buttons that do something. Links and accent text use `action-ink`.
 
-**The Chip Colour Rule.** A chip's colour is its meaning. Filled green means the fact is in your favour. A marigold outline means look closer. A plain green outline is neutral. Never pick a chip colour for decoration.
+**The Status Rule.** A chip or notice's colour is its meaning: `good` is in your favour, `gold` is look closer, `alert` is against you or destructive, neutral is `sunk`. Never pick a status colour for decoration.
+
+**The Plain Header Rule.** The header has no colour. It is set apart from the page by its own face (`bar`) and a hard 4px edge underneath (`shadow-bar`).
 
 ## Typography
 
-**Display Font:** Familjen Grotesk (with Segoe UI, system-ui, sans-serif)
-**Body Font:** Familjen Grotesk (same family)
-**Label Font:** Pixelify Sans (with ui-monospace, Consolas, monospace)
+- **Familjen Grotesk** does all the reading: headings, body, buttons. Class `font-sans` (the default).
+- **Pixelify Sans** is for readouts only: IDs, dates, codes, timers, counts and small labels. Use the `readout` class (Pixelify, 0.8125rem, uppercase, slight letter spacing) or `font-pixel`.
 
-**Character:** Familjen Grotesk is a warm grotesk (a plain sans-serif with a friendly shape); it does all the reading. Pixelify Sans is a pixel face (letters drawn on a square grid); it appears small, like a readout on a device.
+| Class | Size | Use |
+|---|---|---|
+| `text-wordmark` | 1.375rem bold | the product name in the header and footer |
+| `text-hero` | clamp(3.25rem, 9.2vw, 7rem) | the landing hero's headline only |
+| `text-display` | 3.25rem | the one big number or headline on a page |
+| `text-h1` | 2.25rem, 600 | page titles |
+| `text-h2` | 1.5rem, 600 | section headings and dialog titles |
+| `text-title` | 1.125rem, 600 | the name at the top of a card |
+| `text-base` | 1rem | body text and form fields |
+| `text-sm` / `text-xs` | 0.875 / 0.75rem | supporting lines, captions |
 
-### Hierarchy
-- **Display** (500, clamp(3.25rem, 9.2vw, 7rem), line-height 0.96): the one big headline in the hero. Centred.
-- **Headline** (500, clamp(2.25rem, 5vw, 3.75rem), line-height 1.02): section headings.
-- **Subhead** (500, clamp(1.5rem, 2.6vw, 2rem), line-height 1.12): a second heading inside a section, next to its demo.
-- **Title** (600, 1.125rem, line-height 1.3): the name at the top of a card.
-- **Body** (400, 1.0625rem, line-height 1.55): paragraphs. Supporting lines inside cards and tiles step down to 0.9375rem or 0.875rem.
-- **Label** (Pixelify Sans 400, 0.8125rem, letter-spacing 0.05em, uppercase): IDs, dates, timers, counts, stage names, fact names and the sample label.
+**The Readout Rule.** Sentences, headings and button text are never in the pixel face. Large numbers that must be read at a glance (the counts in the landing page's stage blocks) use the reading face in bold, because the pixel face's 1 and 2 blur at that size.
 
-### Named Rules
-**The Readout Rule.** The pixel face is for IDs, dates, codes, timers and small labels. Sentences, big headings and button text are always in Familjen Grotesk.
+## Shape and depth
+
+- **Every corner is square.** There is no rounding anywhere, including avatars, dots and chips.
+- **Pixel corners** (`shadow-pixel`): four hard 4px edges in `edge` that don't meet, so each corner looks like a missing pixel. Every box uses this one style. To colour one box's edge (for example gold for a fact that needs a check), set `[--box-edge:var(--color-gold-lo)]` on it.
+- **Hover on a clickable box:** `hover:shadow-soft` darkens the edge to `line-strong`.
+- **Menus and dialogs:** `shadow-pop`, the pixel edge in `line-strong` plus a hard drop below.
+- **Pressable blocks** have a lit top and shaded bottom edge (`shadow-bevel-action`, `shadow-bevel-gold`, `shadow-bevel-paper`) and the `press` class, which sinks them 2px on hover and 4px when pressed.
+- **No blur.** No soft shadows, glows, gradients or blurred backdrops.
+
+## Motion
+
+Everything moves in 3 visible steps over 120ms (`steps(3, end)`). This is the default for every `transition` class. Menus and toasts step in the same way. All motion turns off when the visitor asks for reduced motion.
 
 ## Layout
 
-- The page is a stack of full-width **bands** (horizontal strips of one colour). Content sits in a centred column up to 76rem wide.
-- The side gutter is clamp(1.25rem, 4vw, 3rem), so it shrinks on phones.
-- Bands have generous top and bottom padding: clamp(4.5rem, 10vw, 8.5rem) on top and slightly less below.
-- The hero fills the first screen (at least 40rem tall). Text sits in the upper half; the lower half is left for the image.
-- Small details are built from a 4px unit called a **voxel**: bevel edges, pixel corners and the dither are all 4px or 8px.
-- Cards sit in a grid with a 1.25rem gap: three columns for board cards, two for posting cards.
-- Key facts tiles sit in a two-column grid with a 0.75rem gap, under their sub-heading. The grid drops to one column below 34rem.
-- Two breakpoints (widths where the layout changes): below 56rem, two-column sections become one column, three-column card grids become two, and the nav's section links hide. Below 34rem, hero buttons become full width, and card grids, tile grids and list rows become one column.
-
-### Named Rules
-**The Show It Rule.** A feature section is a heading plus a demo of the feature. It does not describe the feature in a paragraph. If the demo needs explaining, fix the demo.
-
-**The Real Page Rule.** Every landing section is a small copy of a real app page, built from the same data and the same template helpers (small functions the app's own pages call to format a chip, a countdown or a fact). That way the landing page cannot drift from the app. Discover and Boards work this way today; the Tracker demo is still written by hand and should follow.
-
-## Elevation & Depth
-
-There are no soft shadows. Depth comes from hard edges and from flat colour steps (Night, then Meadow 900, then Meadow 800).
-
-### Shadow Vocabulary
-- **Block bevel** (`box-shadow: inset 0 -4px 0 <shade>, inset 0 4px 0 <light>`): a light strip inside the top edge and a dark strip inside the bottom edge. Used on buttons, member tiles and the selected stage.
-- **Pixel corners** (`box-shadow: 0 -4px 0 0 <edge>, 0 4px 0 0 <edge>, -4px 0 0 0 <edge>, 4px 0 0 0 <edge>`): four hard 4px edges with no blur. Because the edges do not meet at the corners, each corner looks like a missing pixel. Used on panels and cards.
-- **Thin outline** (`box-shadow: inset 0 0 0 1px <edge>`): a 1px line drawn inside the edge. Used on chips, fact tiles and the "+N" member tile. A fact tile that needs a check gets a 2px Marigold Shade outline instead.
-
-### Named Rules
-**The Hard Edge Rule.** Every shadow has zero blur. A shadow here is a drawn edge, not a glow.
-
-**The Press Rule.** A pressed block moves down and loses its bottom edge: 2px on hover, 4px when pressed. The change happens in 3 steps over 120ms (`steps(3, end)`), not as a smooth slide.
-
-## Shapes
-
-- All corners are square (radius 0).
-- Panel and card corners are stepped, made with the pixel-corner shadow above.
-- Divider lines are solid: 2px Meadow 600 under a group heading inside a panel, and 1px (Meadow 600 at 55% opacity) between rows.
-- Dashes and ticks are drawn with hard stops (8px on, 8px off), never dotted or faded.
-- Images in the look are pixel art and are scaled without smoothing (`image-rendering: pixelated`).
+- Content sits in a centred column (`max-w-6xl`, `px-4 sm:px-6`), the same as the header and footer.
+- Boxes in a grid need at least a 1rem gap, because the pixel edge sits 4px outside each box.
+- Spacing comes from Tailwind's scale, which steps in 4px (one voxel).
+- Pages are checked at 1440 and 390 px wide, in both modes.
 
 ## Components
 
-### Buttons
-- **Shape:** square block, 3rem tall (2.5rem for the small size), text in Familjen Grotesk 600.
-- **Primary:** Marigold face, Ink text, block bevel in Marigold Light and Marigold Shade. One per group of actions.
-- **Quiet:** no fill, white text, 2px white outline drawn inside the edge. For the second choice next to a primary button on Dusk Sky. On hover it fills white with Deep Sky text.
-- **Light:** white face, Ink text, shaded bottom edge. Used small, in the nav.
-- **Hover / Pressed:** follows the Press Rule.
-- **Focus:** a 2px Marigold outline, 3px away from the element. On Dusk Sky the outline is white, because Marigold is too faint there.
+Shared pieces live in `templates/components/` and the class helpers in `apps/ui/templatetags/ui.py`.
 
-### Panels
-- **Corner Style:** stepped pixel corners.
-- **Background:** Meadow 800 with Meadow 600 edges. A panel may use Night instead when it sits on Meadow 900.
-- **Structure:** a group heading in the label face (Leaf) over a 2px line, then rows separated by 1px lines.
-- **Internal Padding:** clamp(1rem, 2.5vw, 1.75rem) at the sides, 0.875rem above and below each row.
+- **Buttons** (`{% button_class %}`, `components/button.html`): square blocks. `primary`: Adobe with a bevel. `secondary`: paper with a 2px `line-strong` border and a shaded bottom edge. `ghost`: no fill, `sunk` on hover. `danger`: alert text, `alert-soft` on hover. Sizes `sm` (h-9) and `md` (h-11). One primary per view.
+- **Chips** (`components/chip.html`): small square tags, 0.75rem text, filled with the status `-soft` colour and its `-ink` text. Tones: `good`, `warn` (gold), `alert`, neutral (`sunk`), and `accent` (`action-soft` with `action-ink`) for a label that isn't a status, such as a selected filter.
+- **Notices** (`components/banner.html`): a status-tinted area with a 2px edge in the status colour. No pixel corners, because notices sit inside cards.
+- **Fields** (`components/field.html`, `{% ui_widget %}`): label above, a square input on `paper` with a 2px `line-strong` border; focus turns the border `action-ink`; errors use `alert-ink`.
+- **Avatars** (`components/avatar.html`): flat square tiles with initials in the pixel face, tinted by person.
+- **Countdown** (`components/countdown.html`): a clock icon and the time left as a readout: `alert-ink` when 5 days or fewer, `gold-ink` when 10 or fewer, `ink-muted` otherwise.
+- **Empty state** (`components/empty_state.html`): a dashed `line-strong` outline with a heading, one line, and one action.
+- **Toggle** (`components/toggle.html`): a square track with a square knob; Adobe when on.
+- **Header** (`base.html`): the gold wordmark block, nav links with a 4px `ink` bar under the current page, the light/dark switch, the account menu, and a gold Sign up block.
+- **Landing sections** (`pages/landing.html`): full-width bands that alternate `canvas` and `bar`; each band rises out of the one above along a `ridgeline` in its own colour. The hero stops a little short of the screen and carries a "See how it works" prompt, so it's clear there's more below.
+- **Footer** (`base.html`): a Pine band with a stepped pixel ridgeline (`ridgeline`) rising out of the page.
+- **Toasts** (`base.html`): `ink` with `canvas` text and a gold bottom edge.
 
-### Cards
-A card is a panel with 1.25rem padding that holds one thing: a posting or a board. Cards copy the layout of the app's Discover and Boards pages.
-- **Posting card:** the title, then a Mist Dim line with the organisation and work mode, then a row of chips, then a footer pinned to the bottom. The footer has the closing date on the left and a countdown in the label face on the right. The countdown turns Marigold when the deadline is near.
-- **Board card:** Night face, at least 13rem tall. The board's name with a neutral chip for the member count, a Mist Dim line with the posting count, up to three saved postings (one line each, cut short with "…" if too long, each with a small square Meadow 600 bullet), then member tiles pinned to the bottom.
-- **New-board card:** no face, a dashed Meadow 600 outline (2px, 8px on, 8px off) and one centred link in Mist Dim at weight 600 that turns Mist on hover.
+## Voice
 
-### Chips
-Small square tags that carry a posting's deciding facts (the few facts that settle whether you can apply). Text is Familjen Grotesk 500 at 0.8125rem, on one line, with 0.125rem by 0.5rem padding. Chips are not pressable, so they have no bevel.
-- **In your favour:** Meadow 600 fill, Mist text, no outline.
-- **Look closer:** no fill, Marigold text, 1px Marigold Shade outline.
-- **Neutral:** no fill, Mist text, 1px Meadow 600 outline.
-
-### Key Facts Tiles
-One tile per fact, in a two-column grid. A tile is a Meadow 800 block with a 1px Meadow 600 outline and 1rem padding. Inside: the fact's name in the label face (Leaf), its value at weight 600, where it came from in Mist Dim at 0.875rem, and the quoted sentence underneath at 0.875rem when there is one. A fact that still needs a person to confirm it gets a 2px Marigold Shade outline and a small Marigold tag reading "Needs a check" beside the fact's name. On small screens the tiles stack in one column.
-
-### Sample Label
-One short line in the label face (Leaf) above each block of sample data. It names the app page being shown and says the content is sample data, for example "Discover · sample postings". It is a caption for sample data only; do not put it above a heading as decoration.
-
-### Ruler
-A thin strip along the top of a section. It draws tick marks (a short tick every 8px and a taller one every 80px) and holds a short ID on the left and, optionally, a date on the right, both in the label face.
-
-### Dither Seam
-A two-row checker pattern, 8px tall, placed on the top edge of the lower band and coloured to match that band. It makes one flat colour step into the next without a gradient.
-
-### Navigation
-The wordmark (the product name with a small Marigold block before it) sits on the left, section links in the middle, and Log in plus a small Light button on the right. Links are plain text at weight 500; on hover a 2px underline appears in steps. Below 56rem the section links hide.
-
-### Stage Path
-The signature component. Five square markers sit on a dashed trail, one per application stage, each with its name and a count in the label face. The selected marker turns Marigold, gets a block bevel and sits 4px higher. Choosing a marker shows that stage's entries in the panel below. Without JavaScript, every stage is listed.
-
-### Member Tiles
-2rem square blocks holding initials in the label face. Meadow 600 with a block bevel. A card shows up to four; any others are counted in one last tile ("+N") with no fill, Mist Dim text and a 1px Meadow 600 outline.
-
-### Notices
-Short system messages, fixed to the bottom right. Mist background, Night text, a Leaf bottom edge.
-
-### Hero Image
-A wide voxel valley image (3:1) at `static/img/landing/hero-valley.webp`. It sits along the bottom of the hero: 62% of the hero's height on wide screens and 46% on phones, cropped from the centre. Above it the hero is flat Dusk Sky, which is the same colour as the image's top edge, so the two join without a visible line. The headline and buttons always sit on the flat sky, never on the image's pink horizon or flowers. If the file is missing, the whole hero is flat Dusk Sky.
+Approachable and human. Say what the product does in plain words: postings, boards, tracker, deadline; facts are **extracted** and shown as "Extracted · 94% confident". Never claim the product decides who can apply, and don't use slogans that tell people what not to do. No game words (party, quest, XP, levels) and no location details about the team.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep every corner square.
-- **Do** give pressable blocks a lit top edge and a shaded bottom edge.
-- **Do** use Marigold for one main action per view, the current step, and things the user must notice.
-- **Do** use the pixel face for IDs, dates, codes, timers and small labels.
-- **Do** join colour bands with the dither seam.
-- **Do** move things in steps (`120ms steps(3, end)`), and turn motion off when the user asks for reduced motion.
-- **Do** label demonstration content as sample data, with a sample label above the block.
-- **Do** show a feature with a small copy of its real app page, built from the same data and template helpers.
-- **Do** let a chip's colour carry its meaning: filled green, marigold outline or plain outline.
-- **Do** write labels in plain product words: posting, board, tracker, stage, deadline.
-- **Do** keep text contrast at WCAG 2.1 AA (at least 4.5:1 for normal text). White on Dusk Sky is 7.2:1.
+- **Do** use roles (`bg-paper`, `text-ink`...) instead of raw colours.
+- **Do** give every box pixel corners with `shadow-pixel`.
+- **Do** keep text at WCAG 2.1 AA (4.5:1, or 3:1 for large text) in both modes.
+- **Do** use the pixel face only for readouts.
+- **Do** check light and dark mode for every page you change.
 
 ### Don't:
-- **Don't** round corners.
-- **Don't** use blurred shadows, glows or gradients.
-- **Don't** use smooth easing (`ease`, `ease-in-out`) on transitions or animations.
-- **Don't** add a second warm colour, and don't use Marigold as a band background or for body text.
-- **Don't** set sentences, big headings or button text in the pixel face.
-- **Don't** describe a feature in a paragraph under its section heading. Show the feature.
-- **Don't** hand-write a landing demo that the app's own data and helpers can build.
-- **Don't** use game words (party, quest, XP, levels) in copy, component names or section names.
-- **Don't** show where the team is: no coordinates, city names or campus names. A posting's own job location is product data and stays.
-- **Don't** copy colours or fonts from the older app pages into new work.
+- **Don't** round corners, blur shadows or use gradients.
+- **Don't** colour the header.
+- **Don't** use Gold for large areas or for decoration.
+- **Don't** use a thick coloured line down one side of a box.
+- **Don't** put a box with pixel corners inside another one. Inside a card, use a flat fill (`bg-canvas`), and a 2px inset ring (`ring-2 ring-inset`) when it needs an edge.
+- **Don't** add hard-coded colours, fonts or sizes; add a token instead.

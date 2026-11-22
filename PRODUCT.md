@@ -20,7 +20,9 @@ Shortlist pulls postings from employers' public job boards, uses AI to read each
 
 ## Positioning
 
-Every eligibility fact shows where it came from (the job board, the AI with the sentence it read, or a person), and facts the AI isn't sure about go to a review queue where people confirm or fix them. On top of that sourced catalog, friends collect postings together on shared boards with private comments. A generic job board neither shows its sources nor lets a friend group work the same postings together.
+The extraction is what makes Shortlist different. It reads each posting and pulls out the facts a student needs before applying (deadline, pay, citizenship, clearance, degree, work mode), each with how confident it is. Facts it isn't confident about go to a review queue where people confirm or fix them. On top of that catalog, friends collect postings together on shared boards with private comments.
+
+**Voice:** approachable and human. Say what the product does in plain words ("extracted", "confident"), never claim it decides who can apply, and avoid slogans that tell people what not to do.
 
 ## Operating Context
 

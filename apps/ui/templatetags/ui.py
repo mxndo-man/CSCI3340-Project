@@ -21,18 +21,20 @@ register = template.Library()
 
 # ---- Buttons, icons and form inputs -----------------------------------------------------
 
-# One primary (clay) button per view; secondary and ghost for everything else.
+# Square blocks (DESIGN.md, Components). One primary (Adobe) button per view; secondary and
+# ghost for everything else. Primary and secondary are pressable: a lit top edge, a shaded
+# bottom edge, and `press` sinks them when clicked.
 BUTTON_BASE = (
     "inline-flex shrink-0 select-none items-center justify-center gap-2 whitespace-nowrap "
-    "rounded-full font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+    "font-semibold transition disabled:pointer-events-none disabled:opacity-50"
 )
 BUTTON_KIND = {
-    "primary": "bg-clay-600 text-white hover:bg-clay-700",
-    "secondary": "border border-sand-300 bg-white text-bark-900 hover:bg-sand-100",
-    "ghost": "text-bark-700 hover:bg-sand-100 hover:text-bark-900",
-    "danger": "text-brick-700 hover:bg-brick-50",
+    "primary": "press bg-action pb-1 text-on-action shadow-bevel-action",
+    "secondary": "press border-2 border-line-strong bg-paper pb-1 text-ink shadow-bevel-paper",
+    "ghost": "text-ink-soft hover:bg-sunk hover:text-ink",
+    "danger": "text-alert-ink hover:bg-alert-soft",
 }
-BUTTON_SIZE = {"sm": "h-9 px-4 text-sm", "md": "h-11 px-5 text-[15px]"}
+BUTTON_SIZE = {"sm": "h-9 px-4 text-sm", "md": "h-11 px-5 text-base"}
 
 
 @register.simple_tag
@@ -58,8 +60,8 @@ def icon(name, css="size-4", label=""):
 # Text inputs, selects and textareas share one look. The border color is chosen once
 # (normal or error) so two border colors never compete.
 INPUT = (
-    "w-full rounded-xl border bg-white px-3.5 text-[15px] text-bark-900 placeholder:text-bark-500 "
-    "transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20"
+    "w-full border-2 bg-paper px-3.5 text-base text-ink placeholder:text-ink-muted "
+    "transition-colors focus:border-action-ink focus:outline-none focus:ring-2 focus:ring-action-ink"
 )
 WIDGET_SHAPE = {
     "select": "h-11 appearance-none pr-10",
@@ -74,9 +76,9 @@ def ui_widget(field, has_hint=False, extra="", placeholder="", autocomplete=""):
     The ids match components/field.html: <id>_helptext and <id>_error.
     """
     if field.widget_type == "checkbox":
-        css = "mt-0.5 size-4 shrink-0 accent-clay-600"
+        css = "mt-0.5 size-4 shrink-0 accent-action"
     else:
-        border = "border-brick-700" if field.errors else "border-sand-400"
+        border = "border-alert-ink" if field.errors else "border-line-strong"
         css = f"{INPUT} {border} {WIDGET_SHAPE.get(field.widget_type, 'h-11')}"
     attrs = {"class": f"{css} {extra}".strip()}
     if placeholder:
@@ -321,11 +323,11 @@ def _fix_form(key, value):
 
 @register.simple_tag
 def fact_source(posting, field_name, review=None):
-    """Where a fact came from: "From Greenhouse", "Read by AI · 94% sure", "Checked by a
+    """Where a fact came from: "From Greenhouse", "Extracted · 94% confident", "Checked by a
     student". Reads Posting.field_sources and the confidence in Posting.field_details.
     A pending FieldReview reports its own confidence."""
     if review is not None:
-        return f"Read by AI · {round(review.confidence * 100)}% sure"
+        return f"Extracted · {round(review.confidence * 100)}% confident"
     source = (posting.field_sources or {}).get(field_name)
     detail = (posting.field_details or {}).get(field_name) or {}
     if source == "user":
@@ -333,12 +335,12 @@ def fact_source(posting, field_name, review=None):
     if source == "api":
         return f"From {provider_label(posting)}"
     if source in ("model", "rules"):
-        reader = "AI" if source == "model" else "our rules"
+        label = "Extracted" if source == "model" else "Extracted by rules"
         confidence = detail.get("confidence")
         if confidence is None:
-            return f"Read by {reader}"
-        return f"Read by {reader} · {round(confidence * 100)}% sure"
-    return "Not read yet"
+            return label
+        return f"{label} · {round(confidence * 100)}% confident"
+    return "Not extracted yet"
 
 
 @register.simple_tag

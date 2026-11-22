@@ -5,13 +5,13 @@ Reads posting: title, organization, location, work_mode, deadline, deadline_type
 pay_min, pay_max, pay_period, clearance, citizenship, degree_levels, get_absolute_url.
 static=True: no link and no save button (the landing page's illustration).
 The save menu also needs my_boards from the page (see postings/partials/save_menu.html).
-{% endcomment %}<article class="group relative flex flex-col rounded-2xl border border-sand-200 bg-white p-5 transition{% if not static %} hover:border-sand-300 hover:shadow-soft{% endif %}">
+{% endcomment %}<article class="group relative flex flex-col bg-paper p-5 transition {% if not static %} hover:shadow-soft {% endif %} shadow-pixel">
   <div class="flex items-start gap-3">
     <div class="min-w-0 flex-1">
-      <h3 class="text-title font-semibold text-bark-900{% if not static %} group-hover:text-clay-700{% endif %}">
-        {% if static %}{{ posting.title }}{% else %}<a href="{{ posting.get_absolute_url }}" class="after:absolute after:inset-0 after:rounded-2xl">{{ posting.title }}</a>{% endif %}
+      <h3 class="text-title font-semibold text-ink {% if not static %} group-hover:text-action-ink {% endif %}">
+        {% if static %}{{ posting.title }}{% else %}<a href="{{ posting.get_absolute_url }}" class="after:absolute after:inset-0">{{ posting.title }}</a>{% endif %}
       </h3>
-      <p class="mt-1 text-sm text-bark-500">{{ posting.organization }}{% if posting.location %} · {{ posting.location }}{% endif %}{% if posting.work_mode %} · {% work_mode_label posting.work_mode %}{% endif %}</p>
+      <p class="mt-1 text-sm text-ink-muted">{{ posting.organization }}{% if posting.location %} · {{ posting.location }}{% endif %}{% if posting.work_mode %} · {% work_mode_label posting.work_mode %}{% endif %}</p>
     </div>
     {% if not static %}{% include "postings/partials/save_menu.html" %}{% endif %}
   </div>
@@ -21,8 +21,8 @@ The save menu also needs my_boards from the page (see postings/partials/save_men
       {% for chip in chips %}{% include "components/chip.html" with tone=chip.tone label=chip.label only %}{% endfor %}
     </div>
   {% endif %}
-  <div class="mt-4 flex items-center justify-between gap-3 border-t border-sand-100 pt-3">
-    <span class="text-sm text-bark-700">{% if posting.deadline %}Closes {{ posting.deadline|date:"D, M j" }}{% endif %}</span>
+  <div class="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
+    <span class="text-sm text-ink-soft">{% if posting.deadline %}Closes {{ posting.deadline|date:"D, M j" }}{% endif %}</span>
     {% include "components/countdown.html" with deadline=posting only %}
   </div>
 </article>
