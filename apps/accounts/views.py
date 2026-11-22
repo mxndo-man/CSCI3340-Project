@@ -23,6 +23,7 @@ class SignUpView(CreateView):
         login(self.request, cast(CustomUser, form.instance))
         return response
 
+
 class ProfileView(LoginRequiredMixin, UpdateView):
     form_class = ProfileForm
     template_name = "accounts/profile.html"
