@@ -1,7 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.core import serializers
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.boards.models import Board, Membership
 
@@ -286,3 +288,42 @@ class MembershipNotificationSignalTests(TestCase):
         )
 
         self.assertEqual(notification.link_url, board.get_absolute_url())
+
+
+class FixtureLoadingSignalTests(TestCase):
+    def test_loaddata_does_not_create_notifications(self):
+        # loaddata saves each object with raw=True; the signals should skip those saves
+        # (a fixture already holds whatever notifications it needs).
+        now = timezone.now()  # auto_now_add doesn't run on raw saves, so set it here
+        fixture = serializers.serialize(
+            "json",
+            [
+                get_user_model()(
+                    pk=901, username="fixture-owner", email="fo@example.com"
+                ),
+                get_user_model()(
+                    pk=902, username="fixture-member", email="fm@example.com"
+                ),
+                Board(
+                    pk=901,
+                    created_by_id=901,
+                    name="Fixture board",
+                    join_code="FIXTURE1",
+                    created_at=now,
+                    updated_at=now,
+                ),
+                Membership(
+                    pk=901,
+                    board_id=901,
+                    user_id=902,
+                    role=Membership.Role.MEMBER,
+                    joined_at=now,
+                ),
+            ],
+        )
+
+        for loaded in serializers.deserialize("json", fixture):
+            loaded.save()  # the same save loaddata does
+
+        self.assertEqual(Membership.objects.filter(pk=901).count(), 1)
+        self.assertFalse(Notification.objects.exists())

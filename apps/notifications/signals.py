@@ -8,8 +8,10 @@ from .models import Notification
 
 
 @receiver(post_save, sender=CustomUser)
-def create_welcome_notification(sender, instance, created, **kwargs):
-    if not created:
+def create_welcome_notification(sender, instance, created, raw=False, **kwargs):
+    # raw is True while loaddata loads fixtures: skip, or the fixture's own
+    # notifications would collide with these on the (user, dedupe_key) constraint.
+    if raw or not created:
         return
 
     Notification.objects.create(
@@ -22,8 +24,8 @@ def create_welcome_notification(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Board)
-def notify_board_created(sender, instance, created, **kwargs):
-    if not created or instance.created_by is None:
+def notify_board_created(sender, instance, created, raw=False, **kwargs):
+    if raw or not created or instance.created_by is None:
         return
 
     Notification.objects.create(
@@ -37,8 +39,8 @@ def notify_board_created(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Membership)
-def notify_member_joined(sender, instance, created, **kwargs):
-    if not created or instance.role != Membership.Role.MEMBER:
+def notify_member_joined(sender, instance, created, raw=False, **kwargs):
+    if raw or not created or instance.role != Membership.Role.MEMBER:
         return
 
     Notification.objects.create(
