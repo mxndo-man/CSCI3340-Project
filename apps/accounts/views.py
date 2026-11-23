@@ -2,7 +2,10 @@
 # apps/accounts/views.py
 from typing import cast
 
+from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import BaseModelForm
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 
@@ -13,7 +16,12 @@ from .models import CustomUser
 class SignUpView(CreateView):
     form_class = CustomUserCreationForm
     template_name = "accounts/signup.html"
-    success_url = reverse_lazy("login")  # after signing up, go log in
+    success_url = reverse_lazy("home")
+
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        response = super().form_valid(form)
+        login(self.request, cast(CustomUser, form.instance))
+        return response
 
 
 class ProfileView(LoginRequiredMixin, UpdateView):

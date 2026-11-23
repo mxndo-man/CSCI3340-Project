@@ -7,9 +7,9 @@
 {# Django shows this page for any 404 when DEBUG is off. #}
 {% page_url "postings:discover" as discover_url %}
 <div class="mx-auto w-full max-w-3xl px-4 py-20 text-center sm:px-6 sm:py-24">
-  <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">Not found</p>
-  <h1 class="mt-2 font-serif text-h1 font-semibold text-bark-900">We couldn't find that page</h1>
-  <p class="mx-auto mt-3 max-w-md text-[15px] text-bark-700">The link may be old, or the board may have been deleted.</p>
+  <p class="text-xs font-semibold uppercase tracking-wider text-action-ink">Not found</p>
+  <h1 class="mt-2 text-h1 font-semibold text-ink">We couldn't find that page</h1>
+  <p class="mx-auto mt-3 max-w-md text-base text-ink-soft">The link may be old, or the board may have been deleted.</p>
   <div class="mt-8 flex justify-center">
     {% if discover_url %}
       <a href="{{ discover_url }}" class="{% button_class 'primary' %}">Go to Discover</a>

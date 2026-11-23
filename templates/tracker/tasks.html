@@ -16,20 +16,20 @@ is), next to {% form_url "add_task" %}. Each checkbox posts task, done, next to
 {% form_url "add_task" as add_task_url %}
 <div class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
   <div class="min-w-0">
-    <h1 class="font-serif text-h1 font-semibold text-bark-900">Tracker</h1>
-    <p class="mt-2 text-[15px] text-bark-700">{{ split.open|length }} open task{{ split.open|length|pluralize }} · {{ week_tasks|length }} due this week</p>
+    <h1 class="text-h1 font-semibold text-ink">Tracker</h1>
+    <p class="mt-2 text-base text-ink-soft">{{ split.open|length }} open task{{ split.open|length|pluralize }} · {{ week_tasks|length }} due this week</p>
   </div>
 
   {% include "tracker/partials/tabs.html" with active="tasks" %}
 
-  <div class="mt-6 max-w-3xl rounded-2xl border border-sand-200 bg-white p-3 sm:p-4">
+  <div class="mt-6 max-w-3xl bg-paper p-3 sm:p-4 shadow-pixel">
     <form method="post" action="{{ add_task_url }}" class="grid grid-cols-1 gap-2 p-1 sm:grid-cols-[minmax(0,1fr)_auto_auto]" x-data="{ title: '' }">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
       <label for="new-task" class="sr-only">New task</label>
-      <input id="new-task" name="title" required maxlength="200" x-model="title" placeholder="Add a task, e.g. “Email Prof. Ortiz”" class="h-11 w-full rounded-xl border border-sand-400 bg-white px-3.5 text-[15px] text-bark-900 transition placeholder:text-bark-500 focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+      <input id="new-task" name="title" required maxlength="200" x-model="title" placeholder="Add a task, e.g. “Email Prof. Ortiz”" class="h-11 w-full border border-line-strong bg-paper px-3.5 text-base text-ink transition placeholder:text-ink-muted focus:border-action focus:outline-none focus:ring-3 focus:ring-action/20">
       <label for="new-task-due" class="sr-only">Due</label>
-      <input id="new-task-due" name="due_at" type="datetime-local" required class="h-11 rounded-xl border border-sand-400 bg-white px-3.5 text-[15px] text-bark-900 transition focus:border-clay-600 focus:outline-none focus:ring-3 focus:ring-clay-600/20">
+      <input id="new-task-due" name="due_at" type="datetime-local" required class="h-11 border border-line-strong bg-paper px-3.5 text-base text-ink transition focus:border-action focus:outline-none focus:ring-3 focus:ring-action/20">
       <button type="submit" :disabled="!title.trim()" class="{% button_class 'secondary' %}">Add</button>
     </form>
 
@@ -38,11 +38,11 @@ is), next to {% form_url "add_task" %}. Each checkbox posts task, done, next to
         {% for task in split.open %}{% include "tracker/partials/task_row.html" with task=task %}{% endfor %}
       </ul>
     {% else %}
-      <p class="px-3 py-6 text-center text-sm text-bark-500">Nothing to do. Add a task above, like a reference to ask for or a cover letter to write.</p>
+      <p class="px-3 py-6 text-center text-sm text-ink-muted">Nothing to do. Add a task above, like a reference to ask for or a cover letter to write.</p>
     {% endif %}
 
     {% if split.done %}
-      <p class="mt-4 px-3 text-xs font-semibold uppercase tracking-wider text-bark-500">Done ({{ split.done|length }})</p>
+      <p class="mt-4 px-3 text-xs font-semibold uppercase tracking-wider text-ink-muted">Done ({{ split.done|length }})</p>
       <ul class="mt-1 space-y-1">
         {% for task in split.done %}{% include "tracker/partials/task_row.html" with task=task %}{% endfor %}
       </ul>
