@@ -15,7 +15,6 @@ set -euo pipefail
 SCRIPT_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 cd "$SCRIPT_PATH/.."
 
-
 if [[ ! -f .env ]]; then 
   echo ".env is not present. Create one with .env.example, or update">&2
   exit 1
