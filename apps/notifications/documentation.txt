@@ -1,0 +1,10 @@
+Notifications summary
+
+- The `Notification` model stores a user, kind, optional title, message, optional link, deduplication key, read/emailed status, and creation time.
+- Notifications are unique per user and deduplication key, and are ordered newest first.
+- A signal creates a `WELCOME` notification when a new user account is created.
+- The notifications page requires login and lists only the signed-in user's notifications.
+- The list and bell use the stored title, message, and read status. A context processor provides the latest five notifications and unread count to authenticated users.
+- The "mark all read" and "open notification" actions are POST-only and only update notifications owned by the signed-in user.
+- Celery Beat runs `send_daily_digest` daily at 8:00 AM Chicago time. It creates a generic digest notification for each active user with a `DIGEST:<date>` deduplication key.
+- Celery task discovery, the scheduled task path, and the `CELERY_*` Redis settings are configured for the notification tasks. Redis, a Celery worker, and Celery Beat must be running for scheduled notifications to execute.

@@ -84,6 +84,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.notifications.context_processors.notification_menu",
             ],
         },
     },
@@ -158,13 +159,15 @@ MAILERS = {
 # Celery / Redis
 REDIS_URL = env("REDIS_URL")
 CELERY_BROKER_URL = REDIS_URL
-CELERLY_RESULT_BACKEND = REDIS_URL
-CELERLY_TIMEZONE = TIME_ZONE
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_TIMEZONE = TIME_ZONE
 
 
 TAILWIND_CLI_SRC_CSS = (
     "styles/styles.css"  # Custom colors for easy rewrite of those colors
 )
+
+TAILWIND_CLI_AUTOMATIC_MINIFY = True
 
 # After logging in, go to the home dashboard; after logging out, back to the landing page.
 LOGIN_REDIRECT_URL = "home"
