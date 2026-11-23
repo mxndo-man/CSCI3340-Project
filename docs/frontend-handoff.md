@@ -151,7 +151,7 @@ The helpers do the grouping, so the view passes plain querysets: `tracker_column
 | `notifications/list.html` | `notifications:list` | `notifications` (the user's, newest first) |
 | `notifications/saved_searches.html` | `notifications:saved_searches` | `saved_searches` (the user's, newest first) |
 | `notifications/preferences.html` | `notifications:preferences` (proposed: not in contracts section 7 yet) | `preferences` (the user's NotificationPreference; `get_or_create` it) |
-| `notifications/partials/item.html` | (partial) | `notification` (`kind`, `message`, `link_url`, `read`, `created_at`) |
+| `notifications/partials/item.html` | (partial) | `notification` (`kind`, optional `title`, `message`, `link_url`, `read`, `created_at`) |
 
 **The bell.** `base.html` shows it when the page's context has `notification_menu`. To put it on every page, add a context processor: a function Django calls on every render that adds variables to the context.
 
@@ -182,7 +182,7 @@ Then add `"apps.notifications.context_processors.notification_menu"` to `TEMPLAT
 - **Saving a search** happens on Discover (Armando's page): its form posts `name` and `filters` (the filters as JSON, the same dict `SavedSearch.filters` stores) to `save_search`. That view can live in either app; agree between you.
 - Each saved search links to Discover with its filters through `{{ search.filters|discover_query }}`. The line under it comes from `alerts_enabled` and `last_alerted_at`; the prototype's "4 new matches this week" would need a count per search, which the view could add later.
 - **Settings has two of the prototype's four switches.** The contracts have only `email_enabled` and `digest_hour`, so deadline reminders, board comments and instant matches aren't shown. Add fields to NotificationPreference if you want them back.
-- `components/settings_nav.html` links Profile, Notifications and Saved searches; each goes to its preview until the real page exists (with `UI_PREVIEW` on).
+- The in-app notification list is live at `/notifications/`; its `/preview/notifications/` route has been removed. Saved searches and preferences still use their previews until real views are added.
 
 ### Extraction review (Liam): how FieldReview and field_details feed the fact tiles
 
@@ -227,7 +227,7 @@ Components to `{% include %}` are in `templates/components/`; `/styleguide/` (wi
 | Task due | A date | `due_at`, a date and time (a `datetime-local` input) |
 | Calendar | A tab in Tracker | Azael's `/schedule/` page. The prototype's event colors: deadline clay, task ochre, interview moss. |
 | Notification settings | Four switches | `email_enabled` and `digest_hour` only |
-| Saved searches | Under Settings | `notifications:saved_searches`, still in the Settings side menu |
+| Saved searches | Under Settings | `notifications:saved_searches` preview until its real view exists |
 | Home "Closing" | The next 7 days | The next 14 days (user story 13), plus an applications-by-status card |
 | Routes | `/discover`, `/posting/<id>`, `/add`, `/settings` | `postings:discover`, `postings:detail`, `postings:add`, `accounts:profile` |
 

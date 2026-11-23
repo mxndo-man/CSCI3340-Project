@@ -126,7 +126,6 @@ INDEX_PAGES = [
         "tracker/applications.html",
     ),
     ("Tracker: tasks", "ui_preview:tasks", [], "tracker/tasks.html"),
-    ("Notifications", "ui_preview:notifications", [], "notifications/list.html"),
     (
         "Saved searches",
         "ui_preview:saved_searches",
@@ -280,13 +279,6 @@ def tasks(request):
     world = _world(request)
     context = _context(request, world, "tracker", tasks=world.tasks)
     return render(request, "tracker/tasks.html", context)
-
-
-@login_required
-def notifications(request):
-    world = _world(request)
-    context = _context(request, world, notifications=world.notifications)
-    return render(request, "notifications/list.html", context)
 
 
 @login_required

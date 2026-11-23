@@ -38,6 +38,10 @@ class PreviewOnTests(TestCase):
                 self.assertEqual(status_of(response), 200)
                 self.assertContains(response, "Preview:")  # the banner
 
+    def test_notifications_list_is_not_a_preview_route(self):
+        response = self.client.get("/preview/notifications/")
+        self.assertEqual(status_of(response), 404)
+
     def test_the_preview_is_on_your_account(self):
         response = self.client.get("/preview/boards/1/")
         self.assertContains(response, "Quinn A. (you)")  # in the Members dialog
