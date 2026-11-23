@@ -49,6 +49,8 @@ case "$1" in
     docker compose ps 
     ;;
   restart)
+    echo "Restarting containers"
+    docker compose down -v 
     ;;
   logs)
     echo "Checking logs on the user"
