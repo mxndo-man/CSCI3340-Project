@@ -188,9 +188,9 @@ Then add `"apps.notifications.context_processors.notification_menu"` to `TEMPLAT
 
 The posting page shows eight "Key facts" tiles from `{% facts_for posting reviews %}`. For each field:
 
-- **A pending FieldReview wins.** The tile shows its `proposed_value`, "Read by AI · N% sure" from its `confidence`, its `evidence` as the quote, and the Looks right / Fix it forms.
-- **Otherwise it reads the posting:** the value from the field, the source line from `Posting.field_sources[field]` (`api` → "From Greenhouse", `model` → "Read by AI", `rules` → "Read by our rules", `user` → "Checked by a student"), and the confidence and quote from `Posting.field_details[field]` (`{"confidence": 0.94, "evidence": "..."}`).
-- A field that's null hasn't been read yet, and says "Not read yet" instead of guessing.
+- **A pending FieldReview wins.** The tile shows its `proposed_value`, "Extracted · N% confident" from its `confidence`, its `evidence` as the quote, and the Looks right / Fix it forms.
+- **Otherwise it reads the posting:** the value from the field, the source line from `Posting.field_sources[field]` (`api` → "From Greenhouse", `model` → "Extracted", `rules` → "Extracted by rules", `user` → "Checked by a student"), and the confidence and quote from `Posting.field_details[field]` (`{"confidence": 0.94, "evidence": "..."}`).
+- A field that's null hasn't been read yet, and says "Not extracted yet" instead of guessing.
 
 **Open decision: `field_details`** (contracts section 2.4). Without it, only fields with a FieldReview have a quote and a confidence; the others show just the value and its source. The extractor already returns confidence and evidence for every field (contracts section 6), so storing them is a JSONField and one line in the ingestion job.
 

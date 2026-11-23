@@ -1,53 +1,306 @@
 {% extends "base.html" %}
-{% load ui %}
+{% load static ui %}
+{% comment %}
+   The public front page at /. Each section is a small copy of a real page, built from the
+   same data, the same partials and the same ui helpers, so the landing page can't drift
+   from the app:
+     Discover  the posting cards (postings/partials/card.html) and one posting's key facts
+     Boards    the boards page's cards (boards/partials/board_card.html)
+     Tracker   the application stages
+   It reads:
+     sample_postings  postings for the cards; the first one also gets the key facts
+     sample_reviews   that posting's pending FieldReviews, so unsure facts show "Needs a check"
+     sample_boards    boards for the board cards
+     hero_image       static path of the hero art (static/img/landing/hero-valley.webp),
+                      or "" to show a flat sky colour if the file is missing.
+   The sample_* lists come from the preview's fake data until the real models exist; a
+   section's sample block is skipped when its list is empty.
+   The header, footer and toasts come from base.html. static/css/landing.css holds only
+   the hero and the stage path.
+{% endcomment %}
+
+{% block title %}Shortlist · Track internships with your friends{% endblock %}
+
+{% block extra_head %}
+  <meta name="description" content="Shortlist gathers internships from job boards, extracts the information you care about, and lets you and your friends track applications together.">
+  {# Raise the number after ?v= when landing.css changes, so browsers fetch the new file. #}
+  <link rel="stylesheet" href="{% static 'css/landing.css' %}?v=10">
+{% endblock %}
 
 {% block content %}
 {% page_url "postings:discover" as discover_url %}
-<section class="mx-auto grid grid-cols-1 max-w-6xl items-center gap-12 px-4 pb-16 pt-12 sm:px-6 md:pt-20 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:pb-24">
-  <div>
-    {% include "components/chip.html" with tone="accent" label="Built for students hunting internships" only %}
-    <h1 class="mt-5 text-balance font-serif text-[40px] font-semibold leading-[48px] tracking-[-0.02em] text-bark-900 sm:text-display">Find internships you can actually apply to.</h1>
-    <p class="mt-5 max-w-xl text-lg leading-7 text-bark-700">Shortlist reads every posting for the details that rule you in or out (deadline, citizenship, clearance and pay) and puts them up front.</p>
-    <div class="mt-8 flex flex-wrap items-center gap-3">
-      <a href="{% url 'accounts:signup' %}" class="{% button_class 'primary' %}">Create a free account</a>
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-art" aria-hidden="true">
+    {% if hero_image %}<img src="{% static hero_image %}" alt="" fetchpriority="high">{% endif %}
+  </div>
+  <div class="hero-copy mx-auto w-full max-w-4xl px-4 sm:px-6">
+    <h1 id="hero-title">Track internships with your friends.<span class="cursor" aria-hidden="true"></span></h1>
+    <p class="mx-auto mt-6 max-w-xl text-lg text-pretty">Shortlist gathers internships from job boards, extracts the information you care about, and lets you and your friends track applications together.</p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'accounts:signup' %}" class="press inline-flex h-11 items-center bg-gold px-5 pb-1 font-semibold text-on-gold shadow-bevel-gold">Create a free account</a>
       {% if discover_url %}<a href="{{ discover_url }}" class="{% button_class 'secondary' %}">Browse internships</a>{% endif %}
     </div>
-    {% if discover_url %}<p class="mt-4 text-sm text-bark-500">No account needed to browse.</p>{% endif %}
+  </div>
+</section>
+
+{% comment %}Each section is a full-width band. Every band rises out of the one above it along a
+   stepped pixel ridgeline in its own colour, so the sections read as separate layers.{% endcomment %}
+<div class="ridgeline bg-canvas [--ridge:var(--color-canvas)]">
+{% comment %}A prompt that there is more below the picture. It straddles the picture's bottom edge,
+   gold-edged so it stands out from the flowers.{% endcomment %}
+<div class="relative z-10 -mt-12 flex justify-center px-4">
+  <a href="#discover" class="press inline-flex h-11 items-center gap-2 border-2 border-gold bg-paper px-5 pb-1 font-semibold text-ink shadow-bevel-paper">
+    See how it works
+    <span class="scroll-cue-arrow">{% icon "chevron-down" "size-4" %}</span>
+  </a>
+</div>
+<section id="discover" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 lg:py-28" aria-labelledby="discover-title">
+  <h2 id="discover-title" class="text-h1 font-semibold text-ink">The details you care about</h2>
+
+  {% if sample_postings %}
+    <p class="readout mt-10 text-ink-muted">Discover · sample postings</p>
+    <ul class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+      {% for posting in sample_postings %}
+        <li>{% include "postings/partials/card.html" with posting=posting static=True only %}</li>
+      {% endfor %}
+    </ul>
+
+    {% with posting=sample_postings.0 %}
+      {% facts_for posting sample_reviews as facts %}
+      {% comment %}
+        The extraction demo: a long sample posting on the left, and the facts Shortlist pulls out
+        of it on the right. When the section scrolls into view, a gold line steps down the
+        posting; each sentence it reads lights up and its fact appears on the right. The quoted
+        sentences come from the same sample data as the app (facts_for), the rest of the posting
+        text is written here. It loops while the section is on screen and pauses when it isn't.
+        Without JavaScript, or with reduced motion, it shows the finished result.
+      {% endcomment %}
+      <div class="extract mt-16" data-extract>
+        <div class="flex flex-wrap items-end justify-between gap-4">
+          <h3 class="text-h2 font-semibold text-ink">Extracted from the posting for you.</h3>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.5fr)_auto_minmax(0,1fr)]">
+          <article class="relative overflow-hidden bg-paper p-6 shadow-pixel lg:self-center" aria-label="Sample posting text">
+            <p class="readout text-ink-muted">The posting · sample</p>
+            <p class="mt-2 text-title font-semibold text-ink">{{ posting.title }} · {{ posting.organization }}</p>
+            <div class="ex-text mt-4 space-y-3 text-sm leading-6 text-ink-soft">
+              <p><span class="font-semibold text-ink">Compensation and eligibility.</span> Interns are paid {% for fact in facts %}{% if fact.key == "pay" %}<mark data-step="pay">{{ fact.quote }}</mark>{% endif %}{% endfor %}, paid every two weeks. {% for fact in facts %}{% if fact.key == "citizenship" %}<mark data-step="citizenship">{{ fact.quote }}</mark>{% endif %}{% endfor %} We are not able to sponsor work visas for this role.</p>
+              <p><span class="font-semibold text-ink">Where and when.</span> {% for fact in facts %}{% if fact.key == "work_mode" %}<mark data-step="work_mode">{{ fact.quote }}</mark>{% endif %}{% endfor %}, with the remaining days remote. {% for fact in facts %}{% if fact.key == "deadline" %}<mark data-step="deadline">{{ fact.quote }}</mark>{% endif %}{% endfor %} We read applications as they come in, so applying early helps.</p>
+              <p><span class="font-semibold text-ink">You'll do well here if you have:</span> <mark data-step="skills">{{ posting.skills|join:"; " }}</mark>. Previous internships are not required.</p>
+              <p>Example Corp is an equal opportunity employer.</p>
+            </div>
+            <span class="ex-scan" aria-hidden="true"></span>
+          </article>
+
+          <div class="-my-4 flex justify-center lg:my-0 lg:self-center" aria-hidden="true">
+            <span class="ex-arrow flex size-12 items-center justify-center bg-gold text-on-gold shadow-bevel-gold"><span class="rotate-90 lg:rotate-0">{% icon "arrow-right" "size-5" %}</span></span>
+          </div>
+
+          <section class="bg-paper shadow-pixel lg:sticky lg:top-24" aria-label="What Shortlist extracted">
+            <p class="readout border-b-2 border-edge px-5 py-3 text-ink-muted">Extracted · {{ posting.title }}</p>
+            <dl class="divide-y divide-line">
+        {% for fact in facts %}{% if fact.key == "pay" %}
+          <div class="ex-row px-5 py-3.5" data-step="pay">
+            <dt class="readout flex items-center justify-between gap-2 text-ink-muted">Pay{% if fact.needs_check %}<span class="bg-gold px-1.5 text-on-gold">Needs a check</span>{% endif %}</dt>
+            <dd class="mt-1 font-semibold text-ink">{{ fact.value }}</dd>
+            <dd class="text-sm text-ink-muted">{{ fact.source }}</dd>
+          </div>
+        {% endif %}{% endfor %}
+        {% for fact in facts %}{% if fact.key == "citizenship" %}
+          <div class="ex-row px-5 py-3.5" data-step="citizenship">
+            <dt class="readout flex items-center justify-between gap-2 text-ink-muted">Citizenship{% if fact.needs_check %}<span class="bg-gold px-1.5 text-on-gold">Needs a check</span>{% endif %}</dt>
+            <dd class="mt-1 font-semibold text-ink">{{ fact.value }}</dd>
+            <dd class="text-sm text-ink-muted">{{ fact.source }}</dd>
+          </div>
+        {% endif %}{% endfor %}
+        {% for fact in facts %}{% if fact.key == "work_mode" %}
+          <div class="ex-row px-5 py-3.5" data-step="work_mode">
+            <dt class="readout flex items-center justify-between gap-2 text-ink-muted">Work mode{% if fact.needs_check %}<span class="bg-gold px-1.5 text-on-gold">Needs a check</span>{% endif %}</dt>
+            <dd class="mt-1 font-semibold text-ink">{{ fact.value }}</dd>
+            <dd class="text-sm text-ink-muted">{{ fact.source }}</dd>
+          </div>
+        {% endif %}{% endfor %}
+        {% for fact in facts %}{% if fact.key == "deadline" %}
+          <div class="ex-row px-5 py-3.5" data-step="deadline">
+            <dt class="readout flex items-center justify-between gap-2 text-ink-muted">Deadline{% if fact.needs_check %}<span class="bg-gold px-1.5 text-on-gold">Needs a check</span>{% endif %}</dt>
+            <dd class="mt-1 font-semibold text-ink">{{ fact.value }}</dd>
+            <dd class="text-sm text-ink-muted">{{ fact.source }}</dd>
+          </div>
+        {% endif %}{% endfor %}
+              <div class="ex-row px-5 py-3.5" data-step="skills">
+                <dt class="readout text-ink-muted">Skills</dt>
+                <dd class="mt-2">
+                  <ul class="flex flex-wrap gap-1.5">
+                    {% for skill in posting.skills %}<li class="ex-chip">{% include "components/chip.html" with label=skill only %}</li>{% endfor %}
+                  </ul>
+                </dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </div>
+    {% endwith %}
+  {% endif %}
+</section>
+
+</div>
+
+<div class="ridgeline bg-bar [--ridge:var(--color-bar)]">
+  <section id="boards" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 lg:py-28" aria-labelledby="boards-title">
+    <h2 id="boards-title" class="text-h1 font-semibold text-ink">Share a board with your friends.</h2>
+
+    {% if sample_boards %}
+      <p class="readout mt-10 text-ink-muted">Boards · sample boards</p>
+      <ul class="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {% for board in sample_boards %}
+          <li>{% include "boards/partials/board_card.html" with board=board static=True only %}</li>
+        {% endfor %}
+        <li>
+          <a href="{% url 'accounts:signup' %}" class="flex h-full min-h-52 flex-col items-center justify-center gap-2 border-2 border-dashed border-line-strong text-ink-soft transition-colors hover:bg-sunk hover:text-ink">
+            {% icon "plus" "size-6" %}
+            <span class="text-sm font-semibold">Start a new board</span>
+          </a>
+        </li>
+      </ul>
+    {% endif %}
+  </section>
+</div>
+
+<div class="ridgeline bg-canvas [--ridge:var(--color-canvas)]">
+<section id="tracker" class="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 sm:px-6 lg:py-28" aria-labelledby="tracker-title">
+  <h2 id="tracker-title" class="text-h1 font-semibold text-ink">Track every application.</h2>
+
+  <p class="readout mt-10 text-ink-muted">Pick a stage to see its sample applications</p>
+  <div class="path mt-6" role="group" aria-label="Application stages">
+    <button type="button" class="stage" data-stage="saved" aria-pressed="false"><span class="stage-box">2</span><span class="readout">Saved</span><span class="sr-only"> · 2 applications</span></button>
+    <button type="button" class="stage" data-stage="applying" aria-pressed="false"><span class="stage-box">1</span><span class="readout">Applying</span><span class="sr-only"> · 1 application</span></button>
+    <button type="button" class="stage" data-stage="applied" aria-pressed="false"><span class="stage-box">1</span><span class="readout">Applied</span><span class="sr-only"> · 1 application</span></button>
+    <button type="button" class="stage" data-stage="interview" aria-pressed="true"><span class="stage-box">1</span><span class="readout">Interview</span><span class="sr-only"> · 1 application</span></button>
+    <button type="button" class="stage" data-stage="offer" aria-pressed="false"><span class="stage-box">0</span><span class="readout">Offer</span><span class="sr-only"> · 0 applications</span></button>
   </div>
 
-  {# An illustration made of real cards, so it can't drift from the design. #}
-  <div class="rounded-[28px] border border-sand-200 bg-sand-100 p-4 sm:p-6">
-    <div aria-hidden="true" class="mb-4 flex items-center gap-2 rounded-full border border-sand-200 bg-white px-4 py-2.5 text-sm text-bark-500">
-      {% icon "search" "size-4" %}
-      Software engineering · paid · no clearance
+  <div class="mt-8 bg-paper shadow-pixel" aria-live="polite">
+    <div class="stage-group" data-group="saved" hidden>
+      <h3 class="readout border-b-2 border-edge px-5 py-3 text-ink-muted">Saved · sample applications</h3>
+      <div class="flex items-baseline justify-between gap-4 px-5 py-3.5"><p><span class="font-semibold text-ink">Software Engineering Intern</span> <span class="text-ink-muted">· Halcyon Robotics</span></p><p class="readout shrink-0 text-ink-muted">Closes in 12 days</p></div>
+      <div class="flex items-baseline justify-between gap-4 border-t border-line px-5 py-3.5"><p><span class="font-semibold text-ink">Data Science Intern</span> <span class="text-ink-muted">· Marlow Labs</span></p><p class="readout shrink-0 text-ink-muted">Rolling deadline</p></div>
     </div>
-    <div class="space-y-3">
-      {% for posting in sample_postings %}{% include "postings/partials/card.html" with posting=posting static=True only %}{% endfor %}
+    <div class="stage-group" data-group="applying" hidden>
+      <h3 class="readout border-b-2 border-edge px-5 py-3 text-ink-muted">Applying · sample applications</h3>
+      <div class="flex items-baseline justify-between gap-4 px-5 py-3.5"><p><span class="font-semibold text-ink">Firmware Intern</span> <span class="text-ink-muted">· Tessel Aerospace</span></p><p class="readout shrink-0 text-ink-muted">Next: finish résumé · due Fri</p></div>
+    </div>
+    <div class="stage-group" data-group="applied" hidden>
+      <h3 class="readout border-b-2 border-edge px-5 py-3 text-ink-muted">Applied · sample applications</h3>
+      <div class="flex items-baseline justify-between gap-4 px-5 py-3.5"><p><span class="font-semibold text-ink">Backend Intern</span> <span class="text-ink-muted">· Quillwork</span></p><p class="readout shrink-0 text-ink-muted">Applied 3 Nov</p></div>
+    </div>
+    <div class="stage-group" data-group="interview">
+      <h3 class="readout border-b-2 border-edge px-5 py-3 text-ink-muted">Interview · sample applications</h3>
+      <div class="flex items-baseline justify-between gap-4 px-5 py-3.5"><p><span class="font-semibold text-ink">Security Intern</span> <span class="text-ink-muted">· Brightwater</span></p><p class="readout shrink-0 text-ink-muted">Interview Thu 2:00 PM</p></div>
+    </div>
+    <div class="stage-group" data-group="offer" hidden>
+      <h3 class="readout border-b-2 border-edge px-5 py-3 text-ink-muted">Offer · sample applications</h3>
+      <p class="px-5 py-5 text-ink-muted">No offers yet.</p>
     </div>
   </div>
 </section>
 
-<section class="border-t border-sand-200 bg-white/60">
-  <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-    <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">How it works</p>
-    <h2 class="mt-2 max-w-2xl font-serif text-h1 font-semibold text-bark-900">From “maybe” to “applied” in three steps</h2>
-    <ol class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-      <li class="rounded-2xl border border-sand-200 bg-white p-6">
-        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "compass" "size-5" %}</span>
-        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">1.</span> Discover</h3>
-        <p class="mt-2 text-[15px] leading-6 text-bark-700">Search internships with the deciding facts up front: deadline, pay, citizenship and clearance.</p>
-      </li>
-      <li class="rounded-2xl border border-sand-200 bg-white p-6">
-        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "bookmark" "size-5" %}</span>
-        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">2.</span> Save to a board</h3>
-        <p class="mt-2 text-[15px] leading-6 text-bark-700">Keep a shortlist for yourself, or share a board with friends and talk postings through.</p>
-      </li>
-      <li class="rounded-2xl border border-sand-200 bg-white p-6">
-        <span class="inline-flex size-10 items-center justify-center rounded-full bg-clay-50 text-clay-700">{% icon "list-checks" "size-5" %}</span>
-        <h3 class="mt-4 text-title font-semibold text-bark-900"><span class="text-bark-500">3.</span> Track your applications</h3>
-        <p class="mt-2 text-[15px] leading-6 text-bark-700">Move each application from saved to offer, with reminders before every deadline.</p>
-      </li>
-    </ol>
+</div>
+
+<section class="ridgeline bg-bar [--ridge:var(--color-bar)]" aria-labelledby="close-title">
+  <div class="mx-auto max-w-6xl px-4 py-20 text-center sm:px-6 lg:py-28">
+    <h2 id="close-title" class="text-h1 font-semibold text-ink">Start the hunt. Bring your friends.</h2>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <a href="{% url 'accounts:signup' %}" class="press inline-flex h-11 items-center bg-gold px-5 pb-1 font-semibold text-on-gold shadow-bevel-gold">Create a free account</a>
+      {% if discover_url %}<a href="{{ discover_url }}" class="{% button_class 'secondary' %}">Browse internships</a>{% endif %}
+    </div>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // The extraction demo. Steps through each highlighted sentence in reading order: the gold
+  // scan line moves to it, the sentence lights up, then its fact appears on the right. It holds
+  // the finished result for a few seconds, clears, and plays again, only while it is on screen.
+  (function () {
+    var demo = document.querySelector("[data-extract]");
+    if (!demo) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!("IntersectionObserver" in window)) return;
+    var STEP = 1100; // time per fact
+    var HOLD = 3500; // finished result stays this long before the next loop
+    var marks = Array.prototype.slice.call(demo.querySelectorAll("mark[data-step]"));
+    var scan = demo.querySelector(".ex-scan");
+    var text = demo.querySelector(".ex-text");
+    var timers = [];
+    var running = false;
+
+    function row(key) { return demo.querySelector('.ex-row[data-step="' + key + '"]'); }
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+    function reset() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      demo.classList.remove("done");
+      demo.classList.add("ready");
+      marks.forEach(function (m) { m.classList.remove("lit"); });
+      demo.querySelectorAll(".ex-row, .ex-chip").forEach(function (el) { el.classList.remove("shown"); });
+      scan.style.translate = "0 0";
+    }
+
+    function play() {
+      reset();
+      var t = 400;
+      marks.forEach(function (mark) {
+        var key = mark.dataset.step;
+        later(function () { scan.style.translate = "0 " + (mark.offsetTop + text.offsetTop) + "px"; }, t);
+        later(function () { mark.classList.add("lit"); }, t + 300);
+        later(function () {
+          var r = row(key);
+          if (!r) return;
+          r.classList.add("shown");
+          r.querySelectorAll(".ex-chip").forEach(function (chip, n) {
+            later(function () { chip.classList.add("shown"); }, n * 180);
+          });
+        }, t + 500);
+        t += STEP;
+      });
+      later(function () { demo.classList.add("done"); }, t + 300);
+      later(function () { if (running) play(); }, t + HOLD);
+    }
+
+    reset();
+    new IntersectionObserver(function (entries) {
+      var visible = entries[0].isIntersecting;
+      if (visible && !running) {
+        running = true;
+        play();
+      } else if (!visible && running) {
+        running = false;
+        reset();
+      }
+    }, { threshold: 0.3 }).observe(demo);
+  })();
+
+  // The stage path: choosing a stage shows that stage's applications. Without JavaScript every stage is listed.
+  (function () {
+    var stages = document.querySelectorAll(".stage");
+    var groups = document.querySelectorAll(".stage-group");
+    document.documentElement.classList.add("js");
+    stages.forEach(function (stage) {
+      stage.addEventListener("click", function () {
+        // Once a stage has been picked, the blocks stop bobbing: the hint has done its job.
+        stage.parentElement.classList.add("explored");
+        stages.forEach(function (other) {
+          other.setAttribute("aria-pressed", other === stage ? "true" : "false");
+        });
+        groups.forEach(function (group) {
+          group.hidden = group.dataset.group !== stage.dataset.stage;
+        });
+      });
+    });
+  })();
+</script>
 {% endblock %}

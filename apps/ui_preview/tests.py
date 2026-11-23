@@ -52,11 +52,9 @@ class PreviewOnTests(TestCase):
     def test_only_you_are_you(self):
         # Board 1's first posting has a comment by you and one by Maya K.
         response = self.client.get("/preview/boards/1/")
+        self.assertContains(response, '<span class="font-semibold text-ink">You</span>')
         self.assertContains(
-            response, '<span class="font-semibold text-bark-900">You</span>'
-        )
-        self.assertContains(
-            response, '<span class="font-semibold text-bark-900">Maya K.</span>'
+            response, '<span class="font-semibold text-ink">Maya K.</span>'
         )
 
     def test_every_stand_in_exists(self):

@@ -1,56 +1,246 @@
 @import "tailwindcss";
 
-/* Shortlist design tokens: the same values as the prototype and the "Shortlist tokens" in Figma.
-   Tailwind's default colors are still on, because the old account templates use slate and yellow.
-   Once no template uses them, add `--color-*: initial;` at the top of this block (brief, PR 3). */
+/* Shortlist design tokens. Light mode is a cozy mountain town at golden hour; dark mode is
+   the landing page's valley at night. DESIGN.md explains when to use each one.
+
+   How the tokens are layered:
+     1. Palette: the named colours the look is built from. Adobe, Pine, Sage, Pueblo, Clay
+        and Sand are the brief's shades, warmed and given more colour; Gold carries over
+        from the landing page so the app and landing feel like one place.
+     2. Roles: what a colour is for (canvas, paper, ink, action...). Templates use these.
+        Each role has a light value here and a dark value under [data-theme="dark"] below,
+        so a template written with roles works in both modes without changes.
+   Tailwind's default colours (slate, red, blue...) are switched off at the top of @theme, so
+   only these tokens exist as colour classes. */
+
+/* `dark:` in a class means "only in dark mode", e.g. dark:hidden. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
-  --color-white: #ffffff;
+  --color-*: initial;
 
-  --color-sand-50: #fbf8f3;
-  --color-sand-100: #f4eee4;
-  --color-sand-200: #e9e0d2;
-  --color-sand-300: #d8cab6;
-  --color-sand-400: #9c8e7c;
+  /* ---- 1. Palette ----------------------------------------------------------------------- */
+  --color-adobe: #b4532f; /* terracotta: everyday buttons and links */
+  --color-adobe-deep: #953f1f;
+  --color-pine: #4e5c37; /* olive pine forest: the footer band, good news */
+  --color-sage: #dde6c4;
+  --color-pueblo: #f6dccb; /* peach adobe wash: selected things */
+  --color-clay: #decbae;
+  --color-sand: #f4ebdb; /* the page itself */
+  --color-gold: #f2b92e; /* sunlit gold: where you are, what's next, wins */
+  --color-gold-hi: #ffd977;
+  --color-gold-lo: #b9861a;
+  --color-white: #fffbf3; /* a warm white, never pure #fff */
 
-  --color-bark-500: #75685b;
-  --color-bark-700: #4e443b;
-  --color-bark-900: #2c2620;
+  /* ---- 2. Roles (light mode) ------------------------------------------------------------ */
+  --color-canvas: #f4ebdb; /* the page (Sand) */
+  --color-paper: #fffbf3; /* cards, panels, menus */
+  --color-sunk: #ebddc6; /* hover fills and pressed-in areas */
+  --color-line: #decbae; /* dividers (Clay) */
+  --color-edge: #c4a983; /* the 4px pixel edge around every box */
+  --color-bar: #fffbf3; /* the header: no colour, set apart by its edge */
+  --color-line-strong: #9a825f; /* input borders and edges that must be seen (3:1) */
 
-  --color-clay-50: #fbefe7;
-  --color-clay-100: #f5dccb;
-  --color-clay-600: #a65a32;
-  --color-clay-700: #8a4927;
+  --color-ink: #2e2419; /* main text: warm dark brown */
+  --color-ink-soft: #4a3a28; /* secondary text that still reads as body */
+  --color-ink-muted: #6e583d; /* supporting text */
 
-  --color-moss-50: #eef2e7;
-  --color-moss-600: #5b6e4c;
-  --color-moss-700: #4a5a3e;
+  --color-action: #b4532f; /* everyday buttons (Adobe) */
+  --color-action-hover: #953f1f;
+  --color-action-ink: #9a4423; /* links and accent text */
+  --color-action-soft: #f6dccb; /* tinted backgrounds: selected rows, selection (Pueblo) */
+  --color-on-action: #fffbf3;
 
-  --color-ochre-50: #fbf2dc;
-  --color-ochre-600: #b8861f;
-  --color-ochre-800: #76540f;
+  --color-on-gold: #2e2419; /* text on Gold, both modes */
+  --color-gold-ink: #7a5208; /* gold as text on light grounds */
+  --color-gold-soft: #fbe7b0; /* gold tint: "look here" panels and the preview banner */
 
-  --color-brick-50: #f9e8e3;
-  --color-brick-700: #9a3b2c;
+  --color-band-pine: #4e5c37; /* footer band */
+  --color-on-pine: #f4ebdb;
 
-  /* Loaded from Google Fonts in base.html */
-  --font-serif: "Fraunces", Georgia, "Times New Roman", serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-good-ink: #45602e; /* status: in your favour */
+  --color-good-soft: #dde6c4; /* (Sage) */
+  --color-alert-ink: #a3362b; /* status: closed, unpaid, delete */
+  --color-alert-soft: #f6d6ce;
+  --color-info-ink: #2f5482; /* status: neutral information */
+  --color-info-soft: #d8e3f1;
 
-  /* Type scale from the style guide */
-  --text-display: 3.25rem;
-  --text-display--line-height: 3.75rem;
-  --text-display--letter-spacing: -0.02em;
-  --text-h1: 2.25rem;
-  --text-h1--line-height: 2.75rem;
-  --text-h1--letter-spacing: -0.01em;
-  --text-h2: 1.5rem;
-  --text-h2--line-height: 2rem;
+  /* ---- Type ----------------------------------------------------------------------------- */
+  /* Loaded from Google Fonts in base.html. One family does all the reading; the pixel face
+     is only for readouts: IDs, dates, codes, timers and small labels. */
+  --font-sans: "Familjen Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-pixel: "Pixelify Sans", ui-monospace, Consolas, monospace;
+  /* The product name in the header and footer, the same size as on the landing page. */
+  --text-wordmark: 1.375rem;
+  --text-wordmark--line-height: 1.2;
+  --text-wordmark--letter-spacing: -0.02em;
+
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.3;
+  --text-label--letter-spacing: 0.05em;
   --text-title: 1.125rem;
-  --text-title--line-height: 1.625rem;
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.01em;
+  --text-h2: 1.5rem;
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 1.1;
+  --text-h1--letter-spacing: -0.025em;
+  --text-display: 3.25rem;
+  --text-display--line-height: 1;
+  --text-display--letter-spacing: -0.03em;
 
-  --shadow-soft: 0 1px 2px rgb(44 38 32 / 0.05), 0 8px 24px rgb(44 38 32 / 0.07);
-  --shadow-pop: 0 2px 6px rgb(44 38 32 / 0.08), 0 16px 40px rgb(44 38 32 / 0.14);
+  /* ---- Shape ---------------------------------------------------------------------------- */
+  /* Every corner is square. `rounded-full` (avatars, dots) is not a token and stays round
+     until Session 2 decides what those become. */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
+  /* ---- Motion --------------------------------------------------------------------------- */
+  /* Things move in 3 visible steps over 120ms, never a smooth glide. This is also the
+     default for every `transition` class. */
+  --ease-step: steps(3, end);
+  --default-transition-duration: 120ms;
+  --default-transition-timing-function: steps(3, end);
+}
+
+/* Tokens only static/css/landing.css uses (Tailwind can't see that file), so they are always
+   written out. */
+@theme static {
+  --color-hero-sky: #3e5881; /* the landing hero's sky: the top edge of its image, both modes */
+  /* The landing hero's headline: the one monumental line on the site. */
+  --text-hero: clamp(3.25rem, 9.2vw, 7rem);
+  --text-hero--line-height: 0.96;
+  --text-hero--letter-spacing: -0.035em;
+}
+
+/* Shadows read the colour roles and the --press depth on the element itself, so they are
+   inlined into each class instead of being resolved once on the page root. */
+@theme inline {
+  /* Pixel corners: four hard 4px edges that don't meet, so each corner looks like a missing
+     pixel. Every box (cards, panels, tiles, menus, dialogs) uses this one style. A box can
+     change its edge colour with --box-edge (e.g. gold for a fact that needs a check). */
+  --shadow-pixel:
+    0 -4px 0 0 var(--box-edge, var(--color-edge)), 0 4px 0 0 var(--box-edge, var(--color-edge)),
+    -4px 0 0 0 var(--box-edge, var(--color-edge)), 4px 0 0 0 var(--box-edge, var(--color-edge));
+  /* Old names: a hovered card darkens its edge; a menu or dialog adds a hard drop. */
+  --shadow-soft:
+    0 -4px 0 0 var(--color-line-strong), 0 4px 0 0 var(--color-line-strong),
+    -4px 0 0 0 var(--color-line-strong), 4px 0 0 0 var(--color-line-strong);
+  --shadow-pop:
+    0 -4px 0 0 var(--color-line-strong), 0 4px 0 0 var(--color-line-strong),
+    -4px 0 0 0 var(--color-line-strong), 4px 0 0 0 var(--color-line-strong),
+    0 12px 0 0 color-mix(in oklab, var(--color-ink) 18%, transparent);
+  /* The header sits on the page like a separate layer: a hard 4px edge under it. */
+  --shadow-bar: 0 4px 0 0 var(--color-edge);
+  /* Pressable blocks: a lit top edge and a shaded bottom edge. `press` thins the bottom. */
+  --shadow-bevel-action:
+    inset 0 calc(-1 * var(--press, 4px)) 0 var(--color-action-hover),
+    inset 0 4px 0 color-mix(in oklab, var(--color-action) 65%, var(--color-gold-hi));
+  --shadow-bevel-gold:
+    inset 0 calc(-1 * var(--press, 4px)) 0 var(--color-gold-lo),
+    inset 0 4px 0 var(--color-gold-hi);
+  --shadow-bevel-paper:
+    inset 0 calc(-1 * var(--press, 4px)) 0 var(--color-line-strong),
+    inset 0 4px 0 var(--color-paper);
+  /* The wordmark's small gold block. */
+  --shadow-bevel-mark: inset 0 -3px 0 var(--color-gold-lo), inset 0 3px 0 var(--color-gold-hi);
+  /* A toast's bottom edge: gold, because a toast reports something done. */
+  --shadow-toast: inset 0 -4px 0 var(--color-gold);
+}
+
+/* ---- Dark mode: a cabin at night. Same roles, new values. Set by data-theme on <html>. ---- */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* The landing page's greens: Night, Meadow 900/800/600, Leaf and Mist. */
+    --color-canvas: #0f2118;
+    --color-bar: #142b1f;
+    --color-paper: #1a3828;
+    --color-sunk: #21422f;
+    --color-line: #2e6a41;
+    --color-edge: #2e6a41;
+    --color-line-strong: #5f8f62;
+
+    --color-ink: #e6eedf;
+    --color-ink-soft: #cfdccb;
+    --color-ink-muted: #a8bda5;
+
+    --color-action: #b4532f;
+    --color-action-hover: #953f1f;
+    --color-action-ink: #f2a27b;
+    --color-action-soft: #3d2a1c;
+    --color-on-action: #fffbf3;
+
+    --color-gold-ink: #f5c85a;
+    --color-gold-soft: #3a3514;
+
+    --color-band-pine: #0a1710;
+    --color-on-pine: #e6eedf;
+
+    --color-good-ink: #e6eedf;
+    --color-good-soft: #2e6a41;
+    --color-alert-ink: #f09a88;
+    --color-alert-soft: #45231f;
+    --color-info-ink: #9dbde6;
+    --color-info-soft: #1c2f3c;
+
+  }
+}
+
+/* ---- Small helpers built from the tokens ---------------------------------------------------- */
+
+/* Pixel-face readout: IDs, dates, codes, timers, small labels. */
+@utility readout {
+  font-family: var(--font-pixel);
+  font-size: var(--text-label);
+  line-height: var(--text-label--line-height);
+  letter-spacing: var(--text-label--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* A pressable block sinks 2px under the pointer and 4px when pressed, losing that much of
+   its bottom edge (pair with a shadow-bevel-* class). */
+@utility press {
+  transition-property: translate, box-shadow, background-color, color;
+  &:hover {
+    --press: 2px;
+    translate: 0 2px;
+  }
+  &:active {
+    --press: 0px;
+    translate: 0 4px;
+  }
+}
+
+/* Ridgeline: a stepped pixel mountain range along the top edge of a band, in the band's
+   own colour, so the area above rises into the band. Set the colour with --ridge. */
+@utility ridgeline {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -24px 0 auto;
+    height: 24px;
+    background-color: var(--ridge);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='24' shape-rendering='crispEdges'%3E%3Cpath d='M0 24V16h16v-4h8V8h8V4h8v4h8v4h16v4h16v-4h8V8h8V0h8v4h8v4h8v4h8v4h32V24z'/%3E%3C/svg%3E")
+      0 0 / 160px 24px repeat-x;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='24' shape-rendering='crispEdges'%3E%3Cpath d='M0 24V16h16v-4h8V8h8V4h8v4h8v4h16v4h16v-4h8V8h8V0h8v4h8v4h8v4h8v4h32V24z'/%3E%3C/svg%3E")
+      0 0 / 160px 24px repeat-x;
+    pointer-events: none;
+  }
 }
 
 @layer base {
@@ -59,29 +249,35 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-sand-200);
+    border-color: var(--color-line);
   }
 
   html {
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: 4.5rem;
+    scrollbar-color: var(--color-line-strong) var(--color-canvas);
   }
 
   body {
-    background-color: var(--color-sand-50);
-    color: var(--color-bark-900);
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background-color: var(--color-clay-100);
+    background-color: var(--color-gold);
+    color: var(--color-on-gold);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-clay-600);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-action-ink);
+    outline-offset: 3px;
+  }
+  /* On the Pine footer band the focus ring is gold. */
+  footer :focus-visible {
+    outline-color: var(--color-gold);
   }
 
   button:not(:disabled),
@@ -96,32 +292,33 @@
   display: none !important;
 }
 
-/* Small motion: popovers and toasts ease in. Turned off for people who ask for less motion. */
+/* Menus and toasts arrive in steps, like everything else. Off for people who ask for less
+   motion. */
 @keyframes pop-in {
   from {
     opacity: 0;
-    transform: translateY(-4px) scale(0.98);
+    translate: 0 -4px;
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: 0 0;
   }
 }
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    translate: 0 8px;
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: 0 0;
   }
 }
 .popover {
-  animation: pop-in 140ms ease-out;
+  animation: pop-in 120ms steps(3, end);
 }
 .toast-in {
-  animation: toast-in 180ms ease-out;
+  animation: toast-in 120ms steps(3, end);
 }
 
 @media (prefers-reduced-motion: reduce) {

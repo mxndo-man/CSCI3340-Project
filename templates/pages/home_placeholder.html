@@ -9,9 +9,9 @@
 {% page_url "boards:list" as boards_url %}
 {% page_url "tracker:applications" as tracker_url %}
 <div class="mx-auto w-full max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-20">
-  <p class="text-xs font-semibold uppercase tracking-wider text-clay-700">Welcome, {% first_name user %}</p>
-  <h1 class="mt-2 font-serif text-h1 font-semibold text-bark-900">Your dashboard is on its way</h1>
-  <p class="mx-auto mt-3 max-w-md text-[15px] text-bark-700">Soon this page will show deadlines coming up, your tasks and what your boards are saving. Until then, start here.</p>
+  <p class="text-xs font-semibold uppercase tracking-wider text-action-ink">Welcome, {% first_name user %}</p>
+  <h1 class="mt-2 text-h1 font-semibold text-ink">Your dashboard is on its way</h1>
+  <p class="mx-auto mt-3 max-w-md text-base text-ink-soft">Soon this page will show deadlines coming up, your tasks and what your boards are saving. Until then, start here.</p>
   <div class="mt-8 flex flex-wrap justify-center gap-3">
     {% if discover_url %}<a href="{{ discover_url }}" class="{% button_class 'primary' %}">Browse internships</a>{% endif %}
     {% if boards_url %}<a href="{{ boards_url }}" class="{% button_class 'secondary' %}">Your boards</a>{% endif %}
@@ -20,7 +20,7 @@
   </div>
   {% url "ui_preview:index" as preview_url %}
   {% if preview_url %}
-    <p class="mt-10 text-sm text-bark-500">Want to see the finished pages? <a href="{{ preview_url }}" class="font-semibold text-clay-700 hover:underline">Open the preview on sample data</a>.</p>
+    <p class="mt-10 text-sm text-ink-muted">Want to see the finished pages? <a href="{{ preview_url }}" class="font-semibold text-action-ink hover:underline">Open the preview on sample data</a>.</p>
   {% endif %}
 </div>
 {% endblock %}
