@@ -145,11 +145,17 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 AUTHENTICATION_BACKENDS = ["apps.accounts.backend.EmailOrUsernameModelBackend"]
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+email_backend = env(
+    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+)
+
+MAILERS = {"default": {"BACKEND": email_backend}}
+
+if email_backend.endswith("smtp.EmailBackend"):
+    MAILERS["default"]["OPTIONS"] = {
+        "host": env("EMAIL_HOST", default="localhost"),
+        "port": env.int("EMAIL_PORT", default=1025),
+    }
 
 # Celery / Redis
 REDIS_URL = env("REDIS_URL")
