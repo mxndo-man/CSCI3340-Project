@@ -1,7 +1,33 @@
+x-shortList-Django: &django
+  build: .
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    REDIS_URL: redis://redis:6379/0
+    EMAIL_BACKEND: django.core.mail.backends.smtp.EmailBackend
+    EMAIL_HOST: mailpit      # the service name works as a hostname
+    EMAIL_PORT: "1025" # this port is fine hardcoded atm, but if we advance to a real port then swithc it and change .env
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+# Same as above, but also waits for migrations to finish
+x-shortList-Django-app: &django-app
+  <<: *django
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    migrate:
+      condition: service_completed_successfully
+
 services:
   db:
     image: postgres:18-alpine
-    restart: unless-stopped 
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -11,7 +37,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD","pg_isready"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -25,18 +51,32 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+  migrate:
+    <<: *django
+    command: python manage.py migrate --noinput
+    restart: "no"
   app:
-    build: . 
-    ports: 
-     - "8000:8000"
-    env_file: .env
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+    <<: *django-app
+    ports:
+      - "8000:8000"
+  beat:
+    <<: *django-app
+    command: celery -A config beat --loglevel=INFO -s /tmp/celerybeat-schedule
+    restart: unless-stopped
+  worker:
+    <<: *django-app
+    command: celery -A config worker -Q celery --loglevel=INFO -n default@%h
+    restart: unless-stopped
+  worker-bulk:
+    <<: *django-app
+    command: celery -A config worker -Q bulk --loglevel=INFO --concurrency=2 -n bulk@%h
+    restart: unless-stopped
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025" # WEB UI  http://localhost:8025
+      - "1025:1025" #where django sends mail.
+
 volumes:
   pgdata:
