@@ -98,12 +98,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
+DATABASES = {"default": env.db(default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")}
 
 
 # Password validation
@@ -150,11 +145,17 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 AUTHENTICATION_BACKENDS = ["apps.accounts.backend.EmailOrUsernameModelBackend"]
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+email_backend = env(
+    "EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
+)
+
+MAILERS = {"default": {"BACKEND": email_backend}}
+
+if email_backend.endswith("smtp.EmailBackend"):
+    MAILERS["default"]["OPTIONS"] = {
+        "host": env("EMAIL_HOST", default="localhost"),
+        "port": env.int("EMAIL_PORT", default=1025),
+    }
 
 # Celery / Redis
 REDIS_URL = env("REDIS_URL")
